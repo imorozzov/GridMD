@@ -9,6 +9,8 @@ To be added
 
 A test line
 
+Test line 2
+
 
 Release 2.1, 14th October 2010
 ------------------------------
