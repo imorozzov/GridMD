@@ -6,7 +6,7 @@ Release 3.0, 14th September 2013
 ------------------------------
 
 To be added
-
+And added some more
 
 Release 2.1, 14th October 2010
 ------------------------------
