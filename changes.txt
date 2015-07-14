@@ -1,0 +1,42 @@
+******************************************************************************
+*  GridMD change log
+******************************************************************************
+
+Release 2.1, 14th October 2010
+------------------------------
+
+- Added Fork skeleton template (see description of gmFork). Fork skeleton
+examples are added to examples/simple_workflow (fork_simple_workflow.cpp
+fork_skeleton.cpp fork_skeleton_extra.cpp).
+
+- The parameters of the remote system and user account used by Job Manager are
+loaded now from the XML file (see examples/simple_workflow/resources.xml).
+
+- GridMD application state is saved now in XML file at every important stage.
+This file can be used for restarting. During restart the application retrieves
+all job information and workflow progress from this file.
+
+
+Release 2.0, 10th August 2010
+------------------------------
+
+- First release of the GridMD workflow system! Documentation is added to
+doc/html.
+
+Changes of the Job Manager component:
+- Changed interface of gmJob class, defined new parameters for input/output files.
+The following functions are added: AddInFile, AddOutFile, ClearInFileList,
+ClearInFileList, Restore. The interface of the following functions is changed:
+Submit, StageOut.
+- Added possibility to create 'managed' job object by means of
+gmJobManager::CreateJob function.
+- Changed parameters of the batch job processing functions of gmJobManager class.
+- Added member variables gmShell::com_att_num, gmShell::com_retry_delay which
+control the retries to establish connection with the remote system.
+- Added gmShellUnix class and the corresponding example pbs_unixshell1.cpp
+
+
+Release 1.1, 2nd February 2010
+------------------------------
+
+First release.

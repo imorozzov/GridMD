@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<flowgraph>
+  <scheduler>
+	  <!-- Please edit the field marked by '###' symbols at least -->
+    <resource name="my_resource" type="pbs" active="1">
+      <session type="plink" login="###YOUR_LOGIN###" host="###REMOTE_HOST###">
+        <ssh_path>C:\Program Files\PuTTY\plink.exe</ssh_path>
+        <scp_path>C:\Program Files\PuTTY\pscp.exe</scp_path>
+        <cfg>-load "###PUTTY_CONFIG_NAME###"</cfg>
+      </session>
+      <application name="simple_workflow.exe">
+        <!-- <prefix>export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/opt/wxwidgets/build_icc/lib/</prefix> -->
+        <postfix></postfix>
+        <location>###YOUR_PATH###/examples/simple_workflow/unix/Obj_gnu/</location>
+      </application>
+      <job_template queue="-q seq"/>
+    </resource>
+  </scheduler>
+</flowgraph>
