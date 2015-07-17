@@ -2,8 +2,8 @@
 *  OVERVIEW
 ******************************************************************************
 
-GridMD is the C++ class library intended to help the developers to quickly
-build  molecular dynamics or Monte-Carlo simulation programs and to run it
+GridMD is the C++ class library intended to help developers to quickly
+build  molecular dynamics or Monte-Carlo simulation programs and to run them
 in the distributed environment.
 
 GridMD library is free software. The full licence is available in the file
