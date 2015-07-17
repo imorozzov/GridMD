@@ -2,6 +2,12 @@
 *  GridMD change log
 ******************************************************************************
 
+Release 3.1, 17th July 2015
+------------------------------
+
+- Supporting wxWidgets-independent configuration (wxalt)
+
+
 Release 3.0, 14th September 2013
 ------------------------------
 
