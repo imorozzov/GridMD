@@ -1,4 +1,4 @@
-c/****************************************************************************
+/****************************************************************************
  *
  *   Copyright (c), Ilya Valuev, Igor Morozov 2005-2010        All Rights Reserved.
  *
@@ -14,9 +14,11 @@ c/****************************************************************************
  *
  *****************************************************************************/
 
-#include "gridmd.h"
-#include "gmfork.h"
-#include <cmath>
+
+# include "gridmd.h"
+# include "gmfork.h"
+# include <cmath>
+
 
 using namespace gridmd;
 
@@ -24,8 +26,8 @@ using namespace gridmd;
 int main(int argc,char* argv[]){
 
   // wxWindows initialization
-  if( !wxInitialize() ) {
-    puts("Failed to initialize the wxWidgets library.");
+  if( !gmdInitialize() ) {
+    puts("Failed to initialize the GridMD library.");
     return -1;
   }
 
@@ -38,7 +40,7 @@ int main(int argc,char* argv[]){
   // All distributed code should be put into gridmd_main() function
   int res= gridmd_main(argc, argv);
 
-  wxUninitialize();
+  gmdUninitialize();
   return res;
 }
 

@@ -9,16 +9,16 @@
 ******************************************************************************/
 
 #include <stdio.h>
-#include <wx/app.h>
-#include <wx/utils.h>
+#include <gmd/app.h>
+#include <gmd/utils.h>
 #include "jobmngr/pbsmngr.h"
 #include "jobmngr/plinkshell.h"
 
 int main(int argc, char *argv[])
 {
   // Initialization of wxWindows library
-  if( !wxInitialize() ) {
-    puts("Failed to initialize the wxWidgets library.");
+  if( !gmdInitialize() ) {
+    puts("Failed to initialize the GridMD library.");
     return -1;
   }
 
@@ -76,10 +76,10 @@ int main(int argc, char *argv[])
 
     // Job submission
     res = job->Submit("test");
-    wxString id = job->GetID();
+    gmdString id = job->GetID();
     printf("State after submission: %s, id = %s\n", gmJob::StateName(res), id.c_str());
 
-    wxSleep(2);  // Usually after 2 seconds the jobs is started
+    gmdSleep(2);  // Usually after 2 seconds the jobs is started
 
     // Copying of an intermediate result (a file from the working directory)
     res = job->StageOut("../example1-out-inter", "outfile.txt", gmJob::TEXT | gmJob::CREATEPATH);
@@ -116,7 +116,7 @@ int main(int argc, char *argv[])
   }
   catch(gmJobException &e){ (void)e; }
 
-  wxUninitialize();
+  gmdUninitialize();
 
   return 0;
 }

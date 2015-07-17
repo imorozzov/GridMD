@@ -10,16 +10,16 @@
 ******************************************************************************/
 
 #include <stdio.h>
-#include <wx/app.h>
-#include <wx/utils.h>
+#include <gmd/app.h>
+#include <gmd/utils.h>
 #include "jobmngr/pbsmngr.h"
 #include "jobmngr/plinkshell.h"
 
 int main(int argc, char *argv[])
 {
   // Initialization of wxWindows library
-  if( !wxInitialize() ) {
-    puts("Failed to initialize the wxWidgets library.");
+  if( !gmdInitialize() ) {
+    puts("Failed to initialize the GridMD library.");
     return -1;
   }
 
@@ -66,12 +66,12 @@ int main(int argc, char *argv[])
     for(int i=0; i<njobs; i++){
       // Initialization of the current job
       gmJob job = job_template;
-      job.command = wxString::Format(
+      job.command = gmdString::Format(
         "echo Test Job %d runs on `hostname` >result%d.txt; sleep 10", i, i);
 
       // Submission of the job with the id like "batch-<JOB NUMBER>"
-      res = job.Submit(mngr, wxString::Format("batch-%d", i), false);
-      wxString id = job.GetID();
+      res = job.Submit(mngr, gmdString::Format("batch-%d", i), false);
+      gmdString id = job.GetID();
       printf("Job %s is submitted, state = %s\n", id.c_str(), gmJob::StateName(res));
 
       // The job will be detached automatically on the local gmJob object deletion
@@ -90,7 +90,7 @@ int main(int argc, char *argv[])
       printf("Restored job %s, state = %s\n",
              pjob->GetID().c_str(), gmJob::StateName(pjob->LastState()));
       pjob->AddOutFile( "../example2-out",
-                        wxString::Format("result%d.txt", i++), gmJob::TEXT );
+                        gmdString::Format("result%d.txt", i++), gmJob::TEXT );
     }
     puts("Waiting for completion and fetching results...");
     res = mngr.FetchAll(true);  // change to 'false' to wait for the job completion
@@ -99,12 +99,12 @@ int main(int argc, char *argv[])
     // Stopping all jobs and deleting their remote directories
     // The user has to delete all joblist elements created by RestoreAll
     mngr.ClearAll();
-    wxSleep(1);
+    gmdSleep(1);
     puts("All jobs are cleared.");
   }
   catch(gmJobException &e){ (void)e; }
 
-  wxUninitialize();
+  gmdUninitialize();
 
   return 0;
 }

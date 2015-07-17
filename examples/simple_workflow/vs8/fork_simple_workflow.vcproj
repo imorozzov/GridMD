@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="windows-1251"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="8.00"
+	Version="8,00"
 	Name="fork_simple_workflow"
-	ProjectGUID="{E951DB5D-C829-43AE-9C52-ABA18707AE14}"
+	ProjectGUID="{F8C03F13-BA8A-42D2-B4BD-1F86AFD2F16B}"
 	RootNamespace="test_workflow"
 	>
 	<Platforms>
@@ -44,8 +44,8 @@
 				Name="VCCLCompilerTool"
 				AdditionalOptions="/Gm"
 				Optimization="0"
-				AdditionalIncludeDirectories="../,../../../ivutils/include,../../../gridmd/include,../../../systems/interact,../../../extlib/include,../../../fitting/include, ../../../grasp/Source, ../../../grasp/Source/STUBS"
-				PreprocessorDefinitions="WIN32;_DEBUG;_CONSOLE;_CRT_SECURE_NO_DEPRECATE;_USE_MATH_DEFINES;PATH_MAX=1024;wxUSE_GUI=0"
+				AdditionalIncludeDirectories="../../../wxint,../../../gridmd/include/gmd/xml,../,../../../ivutils/include,../../../gridmd/include"
+				PreprocessorDefinitions="_SCL_SECURE_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE;WIN32;_DEBUG;_CONSOLE;_USE_MATH_DEFINES;PATH_MAX=1024; wxUSE_GUI=0;USING_LIBSSH"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"
 				UsePrecompiledHeader="0"
@@ -73,7 +73,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalOptions="/MACHINE:I386"
-				AdditionalDependencies="wxbase28d.lib wxbase28d_xml.lib wxregexd.lib wxexpatd.lib"
+				AdditionalDependencies="wxbase28d.lib wxbase28d_xml.lib wxregexd.lib libxml2.lib iconv.lib ssh.lib userenv.lib"
 				OutputFile="$(OutDir)\$(ProjectName).exe"
 				LinkIncremental="2"
 				SuppressStartupBanner="true"
@@ -136,8 +136,8 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				InlineFunctionExpansion="1"
-				AdditionalIncludeDirectories="../,../../../ivutils/include,../../../gridmd/include,../../../systems/interact,../../../extlib/include,../../../fitting/include, ../../../grasp/Source, ../../../grasp/Source/STUBS"
-				PreprocessorDefinitions="WIN32;NDEBUG;_CONSOLE;_CRT_SECURE_NO_DEPRECATE;_USE_MATH_DEFINES;PATH_MAX=1024; wxUSE_GUI=0"
+				AdditionalIncludeDirectories="../../../wxint,../../../gridmd/include/gmd/xml,../,../../../ivutils/include,../../../gridmd/include"
+				PreprocessorDefinitions="_SCL_SECURE_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE;WIN32;_CONSOLE;_USE_MATH_DEFINES;PATH_MAX=1024; wxUSE_GUI=0;USING_LIBSSH"
 				StringPooling="true"
 				RuntimeLibrary="2"
 				EnableFunctionLevelLinking="true"
@@ -164,7 +164,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalOptions="/MACHINE:I386"
-				AdditionalDependencies="wxbase28.lib wxbase28_xml.lib wxregex.lib wxexpat.lib"
+				AdditionalDependencies="wxbase28.lib wxbase28_xml.lib wxregex.lib libxml2.lib iconv.lib ssh.lib userenv.lib"
 				OutputFile="$(OutDir)\$(ProjectName).exe"
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
@@ -226,8 +226,8 @@
 				Name="VCCLCompilerTool"
 				AdditionalOptions="/Gm"
 				Optimization="0"
-				AdditionalIncludeDirectories="../,../../../ivutils/include,../../../gridmd/include,../../../systems/interact,../../../extlib/include,../../../fitting/include, ../../../grasp/Source, ../../../grasp/Source/STUBS"
-				PreprocessorDefinitions="WIN32;_DEBUG;_CONSOLE;_CRT_SECURE_NO_DEPRECATE;_USE_MATH_DEFINES;PATH_MAX=1024;wxUSE_GUI=0;WXUSINGDLL"
+				AdditionalIncludeDirectories="../../../wxint,../../../ivutils/include,../../../gridmd/include,../../../gridmd/include/gmd/xml,../../../systems/interact,../../../extlib/include,../../../fitting/include, ../../../grasp/Source, ../../../grasp/Source/STUBS"
+				PreprocessorDefinitions="FU;_CRT_SECURE_NO_DEPRECATE;WIN32;_DEBUG;_CONSOLE;_USE_MATH_DEFINES;PATH_MAX=1024; wxUSE_GUI=0;WXUSINGDLL;_SCL_SECURE_NO_WARNINGS;USING_LIBSSH;UNICODE"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"
 				UsePrecompiledHeader="0"
@@ -255,7 +255,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalOptions="/MACHINE:I386"
-				AdditionalDependencies="wxbase28d.lib wxbase28d_xml.lib wxregexd.lib wxexpatd.lib"
+				AdditionalDependencies="wxbase29ud.lib wxregexud.lib  libxml2.lib iconv.lib ssh.lib userenv.lib"
 				OutputFile="$(OutDir)\$(ProjectName).exe"
 				LinkIncremental="2"
 				SuppressStartupBanner="true"
@@ -290,7 +290,7 @@
 			/>
 		</Configuration>
 		<Configuration
-			Name="Release DLL|Win32"
+			Name="Debug wxalt|Win32"
 			OutputDirectory="$(ConfigurationName)"
 			IntermediateDirectory="$(ConfigurationName)"
 			ConfigurationType="1"
@@ -313,23 +313,25 @@
 			/>
 			<Tool
 				Name="VCMIDLTool"
-				TypeLibraryName=".\Release/graspapp.tlb"
+				TypeLibraryName=".\Debug/graspapp.tlb"
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
-				InlineFunctionExpansion="1"
-				AdditionalIncludeDirectories="../,../../../ivutils/include,../../../gridmd/include,../../../systems/interact,../../../extlib/include,../../../fitting/include, ../../../grasp/Source, ../../../grasp/Source/STUBS"
-				PreprocessorDefinitions="WIN32;NDEBUG;_CONSOLE;_CRT_SECURE_NO_DEPRECATE;_USE_MATH_DEFINES;PATH_MAX=1024; wxUSE_GUI=0;WXUSINGDLL"
-				StringPooling="true"
-				RuntimeLibrary="2"
-				EnableFunctionLevelLinking="true"
+				AdditionalOptions="/Gm"
+				Optimization="0"
+				AdditionalIncludeDirectories="../../../ivutils/include,../../../gridmd/include,../../../gridmd/include/gmd/xml"
+				PreprocessorDefinitions="FU;_CRT_SECURE_NO_DEPRECATE;WIN32;_DEBUG;_CONSOLE;_USE_MATH_DEFINES;PATH_MAX=1024;_SCL_SECURE_NO_WARNINGS;USING_LIBSSH"
+				BasicRuntimeChecks="3"
+				RuntimeLibrary="3"
 				UsePrecompiledHeader="0"
-				PrecompiledHeaderFile=".\Release/graspapp.pch"
-				AssemblerListingLocation=".\Release/"
-				ObjectFile=".\Release/"
-				ProgramDataBaseFileName=".\Release/"
+				PrecompiledHeaderFile=".\Debug/graspapp.pch"
+				AssemblerListingLocation="$(OutDir)/"
+				ObjectFile="$(OutDir)/"
+				ProgramDataBaseFileName="$(OutDir)/"
+				BrowseInformation="0"
 				WarningLevel="3"
 				SuppressStartupBanner="true"
+				DebugInformationFormat="4"
 				CompileAs="0"
 			/>
 			<Tool
@@ -337,7 +339,7 @@
 			/>
 			<Tool
 				Name="VCResourceCompilerTool"
-				PreprocessorDefinitions="NDEBUG"
+				PreprocessorDefinitions="_DEBUG"
 				Culture="1033"
 			/>
 			<Tool
@@ -346,11 +348,104 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalOptions="/MACHINE:I386"
-				AdditionalDependencies="wxbase28.lib wxbase28_xml.lib wxregex.lib wxexpat.lib"
+				AdditionalDependencies="libxml2.lib iconv.lib ssh.lib userenv.lib"
 				OutputFile="$(OutDir)\$(ProjectName).exe"
-				LinkIncremental="1"
+				LinkIncremental="2"
 				SuppressStartupBanner="true"
-				ProgramDatabaseFile=".\Release/graspapp.pdb"
+				AdditionalLibraryDirectories="../../../ivutils/lib"
+				GenerateDebugInformation="true"
+				SubSystem="1"
+			/>
+			<Tool
+				Name="VCALinkTool"
+			/>
+			<Tool
+				Name="VCManifestTool"
+			/>
+			<Tool
+				Name="VCXDCMakeTool"
+			/>
+			<Tool
+				Name="VCBscMakeTool"
+			/>
+			<Tool
+				Name="VCFxCopTool"
+			/>
+			<Tool
+				Name="VCAppVerifierTool"
+			/>
+			<Tool
+				Name="VCWebDeploymentTool"
+			/>
+			<Tool
+				Name="VCPostBuildEventTool"
+			/>
+		</Configuration>
+		<Configuration
+			Name="Release wxalt|Win32"
+			OutputDirectory="$(ConfigurationName)"
+			IntermediateDirectory="$(ConfigurationName)"
+			ConfigurationType="1"
+			InheritedPropertySheets="$(VCInstallDir)VCProjectDefaults\UpgradeFromVC70.vsprops"
+			UseOfMFC="0"
+			ATLMinimizesCRunTimeLibraryUsage="false"
+			CharacterSet="2"
+			>
+			<Tool
+				Name="VCPreBuildEventTool"
+			/>
+			<Tool
+				Name="VCCustomBuildTool"
+			/>
+			<Tool
+				Name="VCXMLDataGeneratorTool"
+			/>
+			<Tool
+				Name="VCWebServiceProxyGeneratorTool"
+			/>
+			<Tool
+				Name="VCMIDLTool"
+				TypeLibraryName=".\Debug/graspapp.tlb"
+			/>
+			<Tool
+				Name="VCCLCompilerTool"
+				Optimization="2"
+				InlineFunctionExpansion="1"
+				AdditionalIncludeDirectories="../../../ivutils/include,../../../gridmd/include,../../../gridmd/include/gmd/xml"
+				PreprocessorDefinitions="FU;_CRT_SECURE_NO_DEPRECATE;WIN32;_DEBUG;_CONSOLE;_USE_MATH_DEFINES;PATH_MAX=1024;_SCL_SECURE_NO_WARNINGS;USING_LIBSSH"
+				BasicRuntimeChecks="0"
+				RuntimeLibrary="2"
+				UsePrecompiledHeader="0"
+				PrecompiledHeaderFile=".\Debug/graspapp.pch"
+				AssemblerListingLocation="$(OutDir)/"
+				ObjectFile="$(OutDir)/"
+				ProgramDataBaseFileName="$(OutDir)/"
+				BrowseInformation="0"
+				WarningLevel="3"
+				SuppressStartupBanner="true"
+				DebugInformationFormat="0"
+				CompileAs="0"
+			/>
+			<Tool
+				Name="VCManagedResourceCompilerTool"
+			/>
+			<Tool
+				Name="VCResourceCompilerTool"
+				PreprocessorDefinitions="_DEBUG"
+				Culture="1033"
+			/>
+			<Tool
+				Name="VCPreLinkEventTool"
+			/>
+			<Tool
+				Name="VCLinkerTool"
+				AdditionalOptions="/MACHINE:I386"
+				AdditionalDependencies="libxml2.lib iconv.lib ssh.lib userenv.lib"
+				OutputFile="$(OutDir)\$(ProjectName).exe"
+				LinkIncremental="2"
+				SuppressStartupBanner="true"
+				AdditionalLibraryDirectories="../../../ivutils/lib"
+				GenerateDebugInformation="true"
 				SubSystem="1"
 			/>
 			<Tool
@@ -395,7 +490,43 @@
 			Name="GridMD Files"
 			>
 			<File
+				RelativePath="..\..\..\gridmd\src\jobmngr\bshmngr.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\gridmd\include\jobmngr\bshmngr.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\gridmd\include\forcelnk.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\gridmd\include\gmdinc.h"
+				>
+			</File>
+			<File
 				RelativePath="..\..\..\gridmd\src\gmfork.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\gridmd\include\gmfork.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\gridmd\src\gmnode.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\gridmd\include\gmnode.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\gridmd\src\gmsched.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\gridmd\include\gmsched.h"
 				>
 			</File>
 			<File
@@ -403,52 +534,11 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\gridmd\src\gridmd.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\gridmd\src\jobmngr\jobmngr.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\gridmd\src\jobmngr\pbsmngr.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\gridmd\src\jobmngr\plinkshell.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\gridmd\src\jobmngr\unixshell.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\gridmd\src\workflow.cpp"
-				>
-			</File>
-		</Filter>
-		<Filter
-			Name="ivutils"
-			>
-			<File
-				RelativePath="..\..\..\ivutils\src\logexc.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\..\ivutils\src\seqpack.cpp"
-				>
-			</File>
-		</Filter>
-		<Filter
-			Name="Header Files"
-			Filter="h;hpp;hxx;hm;inl"
-			>
-			<File
-				RelativePath="..\..\..\gridmd\include\gmfork.h"
-				>
-			</File>
-			<File
 				RelativePath="..\..\..\gridmd\include\jobmngr\gmshell.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\gridmd\src\gridmd.cpp"
 				>
 			</File>
 			<File
@@ -456,11 +546,39 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\..\gridmd\src\jobmngr\jobmngr.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\..\gridmd\include\jobmngr\jobmngr.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\ivutils\include\logexc.h"
+				RelativePath="..\..\..\gridmd\src\jobmngr\jobmngrbase.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\gridmd\include\jobmngr\jobmngrbase.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\gridmd\src\jobmngr\libsshell.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\gridmd\include\jobmngr\libsshell.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\gridmd\src\jobmngr\mingwshell.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\gridmd\include\jobmngr\mingwshell.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\gridmd\src\jobmngr\pbsmngr.cpp"
 				>
 			</File>
 			<File
@@ -468,7 +586,75 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\..\gridmd\src\jobmngr\plinkshell.cpp"
+				>
+			</File>
+			<File
 				RelativePath="..\..\..\gridmd\include\jobmngr\plinkshell.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\gridmd\src\jobmngr\slurmmngr.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\gridmd\include\jobmngr\slurmmngr.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\gridmd\src\jobmngr\winapimngr.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\gridmd\include\jobmngr\winapimngr.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\gridmd\src\jobmngr\winshell.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\gridmd\include\jobmngr\winshell.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\gridmd\src\jobmngr\winshmngr.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\gridmd\include\jobmngr\winshmngr.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\gridmd\src\workflow.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\gridmd\include\workflow.h"
+				>
+			</File>
+		</Filter>
+		<Filter
+			Name="ivutils"
+			>
+			<File
+				RelativePath="..\..\..\ivutils\include\dir_check.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\ivutils\src\logexc.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\ivutils\include\logexc.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\ivutils\include\refobj.h"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\ivutils\src\seqpack.cpp"
 				>
 			</File>
 			<File
@@ -476,16 +662,483 @@
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\gridmd\include\jobmngr\unixshell.h"
+				RelativePath="..\..\..\ivutils\include\utiltl.h"
+				>
+			</File>
+		</Filter>
+		<Filter
+			Name="gmdlib"
+			>
+			<File
+				RelativePath="..\..\..\gridmd\include\gmd\app.h"
+				>
+				<FileConfiguration
+					Name="Release|Win32"
+					ExcludedFromBuild="true"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Debug DLL|Win32"
+					ExcludedFromBuild="true"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+					/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath="..\..\..\gridmd\include\gmd\arrstr.h"
+				>
+				<FileConfiguration
+					Name="Release|Win32"
+					ExcludedFromBuild="true"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Debug DLL|Win32"
+					ExcludedFromBuild="true"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+					/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath="..\..\..\gridmd\src\gmd\dir.cpp"
+				>
+				<FileConfiguration
+					Name="Debug|Win32"
+					ExcludedFromBuild="true"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|Win32"
+					ExcludedFromBuild="true"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Debug DLL|Win32"
+					ExcludedFromBuild="true"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+					/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath="..\..\..\gridmd\include\gmd\dir.h"
+				>
+				<FileConfiguration
+					Name="Release|Win32"
+					ExcludedFromBuild="true"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+					/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath="..\..\..\gridmd\src\gmd\ffile.cpp"
+				>
+				<FileConfiguration
+					Name="Debug|Win32"
+					ExcludedFromBuild="true"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|Win32"
+					ExcludedFromBuild="true"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Debug DLL|Win32"
+					ExcludedFromBuild="true"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+					/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath="..\..\..\gridmd\include\gmd\ffile.h"
+				>
+				<FileConfiguration
+					Name="Release|Win32"
+					ExcludedFromBuild="true"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Debug DLL|Win32"
+					ExcludedFromBuild="true"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+					/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath="..\..\..\gridmd\src\gmd\filefn.cpp"
+				>
+				<FileConfiguration
+					Name="Debug|Win32"
+					ExcludedFromBuild="true"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|Win32"
+					ExcludedFromBuild="true"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Debug DLL|Win32"
+					ExcludedFromBuild="true"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+					/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath="..\..\..\gridmd\include\gmd\filefn.h"
+				>
+				<FileConfiguration
+					Name="Release|Win32"
+					ExcludedFromBuild="true"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Debug DLL|Win32"
+					ExcludedFromBuild="true"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+					/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath="..\..\..\gridmd\src\gmd\filename.cpp"
+				>
+				<FileConfiguration
+					Name="Debug|Win32"
+					ExcludedFromBuild="true"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|Win32"
+					ExcludedFromBuild="true"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Debug DLL|Win32"
+					ExcludedFromBuild="true"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+					/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath="..\..\..\gridmd\include\gmd\filename.h"
+				>
+				<FileConfiguration
+					Name="Release|Win32"
+					ExcludedFromBuild="true"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Debug DLL|Win32"
+					ExcludedFromBuild="true"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+					/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath="..\..\..\gridmd\src\gmd\gmd_internal.h"
+				>
+				<FileConfiguration
+					Name="Release|Win32"
+					ExcludedFromBuild="true"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Debug DLL|Win32"
+					ExcludedFromBuild="true"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+					/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath="..\..\..\gridmd\src\gmd\regex.cpp"
+				>
+				<FileConfiguration
+					Name="Debug|Win32"
+					ExcludedFromBuild="true"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|Win32"
+					ExcludedFromBuild="true"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Debug DLL|Win32"
+					ExcludedFromBuild="true"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+					/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath="..\..\..\gridmd\include\gmd\regex.h"
+				>
+				<FileConfiguration
+					Name="Release|Win32"
+					ExcludedFromBuild="true"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Debug DLL|Win32"
+					ExcludedFromBuild="true"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+					/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath="..\..\..\gridmd\include\gmd\stopwatch.h"
+				>
+				<FileConfiguration
+					Name="Release|Win32"
+					ExcludedFromBuild="true"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Debug DLL|Win32"
+					ExcludedFromBuild="true"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+					/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath="..\..\..\gridmd\src\gmd\string.cpp"
+				>
+				<FileConfiguration
+					Name="Debug|Win32"
+					ExcludedFromBuild="true"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|Win32"
+					ExcludedFromBuild="true"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Debug DLL|Win32"
+					ExcludedFromBuild="true"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+					/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath="..\..\..\gridmd\include\gmd\string.h"
+				>
+				<FileConfiguration
+					Name="Release|Win32"
+					ExcludedFromBuild="true"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Debug DLL|Win32"
+					ExcludedFromBuild="true"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+					/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath="..\..\..\gridmd\src\gmd\tokenzr.cpp"
+				>
+				<FileConfiguration
+					Name="Debug|Win32"
+					ExcludedFromBuild="true"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|Win32"
+					ExcludedFromBuild="true"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Debug DLL|Win32"
+					ExcludedFromBuild="true"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+					/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath="..\..\..\gridmd\include\gmd\tokenzr.h"
+				>
+				<FileConfiguration
+					Name="Release|Win32"
+					ExcludedFromBuild="true"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Debug DLL|Win32"
+					ExcludedFromBuild="true"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+					/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath="..\..\..\gridmd\src\gmd\utils.cpp"
+				>
+				<FileConfiguration
+					Name="Debug|Win32"
+					ExcludedFromBuild="true"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Release|Win32"
+					ExcludedFromBuild="true"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Debug DLL|Win32"
+					ExcludedFromBuild="true"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+					/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath="..\..\..\gridmd\include\gmd\utils.h"
+				>
+				<FileConfiguration
+					Name="Release|Win32"
+					ExcludedFromBuild="true"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+					/>
+				</FileConfiguration>
+				<FileConfiguration
+					Name="Debug DLL|Win32"
+					ExcludedFromBuild="true"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+					/>
+				</FileConfiguration>
+			</File>
+			<File
+				RelativePath="..\..\..\gridmd\src\gmd\xml\xml_file.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\..\..\gridmd\include\workflow.h"
+				RelativePath="..\..\..\gridmd\include\gmd\xml\xml_file.h"
 				>
-			</File>
-			<File
-				RelativePath="..\..\..\gridmd\include\wxinc.h"
-				>
+				<FileConfiguration
+					Name="Release|Win32"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+					/>
+				</FileConfiguration>
 			</File>
 		</Filter>
 	</Files>

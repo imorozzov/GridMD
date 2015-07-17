@@ -3,32 +3,42 @@ Microsoft Visual Studio Solution File, Format Version 9.00
 # Visual Studio 2005
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "pbs_example1", "pbs_plink1.vcproj", "{4C1C312C-2171-42CD-B149-29BF6D596111}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "pbs_example2", "pbs_plink2.vcproj", "{C36749DC-F982-4EA7-8F47-09F5CC9318AB}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "pbs_example2", "pbs_plink2.vcproj", "{C2627247-3F33-4897-8245-6E14537F4C85}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug DLL|Win32 = Debug DLL|Win32
+		Debug wxalt|Win32 = Debug wxalt|Win32
 		Debug|Win32 = Debug|Win32
 		Release DLL|Win32 = Release DLL|Win32
+		Release wxalt|Win32 = Release wxalt|Win32
 		Release|Win32 = Release|Win32
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{4C1C312C-2171-42CD-B149-29BF6D596111}.Debug DLL|Win32.ActiveCfg = Debug DLL|Win32
 		{4C1C312C-2171-42CD-B149-29BF6D596111}.Debug DLL|Win32.Build.0 = Debug DLL|Win32
+		{4C1C312C-2171-42CD-B149-29BF6D596111}.Debug wxalt|Win32.ActiveCfg = Debug wxalt|Win32
+		{4C1C312C-2171-42CD-B149-29BF6D596111}.Debug wxalt|Win32.Build.0 = Debug wxalt|Win32
 		{4C1C312C-2171-42CD-B149-29BF6D596111}.Debug|Win32.ActiveCfg = Debug|Win32
 		{4C1C312C-2171-42CD-B149-29BF6D596111}.Debug|Win32.Build.0 = Debug|Win32
 		{4C1C312C-2171-42CD-B149-29BF6D596111}.Release DLL|Win32.ActiveCfg = Release DLL|Win32
 		{4C1C312C-2171-42CD-B149-29BF6D596111}.Release DLL|Win32.Build.0 = Release DLL|Win32
+		{4C1C312C-2171-42CD-B149-29BF6D596111}.Release wxalt|Win32.ActiveCfg = Release wxalt|Win32
+		{4C1C312C-2171-42CD-B149-29BF6D596111}.Release wxalt|Win32.Build.0 = Release wxalt|Win32
 		{4C1C312C-2171-42CD-B149-29BF6D596111}.Release|Win32.ActiveCfg = Release|Win32
 		{4C1C312C-2171-42CD-B149-29BF6D596111}.Release|Win32.Build.0 = Release|Win32
-		{C36749DC-F982-4EA7-8F47-09F5CC9318AB}.Debug DLL|Win32.ActiveCfg = Debug DLL|Win32
-		{C36749DC-F982-4EA7-8F47-09F5CC9318AB}.Debug DLL|Win32.Build.0 = Debug DLL|Win32
-		{C36749DC-F982-4EA7-8F47-09F5CC9318AB}.Debug|Win32.ActiveCfg = Debug|Win32
-		{C36749DC-F982-4EA7-8F47-09F5CC9318AB}.Debug|Win32.Build.0 = Debug|Win32
-		{C36749DC-F982-4EA7-8F47-09F5CC9318AB}.Release DLL|Win32.ActiveCfg = Release DLL|Win32
-		{C36749DC-F982-4EA7-8F47-09F5CC9318AB}.Release DLL|Win32.Build.0 = Release DLL|Win32
-		{C36749DC-F982-4EA7-8F47-09F5CC9318AB}.Release|Win32.ActiveCfg = Release|Win32
-		{C36749DC-F982-4EA7-8F47-09F5CC9318AB}.Release|Win32.Build.0 = Release|Win32
+		{C2627247-3F33-4897-8245-6E14537F4C85}.Debug DLL|Win32.ActiveCfg = Debug DLL|Win32
+		{C2627247-3F33-4897-8245-6E14537F4C85}.Debug DLL|Win32.Build.0 = Debug DLL|Win32
+		{C2627247-3F33-4897-8245-6E14537F4C85}.Debug wxalt|Win32.ActiveCfg = Debug wxalt|Win32
+		{C2627247-3F33-4897-8245-6E14537F4C85}.Debug wxalt|Win32.Build.0 = Debug wxalt|Win32
+		{C2627247-3F33-4897-8245-6E14537F4C85}.Debug|Win32.ActiveCfg = Debug|Win32
+		{C2627247-3F33-4897-8245-6E14537F4C85}.Debug|Win32.Build.0 = Debug|Win32
+		{C2627247-3F33-4897-8245-6E14537F4C85}.Release DLL|Win32.ActiveCfg = Release wxalt|Win32
+		{C2627247-3F33-4897-8245-6E14537F4C85}.Release DLL|Win32.Build.0 = Release wxalt|Win32
+		{C2627247-3F33-4897-8245-6E14537F4C85}.Release wxalt|Win32.ActiveCfg = Release wxalt|Win32
+		{C2627247-3F33-4897-8245-6E14537F4C85}.Release wxalt|Win32.Build.0 = Release wxalt|Win32
+		{C2627247-3F33-4897-8245-6E14537F4C85}.Release|Win32.ActiveCfg = Release|Win32
+		{C2627247-3F33-4897-8245-6E14537F4C85}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -243,12 +243,8 @@ $Date: 2015/06/17 19:37:59 $
 
 **/
 
-#ifdef _WIN32
-typedef __int32 gm_int32;
-#else
-#include <stdint.h>
-typedef int32_t gm_int32;
-#endif
+
+
 
 # include "gmdinc.h"
 //# include <gmd/cmdline.h>
@@ -260,6 +256,15 @@ typedef int32_t gm_int32;
 # ifndef WRITE_DEBUG_GRAPH
 # define WRITE_DEBUG_GRAPH 0
 # endif
+
+
+#ifdef _WIN32
+//# include <stdlib.h>
+typedef __int32 gm_int32;
+#else
+#include <stdint.h>
+typedef int32_t gm_int32;
+#endif
 
 #include "jobmngr/jobmngr.h"
 #include "jobmngr/gmshell.h"
