@@ -143,6 +143,10 @@ App_Data/*.ldf
 
 #CMake build files
 build/
+Makefile
 
 #CLion project files
 .idea/
+
+#Qt Creator project files
+CMakeLists.txt.user
