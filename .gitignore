@@ -140,3 +140,9 @@ App_Data/*.ldf
 #################
 
 /tests
+
+#CMake build files
+build/
+
+#CLion project files
+.idea/

@@ -116,7 +116,7 @@ $Date: 2013/05/24 17:53:14 $
 #include <cstring>
 #endif
 
-#include "xml_file.h"
+#include <gmd/xml/xml_file.h>
 
 using namespace std;
 

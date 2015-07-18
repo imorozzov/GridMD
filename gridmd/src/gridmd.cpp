@@ -2000,3 +2000,8 @@ int gmManager::process_cur_node(){
 const vector< std::pair<gmNodeID, gmNODE_STATES> >& gmManager::get_event_stack() const {
   return graph->event_stack;
 }
+
+int gridmd_main(int argc, char **argv)
+{
+  return 0;
+}

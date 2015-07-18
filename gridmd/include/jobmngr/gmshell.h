@@ -51,7 +51,7 @@ protected:
   bool EnableRemoveLocal;  /// if false (by default), an attempt to remove local files/dirs generates an error
   gmdString home_dir, home_dir_win, rem_perm_dir;
   bool dump_commands;  /// dump executed commands for debug
-  
+
   int error_code;
   gmdString error_msg;
 
@@ -88,7 +88,7 @@ protected:
 #endif
     return gmdExecute(exec_cmd, out, err);
   }
-  
+
   int StageIn_begin(pCSTR locpath, pCSTR rempath, unsigned flags);
   int StageOut_begin(pCSTR locpath, pCSTR rempath, unsigned flags);
   int StageIn_end(pCSTR locpath, pCSTR rempath, unsigned flags);

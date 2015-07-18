@@ -104,7 +104,7 @@ $Date: 2013/05/24 17:53:14 $
 //# include <gmd/cmdline.h>
 
 #ifndef NO_XML
-#include "xml_file.h"
+#include <gmd/xml/xml_file.h>
 #endif
 
 // without this pragma, the stupid compiler precompiles #defines below so that

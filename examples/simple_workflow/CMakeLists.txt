@@ -1,0 +1,10 @@
+project(simple_workflow)
+
+add_executable(fork_simple_workflow fork_simple_workflow.cpp)
+target_link_libraries(fork_simple_workflow gridmd)
+
+add_executable(fork_skeleton fork_skeleton.cpp)
+target_link_libraries(fork_skeleton gridmd)
+
+add_executable(fork_skeleton_extra fork_skeleton_extra.cpp)
+target_link_libraries(fork_skeleton_extra gridmd)
