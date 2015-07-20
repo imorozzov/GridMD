@@ -1,9 +1,11 @@
 cmake_minimum_required(VERSION 3.0.0)
 project(gridmd)
+set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake/Modules")
 
-#TODO: implement linking to libssh
-option(USE_LIBSSH "Use libssh" OFF)
+
+option(USE_LIBSSH "Use libssh" ON)
 option(USE_LIBSSH2 "Use libssh2" OFF)
+option(WITH_XML "Enable XML support via libxml2" ON)
 option(USE_WXWIDGETS "Use WxWidgets library" OFF)
 option(BUILD_SHARED "Build GridMD as shared library" ON)
 option(BUILD_EXAMPLES "Build all examples" ON)
@@ -25,11 +27,51 @@ else(USE_WXWIDGETS) #find boost compiled
   set(LINKED_LIBS ${LINKED_LIBS} ${Boost_LIBRARIES})
 endif (USE_WXWIDGETS)
 
+
+
+
+if (USE_LIBSSH)
+  find_package(LibSSH)
+  if(LIBSSH_LIBRARY)
+    add_definitions("-DUSING_LIBSSH")
+    set(LINKED_LIBS ${LINKED_LIBS} ${LIBSSH_LIBRARY})
+    include_directories(LIBSSH_INCLUDE_DIR)
+  else(LIBSSH_LIBRARY)
+    set(USE_LIBSSH OFF)
+    message("LibSSH not found!")
+  endif(LIBSSH_LIBRARY)
+endif(USE_LIBSSH)
+
+
+if (USE_LIBSSH2)
+  find_package(LibSSH2)
+  if(LIBSSH2_FOUND)
+    add_definitions("-DUSING_LIBSSH2")
+    set(LINKED_LIBS ${LINKED_LIBS} ${LIBSSH2_LIBRARY})
+    include_directories(LIBSSH2_INCLUDE_DIR)
+  else(LIBSSH2_FOUND)
+    set(USE_LIBSSH2 OFF)
+  endif(LIBSSH2_FOUND)
+endif(USE_LIBSSH2)
+
+if (WITH_XML)
+  find_package(LibXml2)
+  if(LIBXML2_FOUND)
+    include_directories(${LIBXML2_INCLUDE_DIR})
+    set(LINKED_LIBS ${LINKED_LIBS} ${LIBXML2_LIBRARIES})
+  else(LIBXML2_FOUND)
+    set(WITH_XML OFF)
+  endif(LIBXML2_FOUND)
+endif(WITH_XML)
+
+if(NOT WITH_XML)
+  add_definitions("-DNO_XML")
+endif(NOT WITH_XML)
+
 include_directories(${BOOST_INCLUDE_DIRS})
-#TODO make usage of libxml2 to be optional
+
 find_package(LibXml2 REQUIRED)
-include_directories(${LIBXML2_INCLUDE_DIR})
-set(LINKED_LIBS ${LINKED_LIBS} ${LIBXML2_LIBRARIES})
+
 
 #build ivutils library
 add_subdirectory(ivutils)
