@@ -14,6 +14,10 @@
 
 [Dd]ebug/
 [Rr]elease/
+Debug DLL/
+Release DLL/
+Debug wxalt/
+Release wxalt/
 x64/
 build/
 [Bb]in/

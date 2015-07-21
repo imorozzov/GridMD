@@ -1,0 +1,144 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{dbcd8d36-2dce-4128-abb4-6c5ca020fea6}</UniqueIdentifier>
+      <Extensions>cpp;c;cxx;rc;def;r;odl;idl;hpj;bat</Extensions>
+    </Filter>
+    <Filter Include="GridMD Files">
+      <UniqueIdentifier>{e4f8ef55-db3e-40f9-beb9-552c918bf632}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ivutils">
+      <UniqueIdentifier>{bbdd9dbf-df44-431d-89ca-c1ef681a5559}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="gmdlib">
+      <UniqueIdentifier>{114303ec-4e6b-41a4-b28a-1dd990480fca}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\pbs_plink2.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\gridmd\src\jobmngr\gmshell.cpp">
+      <Filter>GridMD Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\gridmd\src\jobmngr\jobmngr.cpp">
+      <Filter>GridMD Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\gridmd\src\jobmngr\jobmngrbase.cpp">
+      <Filter>GridMD Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\gridmd\src\jobmngr\pbsmngr.cpp">
+      <Filter>GridMD Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\gridmd\src\jobmngr\plinkshell.cpp">
+      <Filter>GridMD Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\ivutils\src\logexc.cpp">
+      <Filter>ivutils</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\ivutils\src\seqpack.cpp">
+      <Filter>ivutils</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\gridmd\src\gmd\dir.cpp">
+      <Filter>gmdlib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\gridmd\src\gmd\ffile.cpp">
+      <Filter>gmdlib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\gridmd\src\gmd\filefn.cpp">
+      <Filter>gmdlib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\gridmd\src\gmd\filename.cpp">
+      <Filter>gmdlib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\gridmd\src\gmd\regex.cpp">
+      <Filter>gmdlib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\gridmd\src\gmd\string.cpp">
+      <Filter>gmdlib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\gridmd\src\gmd\tokenzr.cpp">
+      <Filter>gmdlib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\gridmd\src\gmd\utils.cpp">
+      <Filter>gmdlib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\gridmd\src\gmd\xml\xml_file.cpp">
+      <Filter>gmdlib</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\..\gridmd\include\jobmngr\gmshell.h">
+      <Filter>GridMD Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\gridmd\include\jobmngr\jobmngr.h">
+      <Filter>GridMD Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\gridmd\include\jobmngr\jobmngrbase.h">
+      <Filter>GridMD Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\gridmd\include\jobmngr\pbsmngr.h">
+      <Filter>GridMD Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\gridmd\include\jobmngr\plinkshell.h">
+      <Filter>GridMD Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\ivutils\include\dir_check.h">
+      <Filter>ivutils</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\ivutils\include\logexc.h">
+      <Filter>ivutils</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\ivutils\include\refobj.h">
+      <Filter>ivutils</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\ivutils\include\seqpack.h">
+      <Filter>ivutils</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\ivutils\include\utiltl.h">
+      <Filter>ivutils</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="..\..\..\gridmd\include\gmd\app.h">
+      <Filter>gmdlib</Filter>
+    </CustomBuild>
+    <CustomBuild Include="..\..\..\gridmd\include\gmd\arrstr.h">
+      <Filter>gmdlib</Filter>
+    </CustomBuild>
+    <CustomBuild Include="..\..\..\gridmd\include\gmd\dir.h">
+      <Filter>gmdlib</Filter>
+    </CustomBuild>
+    <CustomBuild Include="..\..\..\gridmd\include\gmd\ffile.h">
+      <Filter>gmdlib</Filter>
+    </CustomBuild>
+    <CustomBuild Include="..\..\..\gridmd\include\gmd\filefn.h">
+      <Filter>gmdlib</Filter>
+    </CustomBuild>
+    <CustomBuild Include="..\..\..\gridmd\include\gmd\filename.h">
+      <Filter>gmdlib</Filter>
+    </CustomBuild>
+    <CustomBuild Include="..\..\..\gridmd\src\gmd\gmd_internal.h">
+      <Filter>gmdlib</Filter>
+    </CustomBuild>
+    <CustomBuild Include="..\..\..\gridmd\include\gmd\regex.h">
+      <Filter>gmdlib</Filter>
+    </CustomBuild>
+    <CustomBuild Include="..\..\..\gridmd\include\gmd\stopwatch.h">
+      <Filter>gmdlib</Filter>
+    </CustomBuild>
+    <CustomBuild Include="..\..\..\gridmd\include\gmd\string.h">
+      <Filter>gmdlib</Filter>
+    </CustomBuild>
+    <CustomBuild Include="..\..\..\gridmd\include\gmd\tokenzr.h">
+      <Filter>gmdlib</Filter>
+    </CustomBuild>
+    <CustomBuild Include="..\..\..\gridmd\include\gmd\utils.h">
+      <Filter>gmdlib</Filter>
+    </CustomBuild>
+    <CustomBuild Include="..\..\..\gridmd\include\gmd\xml\xml_file.h">
+      <Filter>gmdlib</Filter>
+    </CustomBuild>
+  </ItemGroup>
+</Project>
