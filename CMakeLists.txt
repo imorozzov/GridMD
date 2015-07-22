@@ -68,17 +68,22 @@ if(NOT WITH_XML)
   add_definitions("-DNO_XML")
 endif(NOT WITH_XML)
 
-include_directories(${BOOST_INCLUDE_DIRS})
-
+include_directories(${Boost_INCLUDE_DIR})
 find_package(LibXml2 REQUIRED)
 
 
 #build ivutils library
 add_subdirectory(ivutils)
 set(LINKED_LIBS ${LINKED_LIBS} ivutils)
+
 #build gridmd library
 add_subdirectory(gridmd)
 
 if(BUILD_EXAMPLES)
     add_subdirectory(examples)
 endif()
+
+get_property(dirs DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY INCLUDE_DIRECTORIES)
+foreach(dir ${dirs})
+  message(STATUS "includedir='${dir}'")
+endforeach()

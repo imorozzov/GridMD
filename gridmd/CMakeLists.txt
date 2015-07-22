@@ -4,7 +4,5 @@ set(GRIDMD_INCLUDE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/include" CACHE STRING "GridM
 include_directories(${GRIDMD_INCLUDE_DIR})
 message("Linked libs: ${LINKED_LIBS}")
 include_directories(${IVUTILS_INCLUDE_DIR})
-message("IvUtils include dir:" ${IVUTILS_INCLUDE_DIR})
-message("GridMD incl dir: ${GRIDMD_INCLUDE_DIR}")
 add_library(gridmd ${BUILDCONF} ${GRIDMD_SOURCES} ${GRIDMD_HEADERS})
 target_link_libraries(gridmd ${LINKED_LIBS})
