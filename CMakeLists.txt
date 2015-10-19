@@ -29,17 +29,17 @@ endif (USE_WXWIDGETS)
 
 
 
-
 if (USE_LIBSSH)
   find_package(LibSSH)
-  if(LIBSSH_LIBRARY)
+  if(LIBSSH_FOUND)
     add_definitions("-DUSING_LIBSSH")
-    set(LINKED_LIBS ${LINKED_LIBS} ${LIBSSH_LIBRARY})
-    include_directories(LIBSSH_INCLUDE_DIR)
-  else(LIBSSH_LIBRARY)
+    set(LINKED_LIBS ${LINKED_LIBS} ${LIBSSH_LIBRARIES})
+    include_directories(${LIBSSH_INCLUDE_DIRS})
+    message("LibSSH include dir: ${LIBSSH_INCLUDE_DIRS}")
+  else(LIBSSH_LIBRARIES)
     set(USE_LIBSSH OFF)
     message("LibSSH not found!")
-  endif(LIBSSH_LIBRARY)
+  endif(LIBSSH_FOUND)
 endif(USE_LIBSSH)
 
 
@@ -55,6 +55,14 @@ if (USE_LIBSSH2)
 endif(USE_LIBSSH2)
 
 if (WITH_XML)
+  #LibXML also needs iconv
+  find_package(Iconv)
+  if (ICONV_FOUND)
+    include_directories(${ICONV_INCLUDE_DIR})
+    set(LINKED_LIBS ${LINKED_LIBS} ${ICONV_LIBRARIES})
+  else(ICONV_FOUND)
+    set(WITH_XML OFF)
+  endif(ICONV_FOUND)
   find_package(LibXml2)
   if(LIBXML2_FOUND)
     include_directories(${LIBXML2_INCLUDE_DIR})
