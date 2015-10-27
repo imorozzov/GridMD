@@ -154,3 +154,6 @@ Makefile
 
 #Qt Creator project files
 CMakeLists.txt.user
+
+#Netbeans
+nbproject
