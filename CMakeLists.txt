@@ -23,7 +23,7 @@ if (USE_WXWIDGETS) #find boost headers
   set(LINKED_LIBS ${LINKED_LIBS} ${wxWidgets_LIBRARIES})
   include_directories(${CMAKE_CURRENT_SOURCE_DIR}/wxint)
 else(USE_WXWIDGETS) #find boost compiled
-  find_package(Boost REQUIRED filesystem timer system regex)
+  find_package(Boost REQUIRED filesystem timer system regex chrono)
   set(LINKED_LIBS ${LINKED_LIBS} ${Boost_LIBRARIES})
 endif (USE_WXWIDGETS)
 

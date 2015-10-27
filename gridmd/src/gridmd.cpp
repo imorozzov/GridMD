@@ -2001,7 +2001,8 @@ const vector< std::pair<gmNodeID, gmNODE_STATES> >& gmManager::get_event_stack()
   return graph->event_stack;
 }
 
+/*
 int gridmd_main(int argc, char **argv)
 {
   return 0;
-}
+}*/
