@@ -157,3 +157,10 @@ CMakeLists.txt.user
 
 #Netbeans
 nbproject
+
+#Emacs
+.dir-locals.el
+\#*\#
+
+#Mac
+.DS_Store
