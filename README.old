@@ -39,6 +39,25 @@ Home project web page: http://gridmd.sourceforge.net/
 *  INSTALLATION
 ******************************************************************************
 
-No install scripts are prepared yet. You can just unpack the archive and add
-the source files to your projects. The examples of GridMD usage are given in
-the 'examples' subdirectory.
+The installation is done via CMake.
+The dependencies are as folows:
+- Boost headers
+- EITHER Boost components: filesystem, timer, system, regex OR WxWidgets core library.
+  To use WxWidgets core, add -DUSE_WXWIDGETS=ON to CMake arguments
+- libxml2 for XML suport (optional, enabled by default, to disable, add -DWITH_XML=OFF)
+- libssh(default) or libssh2 (add -DUSE_LIBSSH=OFF -DUSE_LIBSSH2=ON) for SSH support
+
+Instructions (Windows):
+Let's assume that you have all dependencies built and installed and the root paths are as folows:
+- Boost            C:\devel\boost_1_59_0
+To build Boost, type from VS Developer console:
+   bootstrap
+   .\b2
+
+- libxml2          C:\devel\libxml2-2.7.8.win32
+- libssh           C:\devel\libssh-0.7.2
+
+
+
+
+On Linux you might just run CMake after you've satisfied all dependencies using your distro's package manager
