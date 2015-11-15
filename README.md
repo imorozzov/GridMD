@@ -41,3 +41,31 @@ Home project web page: http://gridmd.sourceforge.net/
     * [WxWidgets](https://www.wxwidgets.org/) ```base``` library*
 * [libssh](https://www.libssh.org/) (default) or [libssh2](http://www.libssh2.org/)
 * [libxml2](http://www.xmlsoft.org) with [iconv](https://www.gnu.org/software/libiconv/) (optional, enabled by default)
+
+### CMake Options
+
+Option | Type| Meaning | Default
+-----|------|----|---|
+```USE_LIBSSH```|bool|Use libssh|:heavy_check_mark:|
+```USE_LIBSSH2```|bool|Use libssh2|:heavy_multiplication_x:|
+```WITH_XML```|bool|Enable XML support via libxml2|:heavy_check_mark:|
+```USE_WXWIDGETS```|bool|Enable WxWidgets implementation. If not set, fall back to compiled Boost|:heavy_multiplication_x:|
+```BUILD_SHARED```|bool|Build as shared library|:heavy_check_mark:|
+```BUILD_EXAMPLES```|bool|Build examples from ```examples``` directory|:heavy_check_mark:|
+```BOOST_ROOT```|directory| Boost root|Empty|
+```BOOST_LIBRARYDIR```|directory|Directory with built Boost libraries (if wxWidgets is disabled)|Empty|
+```wxWidgets_LIB_DIR```|directory|Directory with built WxWidgets base library|Empty|
+```wxWidgets_ROOT_DIR```|directory|WxWidgets root|Empty|
+```SSH_LIBRARY```|file|Path to libssh library|Empty|
+```LIBSSH_INCLUDE_DIR```|directory|Path to libssh includes|Empty|
+```LIBSSH2_LIBRARY```|file|Path to libssh2 library|Empty|
+```LIBSSH2_INCLUDE_DIR```|directory|Path to libssh2 includes|Empty|
+```LIBXML2_INCLUDE_DIR```|directory|Path to libxml ibcludes|Empty|
+```LIBXML2_LIBRARIES```|file|Path to libxml2 library (file)|Empty|
+```ICONV_INCLUDE_DIR```|directory|Path to iconv includes|Empty|
+```ICONV_LIBRARIES```|file|Path to iconv library|Empty|
+
+If you are on UNIX, CMake should find the libraries in system paths. Otherwise you might set them appropriately.
+
+#### Example Windows configuration (Microsoft Visual Studio 2015)
+![cmake-gui](https://www.dropbox.com/s/p7em1f6p3tuwb7r/cmake-gui.png?raw=1)
