@@ -1,19 +1,39 @@
 <?xml version="1.0" encoding="utf-8"?>
 <flowgraph>
   <scheduler>
-	  <!-- Please edit the field marked by '###' symbols at least -->
-    <resource name="my_resource" type="pbs" active="1">
-      <session type="plink" login="###YOUR_LOGIN###" host="###REMOTE_HOST###">
-        <ssh_path>C:\Program Files\PuTTY\plink.exe</ssh_path>
-        <scp_path>C:\Program Files\PuTTY\pscp.exe</scp_path>
-        <cfg>-load "###PUTTY_CONFIG_NAME###"</cfg>
+    <resource name="valuev@ihed_new" active="1">
+      <session type="plink" login="valuev" host="83.149.226.18">
+        <ssh_path>C:\Program Files (x86)\PuTTY\plink.exe</ssh_path>
+        <scp_path>C:\Program Files (x86)\PuTTY\pscp.exe</scp_path>
+        <cfg>-load "ihed-new"</cfg>
       </session>
-      <application name="simple_workflow.exe">
-        <!-- <prefix>export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/opt/wxwidgets/build_icc/lib/</prefix> -->
+      <application name="workflow_skeletons.exe">
+        <prefix>export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/home/valuev/wxwidgets/build_icc/lib/:/opt/intel/cmkl/10.0.1.014/lib/em64t/</prefix>
         <postfix></postfix>
-        <location>###YOUR_PATH###/examples/simple_workflow/unix/Obj_gnu/</location>
+        <location>/share/home/valuev/trans1/source_tree/mdapp/workflow_skeletons/unix/Obj_ihedt_icc10/</location>
       </application>
-      <job_template queue="-q seq"/>
+      <job_manager type="pbs">
+         <save_job_info>true</save_job_info>
+         <jobs_limit>20</jobs_limit>
+         <qsub_args>-q middle</qsub_args>
+      </job_manager>
+    </resource>
+    <resource name="valuev@nwo5" active="0">
+      <session type="plink" login="valuev" host="nwo5.ihed.ras.ru">
+        <ssh_path>C:\Program Files (x86)\PuTTY\plink.exe</ssh_path>
+        <scp_path>C:\Program Files (x86)\PuTTY\pscp.exe</scp_path>
+        <cfg>-load "nwo5"</cfg>
+      </session>
+      <application name="workflow_skeletons.exe">
+        <prefix>export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/home/valuev/wxwidgets/build_icc/lib/</prefix>
+        <postfix></postfix>
+        <location>/home/valuev/trans3/source_tree/mdapp/workflow_skeletons/unix/Obj_nwo5icc/</location>
+      </application>
+      <job_manager type="pbs">
+         <save_job_info>true</save_job_info>
+         <jobs_limit>20</jobs_limit>
+         <qsub_args>-q seq</qsub_args>
+      </job_manager>
     </resource>
   </scheduler>
 </flowgraph>
