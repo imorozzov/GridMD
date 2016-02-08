@@ -6,19 +6,22 @@
  *
  *   Project	: GridMD
  *
- *   $Revision: 1.54 $
- *   $Date: 2015/06/17 19:37:59 $
- *   @(#) $Header: /home/plasmacvs/source_tree/gridmd/include/workflow.h,v 1.54 2015/06/17 19:37:59 valuev Exp $
+ *   $Revision: 1.55 $
+ *   $Date: 2016/02/03 16:41:18 $
+ *   @(#) $Header: /home/plasmacvs/source_tree/gridmd/include/workflow.h,v 1.55 2016/02/03 16:41:18 valuev Exp $
  *
  *****************************************************************************/
 /*
 $Source: /home/plasmacvs/source_tree/gridmd/include/workflow.h,v $
-$Revision: 1.54 $
+$Revision: 1.55 $
 $Author: valuev $
-$Date: 2015/06/17 19:37:59 $
+$Date: 2016/02/03 16:41:18 $
 */
 /*e****************************************************************************
  * $Log: workflow.h,v $
+ * Revision 1.55  2016/02/03 16:41:18  valuev
+ * fixes
+ *
  * Revision 1.54  2015/06/17 19:37:59  valuev
  * sweep farm restructured
  *
@@ -420,7 +423,8 @@ protected:
         if(flags&gmGV_NODENAME){
           label=parent->nodes[i]->GetLabel();
           if(parent->nodes[i]->GetFinal() || parent->nodes[i]->GetLocal())
-            shape= flags&gmGV_NO_EMPTY_NODES ? "point" : "record";
+            if(shape!="point")  // Mrecord -> record, making it square
+              shape = "record";
           //if(parent->nodes[i]->GetLocal())
             //label+="(L)";
         }

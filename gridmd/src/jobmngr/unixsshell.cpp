@@ -126,8 +126,8 @@ int gmSShellUnix::scp_execute(const gmdString& cmd, bool upload){
     gmdString errmsg = ArrayToString(err), str;
     res =
       ( errmsg.EndsWith(": No such file or directory") &&
-        ( errmsg.StartsWith("scp: ") && !upload ||  // missing remote path
-          !errmsg.StartsWith("scp: ") && upload )  // missing local path
+        (  ( errmsg.StartsWith("scp: ") && !upload )   // missing remote path
+         ||( !errmsg.StartsWith("scp: ") && upload ) ) // missing local path
       ) ?
     NO_INPUT_FILE :  COPY_ERROR;
     set_err(res, errmsg);

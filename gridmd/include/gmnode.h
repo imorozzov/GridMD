@@ -6,19 +6,25 @@
  *
  *   Project	: GridMD
  *
- *   $Revision: 1.15 $
- *   $Date: 2015/03/27 18:23:15 $
- *   @(#) $Header: /home/plasmacvs/source_tree/gridmd/include/gmnode.h,v 1.15 2015/03/27 18:23:15 valuev Exp $
+ *   $Revision: 1.17 $
+ *   $Date: 2016/02/03 16:41:18 $
+ *   @(#) $Header: /home/plasmacvs/source_tree/gridmd/include/gmnode.h,v 1.17 2016/02/03 16:41:18 valuev Exp $
  *
  *****************************************************************************/
 /*
 $Source: /home/plasmacvs/source_tree/gridmd/include/gmnode.h,v $
-$Revision: 1.15 $
+$Revision: 1.17 $
 $Author: valuev $
-$Date: 2015/03/27 18:23:15 $
+$Date: 2016/02/03 16:41:18 $
 */
 /*e****************************************************************************
  * $Log: gmnode.h,v $
+ * Revision 1.17  2016/02/03 16:41:18  valuev
+ * fixes
+ *
+ * Revision 1.16  2015/11/05 11:22:28  valuev
+ * fixed trajectory saving (regular sequence)
+ *
  * Revision 1.15  2015/03/27 18:23:15  valuev
  * edges
  *
@@ -315,9 +321,10 @@ protected:
   
   gmNodeProp userprop;
   mngptr<gmNodeAction> useraction; 
+  bool implicit_action;  ///<\en true if the node may have associated implicit code block
 public:
 
-  sysGraphNode(const std::string &slabel="", int final_=0):sysGraphElm(slabel),inports(0),outports(0), error_code(gmERR_NONE),read(false){
+  sysGraphNode(const std::string &slabel="", int final_=0):sysGraphElm(slabel),inports(0),outports(0), error_code(gmERR_NONE),read(false),implicit_action(false){
     id = gmNODE_NONE;
     ts0=0;
     ts1=-1;
@@ -365,7 +372,8 @@ public:
   }
   virtual int isVirtual() const{
       return useraction.ptr() == NULL
-          && userprop.application_call.empty();
+          && userprop.application_call.empty()
+              && !implicit_action;
   }
 
   ///\en Gets error code and optionally (if message !=0) error message 

@@ -6,21 +6,21 @@
  *
  *   Project	: KHIMERA
  *
- *   $Revision: 1.1 $
- *   $Date: 2013/05/24 17:53:14 $
- *   @(#) $Header: /home/plasmacvs/source_tree/gridmd/src/gmd/xml/xml_file.cpp,v 1.1 2013/05/24 17:53:14 valuev Exp $
+ *   $Revision: 1.3 $
+ *   $Date: 2016/02/05 19:04:45 $
+ *   @(#) $Header: /home/plasmacvs/source_tree/gridmd/src/gmd/xml/xml_file.cpp,v 1.3 2016/02/05 19:04:45 valuev Exp $
  *
  *****************************************************************************/
 /*
 $Source: /home/plasmacvs/source_tree/gridmd/src/gmd/xml/xml_file.cpp,v $
-$Revision: 1.1 $
+$Revision: 1.3 $
 $Author: valuev $
-$Date: 2013/05/24 17:53:14 $
+$Date: 2016/02/05 19:04:45 $
 */
 /******************************************************************************
  * $Log: xml_file.cpp,v $
- * Revision 1.1  2013/05/24 17:53:14  valuev
- * sync with kintech svn
+ * Revision 1.3  2016/02/05 19:04:45  valuev
+ * implicit workflow fixes
  *
  * Revision 1.25  2009/10/09 15:28:47  wasp
  * In function addElement node name check was added.
@@ -109,21 +109,47 @@ $Date: 2013/05/24 17:53:14 $
 #include <libxml/xpath.h>
 #include <libxml/xinclude.h>
 
+#include "string.h"
+#include <string>
 #include <iostream>
 #include <sstream>
 //#include <strstream>
 #include <list>
 #include <cstring>
+#include <algorithm>
+#include <utility>
+#include <stdlib.h>
+#include <cstdlib>
+#include <numeric>
+#include <cassert>
+//#include <boost/bind.hpp>
 #endif
 
-#include <gmd/xml/xml_file.h>
+#include "xml_file.h"
 
 using namespace std;
+
+//------------------------------------------throw error utility(s)----------------------------------------
+
+namespace
+{
+
+    void throw_xml_error(const std::string& brife_wath,
+                         const XMLFile*xmlFile=nullptr,
+                         xmlNodePtr node=nullptr,
+                         const std::string& xpath="",
+                         const xml_error::collection& ditails=xml_error::collection(),
+                         const std::string& fiule_path=""
+                         )
+    {
+        throw xml_error(brife_wath, xmlFile, node, xpath, ditails, xml_error::ptr_collection(), fiule_path );
+    }
+}
 
 
 //------------------------------------------Converters----------------------------------------
 
-string XMLFile::convertFloat(double val)
+string XMLFile::convertFloat(double val) const
 {
 	string					res;
 	ostringstream			to;
@@ -131,7 +157,7 @@ string XMLFile::convertFloat(double val)
 	to.precision(16);
 	to.setf(ios::scientific, ios::floatfield);
 	to << val;
-	if(!to) throw xml_error("Bad value for conversion!", this);
+    if(!to) throw_xml_error("Bad value for conversion!", this);
 	res = to.str();
 
 #ifdef DEBUG_XML
@@ -140,13 +166,39 @@ string XMLFile::convertFloat(double val)
 	return res;
 }
 
-string XMLFile::convertInt(int val)
+static string convertInt(int val)
+{
+    string					res;
+    ostringstream			to;
+
+    to << val;
+    res = to.str();
+
+    return res;
+}
+
+string XMLFile::convertInt(int val) const
+{
+    string					res;
+    ostringstream			to;
+
+    to << val;
+    if(!to) throw_xml_error("Bad value for conversion!", this);
+    res = to.str();
+
+#ifdef DEBUG_XML
+    cerr << "XMLFile::convertFloat: value is " << res << "\n";
+#endif
+    return res;
+}
+
+string XMLFile::convertUInt(unsigned int val) const
 {
 	string					res;
 	ostringstream			to;
 
 	to << val;
-	if(!to) throw xml_error("Bad value for conversion!", this);
+    if(!to) throw_xml_error("Bad value for conversion!", this);
 	res = to.str();
 
 #ifdef DEBUG_XML
@@ -155,29 +207,14 @@ string XMLFile::convertInt(int val)
 	return res;
 }
 
-string XMLFile::convertUInt(unsigned int val)
-{
-	string					res;
-	ostringstream			to;
-
-	to << val;
-	if(!to) throw xml_error("Bad value for conversion!", this);
-	res = to.str();
-
-#ifdef DEBUG_XML
-	cerr << "XMLFile::convertFloat: value is " << res << "\n";
-#endif
-	return res;
-}
-
-string XMLFile::convertBool(bool val)
+string XMLFile::convertBool(bool val) const
 {
 	string					res;
 	ostringstream			to;
 
 	boolalpha(to);
 	to << val;
-	if(!to) throw xml_error("Bad value for conversion!", this);
+    if(!to) throw_xml_error("Bad value for conversion!", this);
 	res = to.str();
 
 #ifdef DEBUG_XML
@@ -187,12 +224,13 @@ string XMLFile::convertBool(bool val)
 }
 
 
-double XMLFile::convertFloat(string val)
+
+double XMLFile::convertFloat(string val) const
 {
 	double					res;
 	istringstream			from(val);
 	from >> res;
-	if(!from) throw xml_error("Bad value for conversion!", this);
+    if(!from) throw_xml_error("Bad value for conversion!", this);
 
 #ifdef DEBUG_XML
 	cerr << "XMLFile::convertFloat: value is " << res << "\n";
@@ -200,12 +238,12 @@ double XMLFile::convertFloat(string val)
 	return res;
 }
 
-int XMLFile::convertInt(string val)
+int XMLFile::convertInt(string val) const
 {
 	int					res;
 	istringstream		from(val);
 	from >> res;
-	if(!from) throw xml_error("Bad value for conversion!", this);
+    if(!from) throw_xml_error("Bad value for conversion!", this);
 
 #ifdef DEBUG_XML
 	cerr << "XMLFile::convertInt: value is " << res << "\n";
@@ -213,12 +251,12 @@ int XMLFile::convertInt(string val)
 	return res;
 }
 
-unsigned int XMLFile::convertUInt(string val)
+unsigned int XMLFile::convertUInt(string val) const
 {
 	unsigned int		res;
 	istringstream		from(val);
 	from >> res;
-	if(!from) throw xml_error("Bad value for conversion!", this);
+    if(!from) throw_xml_error("Bad value for conversion!", this);
 
 #ifdef DEBUG_XML
 	cerr << "XMLFile::convertUInt: value is " << res << "\n";
@@ -226,7 +264,7 @@ unsigned int XMLFile::convertUInt(string val)
 	return res;
 }
 
-bool XMLFile::convertBool(string val)
+bool XMLFile::convertBool(string val) const
 {
 	bool					res;
 	string				inp;
@@ -234,7 +272,7 @@ bool XMLFile::convertBool(string val)
 	
 	//Trim whitespaces!
 	from >> inp;
-	if(!from) throw xml_error("Bad value for conversion!", this);
+    if(!from) throw_xml_error("Bad value for conversion!", this);
 
 	
 	if(inp == "1" || inp == "true") {
@@ -243,7 +281,7 @@ bool XMLFile::convertBool(string val)
 		if(inp == "0" || inp == "false") {
 			res = false;
 		} else {
-			throw xml_error("Bad value for conversion!", this);
+            throw_xml_error("Bad value for conversion!", this);
 		}
 	};
 
@@ -253,30 +291,55 @@ bool XMLFile::convertBool(string val)
 	return res;
 }
 
-double XMLFile::convertFloat(const char* val)
+double XMLFile::convertFloat(const char* val) const
 {
 	return convertFloat(string(val));
 }
 
-int XMLFile::convertInt(const char* val)
+int XMLFile::convertInt(const char* val) const
 {
 	return convertInt(string(val));
 }
 
-unsigned int XMLFile::convertUInt(const char* val)
+unsigned int XMLFile::convertUInt(const char* val) const
 {
 	return convertUInt(string(val));
 }
 
-bool XMLFile::convertBool(const char* val)
+bool XMLFile::convertBool(const char* val) const
 {
     return convertBool(string(val));
 }
 
-string XMLFile::convertStr(string val)
+string XMLFile::convertStr(string val) const
 {
     return val;
 }
+
+std::vector<std::string> XMLFile::convertArray(std::string val) const
+{
+    std::vector<std::string> ret;
+
+    std::string i;
+    for( std::istringstream from(val); from>>i; )
+        ret.push_back(i);
+
+    return ret;
+}
+
+std::string XMLFile::convertArray(const std::vector<std::string> &val) const
+{
+    std::string ret;
+
+    for(size_t i=0; i<val.size(); ++i)
+    {
+        if(i!=0)
+            ret+= " ";
+        ret+= val[i];
+    }
+    return ret;
+}
+
 
 //-------------------URL Access----------------------------------------------------------
 
@@ -312,10 +375,10 @@ xmlNodePtr XMLFile::createDoc(string rootName)
 	XMLFile::fname = "";
 
 	doc = xmlNewDoc((xmlChar*) "1.0");
-	if(!doc) throw xml_error("Can't create XML document!", this);
+    if(!doc) throw_xml_error("Can't create XML document!", this);
 
 	rootNode = xmlNewNode(NULL, (xmlChar*) rootName.c_str());
-	if(!rootNode) throw xml_error("Can't create root node!", this);
+    if(!rootNode) throw_xml_error("Can't create root node!", this);
 	
 	xmlDocSetRootElement(doc, rootNode);
 
@@ -324,7 +387,7 @@ xmlNodePtr XMLFile::createDoc(string rootName)
 
 xmlNodePtr XMLFile::addElement(xmlNodePtr parent, string name, string content)
 {
-	if(name.empty()) throw xml_error("Name of created node is empty!", this);
+    if(name.empty()) throw_xml_error("Name of created node is empty!", this);
 	return xmlNewTextChild(parent, NULL, (xmlChar*) name.c_str(),
 		content != "" ? (xmlChar*) content.c_str() : NULL);
 }
@@ -333,6 +396,22 @@ xmlNodePtr XMLFile::addElement(string parentPath, string name, string content)
 {
 	if(isNode(parentPath))
 		return addElement(getNodeByPath(parentPath), name, content);
+	else
+		return NULL;
+}
+
+xmlNodePtr XMLFile::addOptionalElement(xmlNodePtr parent, string name, string content)
+{
+   if(!content.empty()) 
+		return addElement(parent, name, content);
+	else
+		return NULL;
+}
+
+xmlNodePtr XMLFile::addOptionalElement(string parentPath, string name, string content)
+{
+   if(!content.empty()) 
+		return addElement(parentPath, name, content);
 	else
 		return NULL;
 }
@@ -399,13 +478,13 @@ void XMLFile::setContent(string path, int content)
 
 void XMLFile::setContent(string path, bool content)
 {
-	setContent(path, convertBool(content));
+    setContent(path, convertBool(content));
 }
 
 void XMLFile::addOptionalAttribute(xmlNodePtr node, string name, const char* content)
 {
-	if(strlen(content) > 0)
-    xmlNewProp(node, (xmlChar*) name.c_str(), (xmlChar*) content);
+    if( content && strlen(content)>0 )
+        xmlNewProp(node, (xmlChar*) name.c_str(), (xmlChar*) content);
 }
 
 void XMLFile::addOptionalAttribute(xmlNodePtr node, string name, string content)
@@ -435,7 +514,7 @@ void XMLFile::addAttribute(xmlNodePtr node, string name, int content)
 
 void XMLFile::addAttribute(xmlNodePtr node, string name, bool content)
 {
-	addAttribute(node, name, convertBool(content));
+    addAttribute(node, name, convertBool(content));
 }
 
 void XMLFile::addAttribute(string path, string name, const char* content)
@@ -492,27 +571,27 @@ void XMLFile::setAttribute(xmlNodePtr node, string name, bool content)
 
 
 //------------------------------------------Node utilities----------------------------------------
-xmlNodePtr XMLFile::getRootNode(void)
+xmlNodePtr XMLFile::getRootNode(void) const
 {
-	return xmlDocGetRootElement(doc);
+    return doc ? xmlDocGetRootElement(doc) : nullptr;
 }
 
-xmlNodePtr XMLFile::getNodeByPath(const char* path, bool throwOnNotFound)
+xmlNodePtr XMLFile::getNodeByPath(const char* path, bool throwOnNotFound) const
 {
     return getNodeByPath(string(path), throwOnNotFound);
 }
 
-xmlNodePtr XMLFile::getNodeByPath(string path, bool throwOnNotFound)
+xmlNodePtr XMLFile::getNodeByPath(string path, bool throwOnNotFound) const
 {
     return getNodeByRelativePath(path, xmlDocGetRootElement(doc), throwOnNotFound);
 }
 
-xmlNodePtr XMLFile::getNodeByRelativePath(const char*  path, xmlNodePtr current_node, bool throwOnNotFound)
+xmlNodePtr XMLFile::getNodeByRelativePath(const char*  path, xmlNodePtr current_node, bool throwOnNotFound) const
 {
     return getNodeByRelativePath(std::string(path), current_node, throwOnNotFound);
 }
 
-xmlNodePtr XMLFile::getNodeByRelativePath(string path, xmlNodePtr current_node, bool throwOnNotFound)
+xmlNodePtr XMLFile::getNodeByRelativePath(string path, xmlNodePtr current_node, bool throwOnNotFound) const
 {
     xmlNodePtr					res;
     xmlXPathObjectPtr			xpath;
@@ -522,20 +601,20 @@ xmlNodePtr XMLFile::getNodeByRelativePath(string path, xmlNodePtr current_node, 
     cerr << "XMLFile::getNodeByPath: looking for " << path.c_str() << " ...\n";
 #endif
 
-    if(!doc) throw xml_error("Document not found!",this, current_node, path);
+    if(!doc) throw_xml_error("Document not found!",this, current_node, path);
 
     ctxt = xmlXPathNewContext(doc);
     ctxt->node = current_node;
     xpath = xmlXPathEvalExpression((const xmlChar *)path.c_str(), ctxt);
     if(!xpath) {
         xmlXPathFreeContext(ctxt);
-        throw xml_error("Bad path! (Cann't evaluate XPath. Wrong syntax.)",this, current_node, path);
+        throw_xml_error("Bad path! (Cann't evaluate XPath. Wrong syntax.)",this, current_node, path);
     };
     if(!xpath->nodesetval) {
         xmlXPathFreeObject(xpath);
         xmlXPathFreeContext(ctxt);
         if(throwOnNotFound)
-            throw xml_error("Bad path! (Nothing to return.)",this, current_node, path);
+            throw_xml_error("Bad path! (Nothing to return.)",this, current_node, path);
         return NULL;
     };
 
@@ -543,34 +622,34 @@ xmlNodePtr XMLFile::getNodeByRelativePath(string path, xmlNodePtr current_node, 
         xmlXPathFreeObject(xpath);
         xmlXPathFreeContext(ctxt);
         if(throwOnNotFound)
-            throw xml_error("Bad path! (Nothing to return.)",this, current_node, path);
+            throw_xml_error("Bad path! (Nothing to return.)",this, current_node, path);
         return NULL;
     };
 
     res = xpath->nodesetval->nodeTab[0];
     xmlXPathFreeObject(xpath);
     xmlXPathFreeContext(ctxt);
-    if( !res && throwOnNotFound ) throw xml_error("Bad path! (Nothing to return.)",this, current_node, path);
+    if( !res && throwOnNotFound ) throw_xml_error("Bad path! (Nothing to return.)",this, current_node, path);
 
     return res;
-};
+}
 
-vector<xmlNodePtr> XMLFile::getNodesByPath(const char* path)
+vector<xmlNodePtr> XMLFile::getNodesByPath(const char* path) const
 {
 	return getNodesByPath(string(path));
 }
 
-vector<xmlNodePtr> XMLFile::getNodesByPath(string path)
+vector<xmlNodePtr> XMLFile::getNodesByPath(string path) const
 {
 	return getNodesByRelativePath(path, xmlDocGetRootElement(doc));
 }
 
-vector<xmlNodePtr> XMLFile::getNodesByRelativePath(const char*  path, xmlNodePtr current_node)
+vector<xmlNodePtr> XMLFile::getNodesByRelativePath(const char*  path, xmlNodePtr current_node) const
 {
 	return getNodesByRelativePath(std::string(path), current_node);
 }
 
-vector<xmlNodePtr> XMLFile::getNodesByRelativePath(string path, xmlNodePtr current_node)
+vector<xmlNodePtr> XMLFile::getNodesByRelativePath(string path, xmlNodePtr current_node) const
 {
 	vector<xmlNodePtr>		res;
 	xmlXPathObjectPtr			xpath;
@@ -580,7 +659,7 @@ vector<xmlNodePtr> XMLFile::getNodesByRelativePath(string path, xmlNodePtr curre
 	cerr << "XMLFile::getNodeByPath: looking for " << path.c_str() << " ...\n";
 #endif
 
-	if(!doc) throw xml_error("Document not found!",this, current_node, path);
+    if(!doc) throw_xml_error("Document not found!",this, current_node, path);
 
 	ctxt = xmlXPathNewContext(doc);
 	ctxt->node = current_node;
@@ -588,7 +667,7 @@ vector<xmlNodePtr> XMLFile::getNodesByRelativePath(string path, xmlNodePtr curre
 	if(!xpath) {
 		xmlXPathFreeContext(ctxt);
 		//return res;
-		throw xml_error("Bad path! (Cann't evaluate XPath. Wrong syntax.)",this, current_node, path);
+        throw_xml_error("Bad path! (Cann't evaluate XPath. Wrong syntax.)",this, current_node, path);
 	};
 	if(!xpath->nodesetval) {
 		xmlXPathFreeObject(xpath);
@@ -607,7 +686,7 @@ vector<xmlNodePtr> XMLFile::getNodesByRelativePath(string path, xmlNodePtr curre
 	return res;
 }
 
-string XMLFile::getNodePath(xmlNodePtr node)
+string XMLFile::getNodePath(xmlNodePtr node) const
 {
 	xmlChar*			retStr = 0;
 	string			res;
@@ -615,7 +694,7 @@ string XMLFile::getNodePath(xmlNodePtr node)
 
 	if(!node) return res;
 	retStr = xmlGetNodePath(node);
-	if(!retStr) throw xml_error("Bad node!",this, node);
+    if(!retStr) throw_xml_error("Bad node!",this, node);
 	res = string((char*)retStr);
 	xmlFree(retStr);
 #ifdef DEBUG_XML
@@ -624,7 +703,7 @@ string XMLFile::getNodePath(xmlNodePtr node)
 	return res;
 }
 
-xmlNodePtr XMLFile::getChildByName(xmlNodePtr parent, string name,  bool throwOnNotFound)
+xmlNodePtr XMLFile::getChildByName(xmlNodePtr parent, string name,  bool throwOnNotFound) const
 {
 	xmlNodePtr				cur;
 	
@@ -635,17 +714,17 @@ xmlNodePtr XMLFile::getChildByName(xmlNodePtr parent, string name,  bool throwOn
 	};
 	
     if(throwOnNotFound)
-        throw xml_error( "Child node not found." , this, parent, name );
+        throw_xml_error( "Child node not found." , this, parent, name );
 
 	return NULL;
 }
 
-xmlNodePtr XMLFile::getChildByName(xmlNodePtr parent, const char* name, bool throwOnNotFound)
+xmlNodePtr XMLFile::getChildByName(xmlNodePtr parent, const char* name, bool throwOnNotFound) const
 {
     return getChildByName(parent, string(name), throwOnNotFound);
 }
 
-vector<xmlNodePtr> XMLFile::getChildsByName(xmlNodePtr parent, string name)
+vector<xmlNodePtr> XMLFile::getChildsByName(xmlNodePtr parent, string name) const
 {
 	xmlNodePtr					cur;
 	vector<xmlNodePtr>		ret;
@@ -660,12 +739,12 @@ vector<xmlNodePtr> XMLFile::getChildsByName(xmlNodePtr parent, string name)
 	return ret;
 }
 
-vector<xmlNodePtr> XMLFile::getChildsByName(xmlNodePtr parent, const char* name)
+vector<xmlNodePtr> XMLFile::getChildsByName(xmlNodePtr parent, const char* name) const
 {
 	return getChildsByName(parent, string(name));
 }
 
-vector<xmlNodePtr> XMLFile::getAllChildren(xmlNodePtr parent)
+vector<xmlNodePtr> XMLFile::getAllChildren(xmlNodePtr parent) const
 {
 	xmlNodePtr					cur;
 	vector<xmlNodePtr>		ret;
@@ -680,17 +759,17 @@ vector<xmlNodePtr> XMLFile::getAllChildren(xmlNodePtr parent)
 	return ret;
 }
 
-bool XMLFile::isNode(xmlNodePtr parent, string name)
+bool XMLFile::isNode(xmlNodePtr parent, string name) const
 {
 	return (getChildByName(parent, name) != NULL);
 }
 
-bool XMLFile::isNode(xmlNodePtr parent, const char* name)
+bool XMLFile::isNode(xmlNodePtr parent, const char* name) const
 {
 	return isNode(parent, string(name));
 }
 
-bool XMLFile::isNode(string path)
+bool XMLFile::isNode(string path) const
 {
 //	xmlNodePtr					res;
 	xmlXPathObjectPtr			xpath;
@@ -701,7 +780,7 @@ bool XMLFile::isNode(string path)
 #endif
 
 	if(!doc) 
-		throw xml_error("Document not found!",this, NULL, path);
+        throw_xml_error("Document not found!",this, NULL, path);
 		//throw invalid_argument("Document not found!");
 
 	ctxt = xmlXPathNewContext(doc);
@@ -725,14 +804,14 @@ bool XMLFile::isNode(string path)
 	xmlXPathFreeObject(xpath);
 	xmlXPathFreeContext(ctxt);
 	return true;
-};
+}
 
-bool  XMLFile::isNode(const char* path)
+bool  XMLFile::isNode(const char* path) const
 {
 	return isNode(string(path));
-};
+}
 
-bool  XMLFile::isAttribute(string path)
+bool  XMLFile::isAttribute(string path) const
 {
 	xmlXPathObjectPtr			xpath;
 	xmlXPathContextPtr		ctxt;
@@ -760,50 +839,67 @@ bool  XMLFile::isAttribute(string path)
 	return ret;
 }
 
-bool  XMLFile::isAttribute(const char* path)
+bool  XMLFile::isAttribute(const char* path) const
 {
 	return isAttribute(string(path));
 }
 
-bool  XMLFile::hasAttribute(xmlNodePtr node, string name)
+bool  XMLFile::hasAttribute(xmlNodePtr node, string name) const
 {
 #ifdef DEBUG_XML
 	cerr << "XMLFile::hasAttribute: checking attribute " << name << " ...\n";
 #endif
 	if(!node) 
-		throw xml_error("Parent node not set!",this, node, name);
+        throw_xml_error("Parent node not set!",this, node, name);
 		//throw invalid_argument("Parent node not set!"); 
 
 	xmlChar*res= xmlGetProp(node,(const xmlChar*) name.c_str());
-	if(res) {
+    if(res) {
 		xmlFree(res);
 		return true;
 	} else return false;
 }
 
-bool  XMLFile::hasAttribute(xmlNodePtr node, const char* name)
+bool XMLFile::hasAttribute(xmlNodePtr node, string name, bool inheridFromParent) const
+{
+    if(!node)
+        return false;
+
+    if(hasAttribute(node, name))
+        return true;
+
+    if(inheridFromParent)
+        for(xmlNodePtr p=node->parent; p; p=p->parent )
+            if(hasAttribute(p, name))
+                return true;
+
+    return false;
+}
+
+
+bool  XMLFile::hasAttribute(xmlNodePtr node, const char* name) const
 {
 	return hasAttribute(node, string(name));
 }
 
-bool XMLFile::parseBoolAttribute(string root, string name)
+bool XMLFile::parseBoolAttribute(string root, string name) const
 {
 	return parseBoolAttribute(getNodeByPath(root), string(name));
 }
 
-bool XMLFile::parseBoolAttribute(const char* root, const char* name)
+bool XMLFile::parseBoolAttribute(const char* root, const char* name) const
 {
 	return parseBoolAttribute(string(root), string(name));
 }
 
-bool XMLFile::parseBoolAttribute(xmlNodePtr node, string name)
+bool XMLFile::parseBoolAttribute(xmlNodePtr node, string name) const
 {
 	xmlChar*			retStr;
 	bool				res;
 
 	retStr = xmlGetProp(node, (const xmlChar*)name.c_str());
 	if(!retStr) 
-		throw xml_error("Bad node!",this, node, name);
+        throw_xml_error("Bad node!",this, node, name);
 		
 	res = convertBool((const char*)retStr);
 	xmlFree(retStr);
@@ -811,27 +907,27 @@ bool XMLFile::parseBoolAttribute(xmlNodePtr node, string name)
 #ifdef DEBUG_XML
 	cerr << "XMLFile::parseBoolAttribute: value is \"" << res << "\"\n";
 #endif
-	return res;
+    return res;
 }
 
-int XMLFile::parseIntAttribute(string root, string name)
+int XMLFile::parseIntAttribute(string root, string name) const
 {
 	return parseIntAttribute(getNodeByPath(root), string(name));
 }
 
-int XMLFile::parseIntAttribute(const char* root, const char* name)
+int XMLFile::parseIntAttribute(const char* root, const char* name) const
 {
 	return parseIntAttribute(string(root), string(name));
 }
 
-int XMLFile::parseIntAttribute(xmlNodePtr node, string name)
+int XMLFile::parseIntAttribute(xmlNodePtr node, string name) const
 {
 	xmlChar*			retStr;
 	int				res;
 
 	retStr = xmlGetProp(node, (const xmlChar*)name.c_str());
 	if(!retStr) 
-		throw xml_error("Bad node!",this, node, name);
+        throw_xml_error("Bad node!",this, node, name);
 		
 	res = convertInt((const char*)retStr);
 	xmlFree(retStr);
@@ -842,24 +938,24 @@ int XMLFile::parseIntAttribute(xmlNodePtr node, string name)
 	return res;
 }
 
-double XMLFile::parseFloatAttribute(string root, string name)
+double XMLFile::parseFloatAttribute(string root, string name) const
 {
 	return parseFloatAttribute(getNodeByPath(root), string(name));
-};
+}
 
-double XMLFile::parseFloatAttribute(const char* root, const char* name)
+double XMLFile::parseFloatAttribute(const char* root, const char* name) const
 {
 	return parseFloatAttribute(string(root), string(name));
-};
+}
 
-double XMLFile::parseFloatAttribute(xmlNodePtr node, string name)
+double XMLFile::parseFloatAttribute(xmlNodePtr node, string name) const
 {
 	xmlChar*			retStr;
 	double			res;
 
 	retStr = xmlGetProp(node, (const xmlChar*)name.c_str());
 	if(!retStr) 
-		throw xml_error("Bad node!",this, node, name);
+        throw_xml_error("Bad node!",this, node, name);
 		
 	res = convertFloat((const char*)retStr);
 	xmlFree(retStr);
@@ -870,7 +966,7 @@ double XMLFile::parseFloatAttribute(xmlNodePtr node, string name)
 	return res;
 }
 
-string XMLFile::parseAttribute(string root, string name)
+string XMLFile::parseAttribute(string root, string name) const
 {
 	xmlNodePtr		node;
 	xmlChar*			retStr;
@@ -879,28 +975,7 @@ string XMLFile::parseAttribute(string root, string name)
 	node = getNodeByPath(root);
 	retStr = xmlGetProp(node, (const xmlChar*)name.c_str());
 	if(!retStr) 
-		throw xml_error("Bad node!",this, node, name);
-	res = string((const char*)retStr);
-	xmlFree(retStr);
-
-#ifdef DEBUG_XML
-	cerr << "XMLFile::parseAttribute: string is \"" << res.c_str() << "\"\n";
-#endif
-	return res;
-};
-
-string XMLFile::parseAttribute(const char* root, const char* name)
-{
-	return parseAttribute(string(root), string(name));
-};
-
-string XMLFile::parseAttribute(xmlNodePtr node, string name)
-{
-	xmlChar*			retStr;
-	string			res;
-
-	retStr = xmlGetProp(node, (const xmlChar*)name.c_str());
-	if(!retStr) throw xml_error("Bad node!",this, node, name);
+        throw_xml_error("Bad node!",this, node, name);
 	res = string((const char*)retStr);
 	xmlFree(retStr);
 
@@ -910,7 +985,28 @@ string XMLFile::parseAttribute(xmlNodePtr node, string name)
 	return res;
 }
 
-string XMLFile::parseAttribute(xmlNodePtr node, const char* name)
+string XMLFile::parseAttribute(const char* root, const char* name) const
+{
+	return parseAttribute(string(root), string(name));
+}
+
+string XMLFile::parseAttribute(xmlNodePtr node, string name) const
+{
+	xmlChar*			retStr;
+	string			res;
+
+	retStr = xmlGetProp(node, (const xmlChar*)name.c_str());
+    if(!retStr) throw_xml_error("Bad node!",this, node, name);
+	res = string((const char*)retStr);
+	xmlFree(retStr);
+
+#ifdef DEBUG_XML
+	cerr << "XMLFile::parseAttribute: string is \"" << res.c_str() << "\"\n";
+#endif
+	return res;
+}
+
+string XMLFile::parseAttribute(xmlNodePtr node, const char* name) const
 {
 	return parseAttribute(node, string(name));
 }
@@ -918,12 +1014,12 @@ string XMLFile::parseAttribute(xmlNodePtr node, const char* name)
 namespace {
     template <typename T>
     T parseOptionalAttributeImpl(
-            XMLFile&   parser,
-            xmlNodePtr node,
-            string     name,
-            T          defaultValue,
-            bool       inheridFromParent,
-            T          (XMLFile::*getter)(xmlNodePtr node, string name))
+            const XMLFile&  parser,
+            xmlNodePtr      node,
+            string          name,
+            T               defaultValue,
+            bool            inheridFromParent,
+            T   (XMLFile:: * getter  )(xmlNodePtr node, string name) const )
     {
         if(parser.hasAttribute(node, name))
             return (parser.*getter)(node, name);
@@ -933,122 +1029,247 @@ namespace {
             return defaultValue;
     }
 
+    template<typename T>
+    std::vector<T> convertVectorImpl(
+            const XMLFile&      parser,
+            const std::string & str,
+            std::vector<std::string> (XMLFile::*convertArray)(std::string val) const,
+            T               (XMLFile::*convertor)(string val) const
+            )
+    {
+        std::vector<std::string> strs=(parser.*convertArray)( str );
+        std::vector<T> ret;
+        ret.reserve(strs.size());
+        for(size_t i=0; i<strs.size(); ++i)
+            ret.push_back( (parser.*convertor)(strs[i]) );
+        return ret;
+    }
 
+
+    template<typename T>
+    std::vector<T> parseOptionalAttributeImpl(
+            const XMLFile&  parser,
+            xmlNodePtr      node,
+            string          name,
+            std::vector<T>  defaultValue,
+            bool            inheridFromParent,
+            std::vector<std::string> (XMLFile::*convertArray)(std::string val) const,
+            T               (XMLFile::*convertor)(string val) const
+            )
+    {
+        if(parser.hasAttribute(node, name))
+            return convertVectorImpl( parser, parser.parseAttribute(node, name), convertArray, convertor );
+        else if(inheridFromParent && node->parent)
+            return parser.parseOptionalAttribute(node->parent, name, defaultValue, inheridFromParent);
+        else
+            return defaultValue;
+    }
 }
 
-bool   XMLFile::parseOptionalAttribute(xmlNodePtr node, string name, bool     defaultValue, bool inheridFromParent)
+
+bool   XMLFile::parseOptionalAttribute(xmlNodePtr node, string name, bool     defaultValue, bool inheridFromParent) const
 {
     return parseOptionalAttributeImpl( *this, node, name, defaultValue, inheridFromParent, & XMLFile::parseBoolAttribute );
 }
 
-int    XMLFile::parseOptionalAttribute(xmlNodePtr node, string name, int      defaultValue, bool inheridFromParent)
+int    XMLFile::parseOptionalAttribute(xmlNodePtr node, string name, int      defaultValue, bool inheridFromParent) const
 {
     return parseOptionalAttributeImpl( *this, node, name, defaultValue, inheridFromParent, & XMLFile::parseIntAttribute );
 }
 
-double XMLFile::parseOptionalAttribute(xmlNodePtr node, string name, double   defaultValue, bool inheridFromParent)
+double XMLFile::parseOptionalAttribute(xmlNodePtr node, string name, double   defaultValue, bool inheridFromParent) const
 {
     return parseOptionalAttributeImpl( *this, node, name, defaultValue, inheridFromParent, & XMLFile::parseFloatAttribute );
 }
 
-string XMLFile::parseOptionalAttribute(xmlNodePtr node, string name, string   defaultValue, bool inheridFromParent)
+string XMLFile::parseOptionalAttribute(xmlNodePtr node, string name, string   defaultValue, bool inheridFromParent) const
 {
     return parseOptionalAttributeImpl( *this, node, name, defaultValue, inheridFromParent, & XMLFile::parseAttribute );
 }
-string XMLFile::parseOptionalAttribute(xmlNodePtr node, string name, const char* defaultValue, bool inheridFromParent)
+string XMLFile::parseOptionalAttribute(xmlNodePtr node, string name, const char* defaultValue, bool inheridFromParent) const
 {
     return parseOptionalAttribute(node, name, std::string(defaultValue), inheridFromParent);
+}
+
+std::vector<bool       >  XMLFile::parseOptionalAttribute(xmlNodePtr node, string name, std::vector<bool       >  defaultValue, bool inheridFromParent) const
+{
+    return parseOptionalAttributeImpl(*this, node, name, defaultValue, inheridFromParent, & XMLFile::convertArray,  & XMLFile::convertBool );
+}
+std::vector<int        >  XMLFile::parseOptionalAttribute(xmlNodePtr node, string name, std::vector<int        >  defaultValue, bool inheridFromParent) const
+{
+    return parseOptionalAttributeImpl(*this, node, name, defaultValue, inheridFromParent, & XMLFile::convertArray,  & XMLFile::convertInt );
+}
+std::vector<double     >  XMLFile::parseOptionalAttribute(xmlNodePtr node, string name, std::vector<double     >  defaultValue, bool inheridFromParent) const
+{
+    return parseOptionalAttributeImpl(*this, node, name, defaultValue, inheridFromParent, & XMLFile::convertArray,  & XMLFile::convertFloat );
+}
+std::vector<std::string>  XMLFile::parseOptionalAttribute(xmlNodePtr node, string name, std::vector<std::string>  defaultValue, bool inheridFromParent) const
+{
+    return parseOptionalAttributeImpl(*this, node, name, defaultValue, inheridFromParent, & XMLFile::convertArray,  & XMLFile::convertStr );
 }
 
 namespace {
     template <typename T>
     T parseOptionalImpl(
-            XMLFile&        parser      ,
+            const XMLFile&  parser      ,
             const string&   xpath       ,
             T               defaultValue,
-            T  (XMLFile::*  convert     )(std::string content)  )
+            T  (XMLFile::*  convert     )(std::string content) const )
     {
-        if(parser.isNode(xpath))
-            return (parser.*convert)( parser.parseNode(  parser.getNodeByPath(xpath) ) );
+        xmlNodePtr node=parser.getNodeByPath(xpath, false);
+        if(node)
+            return (parser.*convert)( parser.parseNode( node ) );
         else
             return defaultValue;
     }
 
     template <typename T>
     T parseOptionalImpl(
-            XMLFile&        parser      ,
+            const XMLFile&  parser      ,
             xmlNodePtr      parent      ,
             const string&   xpath       ,
             T               defaultValue,
-            T  (XMLFile::*  convert     )(std::string content)  )
+            T  (XMLFile::*  convert     )(std::string content) const )
     {
-
         xmlNodePtr node=parser.getNodeByRelativePath(xpath, parent, false );
         if(node)
-            return (parser.*convert)( parser.parseNode(  node ) );
+            return (parser.*convert)( parser.parseNode( node ) );
         else
             return defaultValue;
     }
+
+    template<typename T>
+    std::vector<T> parseOptionalImpl(
+            const XMLFile&  parser      ,
+            const string&   xpath       ,
+            std::vector<T>  defaultValue,
+            std::vector<std::string> (XMLFile::*convertArray)(std::string val) const,
+            T               (XMLFile::*convertor)(string val) const
+            )
+    {
+        if(parser.isNode(xpath))
+            return convertVectorImpl( parser, parser.parseOptional(xpath, ""), convertArray, convertor );
+        else
+            return defaultValue;
+    }
+
+    template<typename T>
+    std::vector<T> parseOptionalImpl(
+            const XMLFile&  parser      ,
+            xmlNodePtr      parent      ,
+            const string&   xpath       ,
+            std::vector<T>  defaultValue,
+            std::vector<std::string> (XMLFile::*convertArray)(std::string val) const,
+            T               (XMLFile::*convertor)(string val) const
+            )
+    {
+        xmlNodePtr node=parser.getNodeByRelativePath(xpath, parent, false );
+        if(node)
+            return convertVectorImpl( parser, parser.parseNode(  node ), convertArray, convertor );
+        else
+            return defaultValue;
+    }
+
 }
 
-bool XMLFile::parseOptional(string xpath, bool defaultValue)
+bool XMLFile::parseOptional(string xpath, bool defaultValue) const
 {
     return parseOptionalImpl( *this, xpath, defaultValue , & XMLFile::convertBool );
 }
 
-int XMLFile::parseOptional(string xpath, int defaultValue)
+int XMLFile::parseOptional(string xpath, int defaultValue) const
 {
     return parseOptionalImpl( *this, xpath, defaultValue , & XMLFile::convertInt );
 }
 
-double XMLFile::parseOptional(string xpath, double defaultValue)
+double XMLFile::parseOptional(string xpath, double defaultValue) const
 {
     return parseOptionalImpl( *this, xpath, defaultValue , & XMLFile::convertFloat );
 }
 
-string XMLFile::parseOptional(string xpath, string defaultValue)
+string XMLFile::parseOptional(string xpath, string defaultValue) const
 {
     return parseOptionalImpl( *this, xpath, defaultValue , & XMLFile::convertStr );
 }
 
-string XMLFile::parseOptional(string xpath, const char *defaultValue)
+string XMLFile::parseOptional(string xpath, const char *defaultValue) const
 {
     return parseOptionalImpl( *this, xpath, (std::string)defaultValue , & XMLFile::convertStr );
 }
 
-bool XMLFile::parseOptional(xmlNodePtr parent, string xpath, bool defaultValue)
+std::vector<bool       > XMLFile::parseOptional(string xpath, std::vector<bool       > defaultValue) const
+{
+    return parseOptionalImpl( *this, xpath, defaultValue , & XMLFile::convertArray, & XMLFile::convertBool );
+}
+
+std::vector<int        > XMLFile::parseOptional(string xpath, std::vector<int        > defaultValue) const
+{
+    return parseOptionalImpl( *this, xpath, defaultValue , & XMLFile::convertArray, & XMLFile::convertInt );
+}
+
+std::vector<double     > XMLFile::parseOptional(string xpath, std::vector<double     > defaultValue) const
+{
+    return parseOptionalImpl( *this, xpath, defaultValue , & XMLFile::convertArray, & XMLFile::convertFloat );
+}
+
+std::vector<std::string> XMLFile::parseOptional(string xpath, std::vector<std::string> defaultValue) const
+{
+    return parseOptionalImpl( *this, xpath, defaultValue , & XMLFile::convertArray, & XMLFile::convertStr );
+}
+
+
+bool XMLFile::parseOptional(xmlNodePtr parent, string xpath, bool defaultValue) const
 {
     return parseOptionalImpl(*this, parent, xpath, defaultValue, & XMLFile::convertBool );
 }
 
-int XMLFile::parseOptional(xmlNodePtr parent, string xpath, int defaultValue)
+int XMLFile::parseOptional(xmlNodePtr parent, string xpath, int defaultValue) const
 {
     return parseOptionalImpl(*this, parent, xpath, defaultValue, & XMLFile::convertInt );
 }
 
-double XMLFile::parseOptional(xmlNodePtr parent, string xpath, double defaultValue)
+double XMLFile::parseOptional(xmlNodePtr parent, string xpath, double defaultValue) const
 {
     return parseOptionalImpl( *this, parent, xpath, defaultValue , & XMLFile::convertFloat );
 }
 
-string XMLFile::parseOptional(xmlNodePtr parent, string xpath, string defaultValue)
+string XMLFile::parseOptional(xmlNodePtr parent, string xpath, string defaultValue) const
 {
     return parseOptionalImpl( *this, parent, xpath, defaultValue , & XMLFile::convertStr );
 }
 
-string XMLFile::parseOptional(xmlNodePtr parent, string xpath, const char *defaultValue)
+string XMLFile::parseOptional(xmlNodePtr parent, string xpath, const char *defaultValue) const
 {
     return parseOptionalImpl( *this, parent, xpath, (std::string)defaultValue , & XMLFile::convertStr );
 }
 
+std::vector<bool       > XMLFile::parseOptional(xmlNodePtr parent, std::string xpath, std::vector<bool       > defaultValue) const
+{
+    return parseOptionalImpl( *this, parent, xpath, defaultValue , & XMLFile::convertArray, & XMLFile::convertBool );
+}
 
-string XMLFile::parseNode(xmlNodePtr node)
+std::vector<int        > XMLFile::parseOptional(xmlNodePtr parent, std::string xpath, std::vector<int        > defaultValue) const
+{
+    return parseOptionalImpl( *this, parent, xpath, defaultValue , & XMLFile::convertArray, & XMLFile::convertInt );
+}
+
+std::vector<double     > XMLFile::parseOptional(xmlNodePtr parent, std::string xpath, std::vector<double     > defaultValue) const
+{
+    return parseOptionalImpl( *this, parent, xpath, defaultValue , & XMLFile::convertArray, & XMLFile::convertFloat );
+}
+
+std::vector<std::string> XMLFile::parseOptional(xmlNodePtr parent, std::string xpath, std::vector<std::string> defaultValue) const
+{
+    return parseOptionalImpl( *this, parent, xpath, defaultValue , & XMLFile::convertArray, & XMLFile::convertStr );
+}
+
+string XMLFile::parseNode(xmlNodePtr node) const
 {
 	xmlChar*			retStr;
 	string			res;
 
 	retStr = xmlNodeGetContent(node);
-	if(!retStr) throw xml_error("Bad node!",this, node);
+    if(!retStr) throw_xml_error("Bad node!",this, node);
 	res = string((char*)retStr);
 	xmlFree(retStr);
 #ifdef DEBUG_XML
@@ -1057,14 +1278,14 @@ string XMLFile::parseNode(xmlNodePtr node)
 	return res;
 }
 
-string XMLFile::getNodeName(xmlNodePtr node)
+string XMLFile::getNodeName(xmlNodePtr node) const
 {
 	xmlChar*			retStr;
 	string			res;
 
 	if(!node) return res;
 	retStr = (xmlChar*)node->name;
-	if(!retStr) throw xml_error("Bad node!",this, node);
+    if(!retStr) throw_xml_error("Bad node!",this, node);
 	res = string((char*)retStr);
 #ifdef DEBUG_XML
 	cerr << "XMLFile::getNodeName: name is \"" << res.c_str() << "\"\n";
@@ -1072,7 +1293,7 @@ string XMLFile::getNodeName(xmlNodePtr node)
 	return res;
 }
 
-string XMLFile::parseNodeTree(xmlNodePtr node)
+string XMLFile::parseNodeTree(xmlNodePtr node) const
 {
 	string					res;
 	xmlBufferPtr			buf;
@@ -1080,7 +1301,7 @@ string XMLFile::parseNodeTree(xmlNodePtr node)
 	
 	buf = xmlBufferCreate();
 	ret = xmlNodeDump(buf, node->doc, node, 0, 0);
-	if(ret == -1) throw xml_error("Bad node!",this, node);
+    if(ret == -1) throw_xml_error("Bad node!",this, node);
 	res = string((char*)xmlBufferContent(buf));
 	xmlBufferFree(buf);
 #ifdef DEBUG_XML
@@ -1114,16 +1335,175 @@ void XMLFile::removeAttribute(string     path, string name)
 }
 
 
+
+namespace {
+    // context is used to store error/warning messages of parser.
+    class ParserContext
+    {
+    public:
+        ParserContext()
+            : context(xmlNewParserCtxt())
+        {}
+        //ParserContext(const char* content, size_t size, const char* utf8_filename=NULL)
+        //    : context(xmlCreateMemoryParserCtxt(const_cast<char*>(content), size))
+        //{}
+        ~ParserContext() { xmlFreeParserCtxt(context); }
+
+        operator xmlParserCtxtPtr () const { return context; }
+
+    protected:
+        const xmlParserCtxtPtr context;
+    private:
+        ParserContext(ParserContext&);
+        void operator=(ParserContext&);
+    };
+
+    class ParserContextStoreErrors : public ParserContext
+    {
+        typedef ParserContextStoreErrors Me;
+        typedef std::vector<std::string> collection;
+
+    protected:
+        xmlValidCtxt& vctxt() const { return context->vctxt; }
+        xmlSAXHandler& sax() const { return *context->sax; }
+
+        void iniHandlers()
+        {
+            vctxt().userData = this;
+            vctxt().error    = & Me::handleError;
+            vctxt().warning  = & Me::handleWarning;
+
+            sax().error      = & Me::handleErrorSAX;
+            sax().warning    = & Me::handleWarningSAX;
+        }
+
+    public:
+        std::vector<std::string> ditails;
+
+        ParserContextStoreErrors()
+            : ParserContext()
+        {
+            iniHandlers();
+        }
+        //ParserContextStoreErrors(const char* content, size_t size)
+        //    : ParserContext(content, size)
+        //{
+        //    iniHandlers();
+        //}
+    private:
+        std::string pushMessageVa(const char* prefix , const char* format, va_list arguments)
+        {
+            //const size_t bufferSize = 10;
+            std::vector<char> buffer(10, 0);
+
+            while ( vsnprintf(&buffer.front(), buffer.size(), format, arguments) ==-1 )
+            {
+                if(buffer.size()>=1024*64)
+                {
+                    break;
+                }
+                buffer.resize(buffer.size()*2);
+            }
+//            for(int charactersWritten=-1;
+//                charactersWritten==-1;
+//                buffer.resize(buffer.size()*2)  )
+//            {
+//                charactersWritten = vsnprintf(&buffer.front(), buffer.size(), format, arguments);
+//            }
+
+            std::string msg(&buffer.front());
+            ditails.push_back( prefix + msg );
+            return msg;
+        }
+        std::string pushMessage(const char* prefix , const char* format, ...)
+        {
+            va_list arguments;
+            va_start(arguments, format);
+            std::string ret=pushMessageVa( prefix, format, arguments );
+            va_end(arguments);
+            return ret;
+        }
+
+        void pushSaxPoint()
+        {
+            //TODO: append information on current line/column of input file
+
+            if(context->lastError.int2>0)
+            {
+                // file+line+column
+                pushMessage( "   See: ",  "%s , line %i, column %i\n",
+                             context->lastError.file ? context->lastError.file : "",
+                             context->lastError.line,
+                             context->lastError.int2
+                             );
+            }
+            else
+            {
+                // file+line
+                pushMessage( "   See: ",  "%s , line %i \n",
+                             context->lastError.file ? context->lastError.file : "",
+                             context->lastError.line
+                             );
+            };
+        }
+
+        static Me* meFromHandler(void *handler)
+        {
+            return static_cast<Me*>(handler);
+        }
+        static Me* meFromContext(void * ctxt)
+        {
+            return meFromHandler( static_cast<xmlParserCtxt*>(ctxt)->vctxt.userData );
+        }
+
+        static void handleError(void *handler, const char *format, ...)
+        {
+            va_list arguments;
+            va_start(arguments, format);
+            meFromHandler(handler)->pushMessageVa( "  Validation error: ", format, arguments );
+            va_end(arguments);
+        }
+        static void handleWarning(void *handler, const char *format, ...)
+        {
+            va_list arguments;
+            va_start(arguments, format);
+            meFromHandler(handler)->pushMessageVa( "  Validation warning: ", format, arguments );
+            va_end(arguments);
+        }
+        static void handleErrorSAX(void *context, const char *format, ...)
+        {
+            va_list arguments;
+            va_start(arguments, format);
+            meFromContext(context)->pushMessageVa( "  SAX error: ", format, arguments );
+            meFromContext(context)->pushSaxPoint();
+            va_end(arguments);
+        }
+        static void handleWarningSAX(void *context, const char *format, ...)
+        {
+            va_list arguments;
+            va_start(arguments, format);
+            meFromContext(context)->pushMessageVa( "  SAX warning: ", format, arguments );
+            meFromContext(context)->pushSaxPoint();
+            va_end(arguments);
+        }
+    };
+}
+
 void XMLFile::attachMemory(const char *buffer, int size)
 {
+	if(size<=0) size = strlen(buffer);
+
 	xmlLineNumbersDefault(1);
 	if(doc) {
 		xmlFreeDoc(doc);
 		doc = 0;
 	};
 	XMLFile::fname = "";
-	doc = xmlParseMemory(buffer, size);
-	if(!doc) throw xml_error("Can't parse XML file!");
+    //doc = xmlParseMemory(buffer, size);
+    ParserContextStoreErrors ctxt;
+    doc = xmlCtxtReadMemory(ctxt, buffer, size, NULL, NULL, XML_PARSE_HUGE );
+    //doc = xmlReadMemory(ctxt, buffer, size, NULL, NULL, XML_PARSE_HUGE );
+    if(!doc) throw_xml_error("Can't parse XML file!", this, NULL, "", ctxt.ditails);
 }
 
 void XMLFile::attachMemory(string buffer)
@@ -1139,8 +1519,10 @@ void XMLFile::attach(string fname)
 		doc = 0;
 	};
 	XMLFile::fname = fname;
-	doc = xmlParseFile(fname.c_str());
-	if(!doc) throw xml_error("Wrong XML file name!");
+    //doc = xmlParseFile(fname.c_str());
+    ParserContextStoreErrors ctxt;
+    doc = xmlCtxtReadFile(ctxt, fname.c_str(), NULL, XML_PARSE_HUGE );
+    if(!doc) throw_xml_error("Can't parse XML file!", this, NULL, "", ctxt.ditails);
 }
 
 void XMLFile::attach(char* fname)
@@ -1155,14 +1537,24 @@ void XMLFile::detach(void)
     doc = 0;
 }
 
+#if __cplusplus > 199711L // C++11
 
+XMLFile XMLFile::clone() const
+{
+    XMLFile ret;
+    ret.fname= fname;
+    ret.doc  = ::xmlCopyDoc(doc, 1);
+    return std::move(ret);
+}
 
-void XMLFile::dumpToMemory(string& s)
+# endif
+
+void XMLFile::dumpToMemory(string& s) const
 {
 	xmlChar		*xmlBuffer = 0;
 	int			size;
 
-	if(!doc) throw xml_error("Empty document!");
+    if(!doc) throw_xml_error("Empty document!");
 	
 	//xmlDocDumpMemory(doc, &xmlBuffer, &size);
 
@@ -1177,10 +1569,10 @@ void XMLFile::dumpToMemory(string& s)
 	};
 }
 
-void XMLFile::dumpNodeToMemory(string& s, xmlNodePtr node)
+void XMLFile::dumpNodeToMemory(string& s, xmlNodePtr node) const
 {
-	if(!doc)  throw xml_error("Empty document!");
-	if(!node) throw xml_error("Empty node!");
+    if(!doc)  throw_xml_error("Empty document!");
+    if(!node) throw_xml_error("Empty node!");
 
 	xmlBufferPtr buffer =xmlBufferCreate();
 
@@ -1193,17 +1585,24 @@ void XMLFile::dumpNodeToMemory(string& s, xmlNodePtr node)
 	xmlBufferFree(buffer);
 }
 
-void XMLFile::dumpNodeToMemory(string& s, string     path)
+void XMLFile::dumpNodeToMemory(string& s, string     path) const
 {
 	if(isNode(path))
         dumpNodeToMemory( s, getNodeByPath(path));
 }
 
-void XMLFile::dumpToFile(const string &utf8_file_name)
+void XMLFile::dumpToFile(const string &utf8_file_name) const
 {
     int ret=xmlSaveFile( utf8_file_name.c_str(), doc );
     if(ret<0)
-        throw xml_error("Fail to write xml file.", this);
+        throw_xml_error("Fail to write xml file.", nullptr, nullptr, "", xml_error::collection(), utf8_file_name );
+}
+
+void XMLFile::dumpToFile(const string &utf8_file_name, int format) const
+{
+    int ret=xmlSaveFormatFile( utf8_file_name.c_str(), doc, format );
+    if(ret<0)
+        throw_xml_error("Fail to write xml file.", nullptr, nullptr, "", xml_error::collection(), utf8_file_name );
 }
 
 int XMLFile::processXinclude(int iterations_limit)
@@ -1218,7 +1617,7 @@ int XMLFile::processXinclude(int iterations_limit)
         if(ret==0)
             break; // no more to substitute...;
         if(ret==-1)
-            throw xml_error( "Error at XInclude substitution" , this);
+            throw_xml_error( "Error at XInclude substitution" , this);
 
         summ +=ret;
     }
@@ -1237,7 +1636,7 @@ int XMLFile::processXinclude(xmlNodePtr node, int iterations_limit)
         if(ret==0)
             break; // no more to substitute...;
         if(ret==-1)
-            throw xml_error( "Error at XInclude substitution" , this);
+            throw_xml_error( "Error at XInclude substitution" , this);
 
         summ +=ret;
     }
@@ -1273,51 +1672,160 @@ XMLFile::XMLFile(xmlDocPtr doc)
     : doc(doc)
 {}
 
+
+#if __cplusplus > 199711L // C++11
+XMLFile::XMLFile(XMLFile && rhs)
+    : fname(rhs.fname),
+      doc(rhs.doc)
+{
+    rhs.doc=nullptr;
+}
+
+XMLFile& XMLFile::operator = ( XMLFile&& rhs )
+{
+    assert( rhs.doc != doc );
+
+    if(doc) xmlFreeDoc(doc);
+    fname   =rhs.fname;
+    doc     =rhs.doc;
+    rhs.doc =nullptr;
+    return *this;
+}
+# endif
+
 XMLFile::~XMLFile(void)
 {
 	if(doc) xmlFreeDoc(doc);
 }
 
-
-static std::string xml_error_what(const std::string& brife_wath_,  XMLFile*xmlFile_, xmlNodePtr node_, std::string xpath_)
+static xmlNodePtr seek_XML_INDLUE_START(xmlNodePtr node)
 {
-	
-	std::string ret=brife_wath_;
+    if(!node)
+        return NULL;
 
-	try
-	{
-		if(xmlFile_!=NULL)
-		{
-			try
-			{
-				ret+= "\n" "At document: '" + xmlFile_->getFileName()+"'";
-			}
-			catch(...)
-			{
-				ret+= "\n" "At incorrect document.";
-			}
+    for(xmlNodePtr i=node->prev; i; i=i->prev)
+    {
+        if(i->type==XML_XINCLUDE_END)
+            i=seek_XML_INDLUE_START(i->prev);
+        else if(i->type==XML_XINCLUDE_START)
+            return i;
+    }
 
-			try
-			{
-				if(node_!=NULL)
-					ret+="\n" "At node: '"+ xmlFile_->getNodePath(node_)+"'";
-			}
-			catch(...)
-			{
-				ret+= "\n" "At incorrect node.";
-			}
+    if(node && node->parent)
+        return seek_XML_INDLUE_START(node->parent);
 
-			if( ! xpath_.empty() )
-				ret+= "\n" "With XPath='"+xpath_+"'.";
-		}
-	}
-	catch(...)
-	{} // I Am shure! all error ignored.
-
-	return ret;
+    return NULL;
 }
 
-xml_error::xml_error(const std::string& brife_wath_,  XMLFile*xmlFile_, xmlNodePtr node_, const std::string& xpath_)
-	: invalid_argument( xml_error_what( brife_wath_,  xmlFile_, node_, xpath_ ) ),
-	  xmlFile(xmlFile_), node(node_), xpath(xpath_ )
+std::string xml_error::make_what(xmlNodePtr node)
+{
+    std::string ret;
+
+    if(node!=NULL)
+    {
+        if(xmlChar * path=xmlGetNodePath(node) )
+        {
+            ret+='"';
+            ret+=(const char*) path;
+            ret+='"';
+            xmlFree(path);
+        }
+        else if(node->name)
+        {
+            ret+='"';
+            ret+= (const char*) node->name;
+            ret+='"';
+        }
+
+        long line =xmlGetLineNo(node);
+        xmlNodePtr ptrXIncludeStart=seek_XML_INDLUE_START(node);
+        if( line>=0 || ptrXIncludeStart ) // -1 mean no line information ...
+        {
+            ret+="  (At line " + convertInt(line);
+            if(ptrXIncludeStart)
+            {
+                ret += ", of document included ";
+                for(xmlAttrPtr attr=ptrXIncludeStart->properties; attr; attr=attr->next)
+                {
+                    if( attr->name && attr->children )
+                    {
+                        xmlChar* txt=xmlNodeGetContent(attr->children);
+                        ret+= std::string("") +((const char*) attr->name)+"=\"" +(const char*)txt +"\" ";
+                        xmlFree(txt);
+                    }
+                }
+                ret += "from " + make_what(ptrXIncludeStart);
+            }
+            ret+=")";
+        }
+    }
+
+    return ret;
+}
+
+std::string xml_error::make_what(const std::string& brife_wath,
+                                 const XMLFile *xmlFile,
+                                 xmlNodePtr node,
+                                 const std::string& xpath,
+                                 const collection& ditails,
+                                 const ptr_collection& nodes, const string &file_path)
+{
+
+    std::string ret=brife_wath;
+
+    try
+    {
+        if(xmlFile!=NULL)
+        {
+            try
+            {
+                //if(file_path.empty())
+                //    file_path = xmlFile->getFileName();
+                ret+= "\n  " "At document: '" + xmlFile->getFileName()+"'";
+            }
+            catch(...)
+            {
+                ret+= "\n  " "At incorrect document.";
+            }
+
+            try
+            {
+                ret += "\n  " "At node: " + make_what(node);
+            }
+            catch(...)
+            {
+                ret+= "\n  " "At incorrect node.";
+            }
+
+            if( ! xpath.empty() )
+                ret+= "\n  " "With XPath='"+xpath+"'.";
+        }
+
+        if(!file_path.empty())
+            ret += "\n  " "At file: '" + file_path +"'.";
+
+        if( !ditails.empty() )
+            ret+="\n  More ditails:\n";
+
+        for(size_t i=0; i<ditails.size(); ++i)
+            ret += ditails[i] ;
+
+        if( !nodes.empty() )
+            ret+="\n  Related nodes:\n";
+
+        for(size_t i=0; i<nodes.size(); ++i)
+            ret += "\n   " + make_what(nodes[i]);
+    }
+    catch(...)
+    {} // I Am shure! all error ignored.
+
+    return ret;
+}
+
+xml_error::xml_error(const std::string& brife_wath_,  const XMLFile *xmlFile_, xmlNodePtr node_, const std::string& xpath_,
+                     const collection& ditails_,
+                     const ptr_collection& nodes_, const string &file_path)
+    : invalid_argument( make_what( brife_wath_,  xmlFile_, node_, xpath_, ditails_, nodes_, file_path) ),
+      xmlFile(xmlFile_), node(node_), xpath(xpath_ ),
+      ditails(ditails_)
 {}

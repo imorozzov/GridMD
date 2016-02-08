@@ -6,19 +6,22 @@
  *
  *   Project	: GridMD
  *
- *   $Revision: 1.1 $
- *   $Date: 2013/05/24 17:53:14 $
- *   @(#) $Header: /home/plasmacvs/source_tree/gridmd/include/gmdinc.h,v 1.1 2013/05/24 17:53:14 valuev Exp $
+ *   $Revision: 1.2 $
+ *   $Date: 2015/10/27 13:54:29 $
+ *   @(#) $Header: /home/plasmacvs/source_tree/gridmd/include/gmdinc.h,v 1.2 2015/10/27 13:54:29 valuev Exp $
  *
  *****************************************************************************/
 /*
 $Source: /home/plasmacvs/source_tree/gridmd/include/gmdinc.h,v $
-$Revision: 1.1 $
+$Revision: 1.2 $
 $Author: valuev $
-$Date: 2013/05/24 17:53:14 $
+$Date: 2015/10/27 13:54:29 $
 */
 /*e****************************************************************************
  * $Log: gmdinc.h,v $
+ * Revision 1.2  2015/10/27 13:54:29  valuev
+ * more wxWidgets-independent includes
+ *
  * Revision 1.1  2013/05/24 17:53:14  valuev
  * sync with kintech svn
  *

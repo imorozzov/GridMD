@@ -6,21 +6,36 @@
  *
  *   Project	: GridMD, ivutils
  *
- *   This source code is Free Software and distributed under the terms of wxWidgets license (www.wxwidgets.org)
+ *   This source code is Free Software and distributed under the terms of wxWidgets license (www.wxwidgets.org) 
  *
- *   $Revision: 1.45 $
- *   $Date: 2015/06/17 19:37:59 $
- *   @(#) $Header: /home/plasmacvs/source_tree/gridmd/src/gridmd.cpp,v 1.45 2015/06/17 19:37:59 valuev Exp $
+ *   $Revision: 1.50 $
+ *   $Date: 2016/02/08 08:16:59 $
+ *   @(#) $Header: /home/plasmacvs/source_tree/gridmd/src/gridmd.cpp,v 1.50 2016/02/08 08:16:59 valuev Exp $
  *
  *****************************************************************************/
 /*
 $Source: /home/plasmacvs/source_tree/gridmd/src/gridmd.cpp,v $
-$Revision: 1.45 $
+$Revision: 1.50 $
 $Author: valuev $
-$Date: 2015/06/17 19:37:59 $
+$Date: 2016/02/08 08:16:59 $
 */
 /*s****************************************************************************
  * $Log: gridmd.cpp,v $
+ * Revision 1.50  2016/02/08 08:16:59  valuev
+ * working examples
+ *
+ * Revision 1.49  2016/02/05 19:04:45  valuev
+ * implicit workflow fixes
+ *
+ * Revision 1.48  2016/02/04 16:41:04  valuev
+ * serial final job execution
+ *
+ * Revision 1.47  2016/02/03 16:41:18  valuev
+ * fixes
+ *
+ * Revision 1.46  2016/02/02 12:15:35  valuev
+ * fixing mutex
+ *
  * Revision 1.45  2015/06/17 19:37:59  valuev
  * sweep farm restructured
  *
@@ -237,7 +252,7 @@ string gmGetStateName(gmNODE_STATES state){
     case gmNS_PROC:
       return "PROC";
     case gmNS_BLOCK:
-      return "BLOCK";
+      return "BLOCK";  
     case gmNS_WAIT:
       return "WAIT";
     case gmNS_FAIL:
@@ -282,7 +297,7 @@ gmNODE_STATES gmGetStateId(const string &state){
 gmManager gmExperiment;
 
 bool gmShellDescr::operator==(const gmShellDescr &other) const {
-  return
+  return 
     shell_type == other.shell_type &&
     host       == other.host       &&
     login      == other.login      &&
@@ -358,42 +373,43 @@ void gmResourceDescr::init(const int res_type_, const int shell_type_, int activ
   progname.Clear();
   param.clear();
 
-  timing = false;
+	timing = false;
 }
 
+# ifndef NO_XML
 
 int gmResourceDescr::Save(XMLFile& xmldoc, xmlNodePtr parent, const gmdString &name){
   xmlNodePtr resource;
 
   // Node <resource>
   resource = xmldoc.addElement(parent, "resource");
-  xmldoc.addAttribute(resource, "name", name=="" ? static_cast<const char *>((session.login +"@"+session.host).c_str()) : static_cast<const char *>(name.c_str()));
+  xmldoc.addAttribute(resource, "name", name=="" ? session.login+"@"+session.host : name);
   xmldoc.addAttribute(resource, "active", fmt("%d",active));
-
+  
   // Node <session>
   xmlNodePtr node = xmldoc.addElement(resource, "session");
   xmldoc.addAttribute(node, "type", gmShellTypeName[session.shell_type]);
-  if(!session.host.IsEmpty()) xmldoc.addAttribute(node, "host", static_cast<const char *>(session.host.c_str()));
-  if(!session.login.IsEmpty()) xmldoc.addAttribute(node, "login", static_cast<const char *>(session.login.c_str()));
-
+  if(!session.host.IsEmpty()) xmldoc.addAttribute(node, "host", session.host);
+  if(!session.login.IsEmpty()) xmldoc.addAttribute(node, "login", session.login);
+  
   FOR_EACH_LOOP(gmExtraParHash, session.param, it)
-    xmldoc.addElement(node, static_cast<const char *>(it->first.c_str()), static_cast<const char *>(it->second.c_str()));
+    xmldoc.addElement(node, (const char *)it->first.c_str(), (const char *)it->second.c_str());
 
   // Node <job_manager>
   node = xmldoc.addElement(resource, "job_manager");
   xmldoc.addAttribute(node, "type", gmResTypeName[res_type]);
-  xmldoc.addAttribute(node, "timing", timing? "yes": "no" );
+	xmldoc.addAttribute(node, "timing", timing? "yes": "no" );
 
   FOR_EACH_LOOP(gmExtraParHash, param, it)
-    xmldoc.addElement(node, static_cast<const char *>(it->first.c_str()), static_cast<const char *>(it->second.c_str()));
+    xmldoc.addElement(node, (const char *)it->first.c_str(), (const char *)it->second.c_str());
 
   // Node <application>
   node = xmldoc.addElement(resource, "application");
-  if(!progname.IsEmpty()) xmldoc.addAttribute(node, "name", static_cast<std::string>(progname));
+  if(!progname.IsEmpty()) xmldoc.addAttribute(node, "name", progname);
 
-  if(!postfix.IsEmpty()) xmldoc.addElement(node, "postfix", static_cast<std::string>(postfix));
-  if(!prefix.IsEmpty()) xmldoc.addElement(node, "prefix", static_cast<std::string>(prefix));
-  if(!progdir.IsEmpty()) xmldoc.addElement(node, "progdir", static_cast<std::string>(progdir));
+  if(!postfix.IsEmpty()) xmldoc.addElement(node, "postfix", (std::string)postfix);
+  if(!prefix.IsEmpty()) xmldoc.addElement(node, "prefix", (std::string)prefix);
+  if(!progdir.IsEmpty()) xmldoc.addElement(node, "progdir", (std::string)progdir);
 
   return 1;
 }
@@ -441,7 +457,7 @@ int gmResourceDescr::Load(XMLFile& xmldoc, xmlNodePtr parent, gmdString &name){
   // Get shell parameters
   session.login = xmldoc.parseOptionalAttribute(node, "login", "");
   session.host = xmldoc.parseOptionalAttribute(node, "host", "");
-
+  
   pars = xmldoc.getAllChildren(node);
   FOR_EACH_LOOP(std::vector<xmlNodePtr>, pars, par)
     if((*par)->type == XML_ELEMENT_NODE)
@@ -480,10 +496,10 @@ int gmResourceDescr::Load(XMLFile& xmldoc, xmlNodePtr parent, gmdString &name){
 
     xmlNodePtr par = xmldoc.getChildByName(node, "progdir", false);
     if(par) progdir = xmldoc.parseNode(par);
-
+    
     par = xmldoc.getChildByName(node, "prefix", false);
     if(par) prefix = xmldoc.parseNode(par);
-
+    
     par = xmldoc.getChildByName(node, "postfix", false);
     if(par) postfix = xmldoc.parseNode(par);
   }
@@ -491,6 +507,7 @@ int gmResourceDescr::Load(XMLFile& xmldoc, xmlNodePtr parent, gmdString &name){
   return 1;
 }
 
+# endif // NO_XML
 
 gmJobManager * gmResourceDescr::CreateJobManager(gmShell *shell) const {
   // Create shell
@@ -566,9 +583,9 @@ public:
     virtual void lock() {}
     virtual void unlock() {}
 } voidMutexItem;
-gmMutex& gmMutex::voidMutex=voidMutexItem;
+//gmMutex& gmMutex::voidMutex=voidMutexItem;  /// gmMutex& gmMutex::voidMutex=voidMutexItem
 
-
+gmMutex gmMutex::voidMutex;
 gmManagerCallback gmManagerCallback::voidCallBack;
 
 
@@ -583,6 +600,8 @@ public:
         mutex->unlock();
     }
 };
+
+int gmManager::rec_level = 0;
 
 int gmManager::init(const string &name_, bool restart, bool recalc_locals, const string &restart_file_){
   gmScopeLock scopeLock(mutex);
@@ -610,7 +629,7 @@ int gmManager::init(int &argc, charDoublePtr &argv, const string &name_){
     _argc=argc;
     _argv=argv;
   }
-
+  
   // clearing idcount
   //idcount=0;
   // parsing command line
@@ -623,7 +642,7 @@ int gmManager::init(int &argc, charDoublePtr &argv, const string &name_){
         wnodes.clear();
         add_ranges(wnodes,argv[i]+2,0,1000000,true,":-");
         if(!wnodes.size())
-          return LOGERR(-1,fmt("gmManager.init: invalid list of nodes for worker mode ('%s')!",_argv[i]+2),0);
+          return LOGERR(-1,fmt("gmManager.init: invalid list of nodes for worker mode ('%s')!",_argv[i]+2),0); 
         // calculating max_node
         max_node=-1;
         for(int_pack::iterator it=wnodes.begin();it!=wnodes.end();++it){
@@ -702,12 +721,14 @@ void gmManager::_init_params(){
   nfinished = 0;
   entered_exec = false;
 
-  have_start_node = false;
+  have_start_node = -1;
 }
 
 
 
 gmManager::~gmManager(){
+  if((write_files&gmFILES_CLEANUP))
+    link_cleanup();
   delete graph;
   delete sched;
 }
@@ -732,10 +753,41 @@ void gmManager::updated_status()
 }
 
 int gmManager::mark_distributed(){
-  if(!have_start_node){
-    graph->root=graph->add_node(new gmNode("start"));
-    have_start_node = true;
+
+  if(have_start_node<0){
+    if(have_start_node == -1){ // the very first distributed section
+      if(mode&gmMODE_WORKER){
+        have_start_node = idcount;
+        return process_cur_node(); // in case we have something associated with 'start' node;
+      }
+      else{ // actually adding nodes only when constructing
+        gmNode *start = new gmNode("start");
+        graph->root=graph->add_node(start);
+        
+        if(!(exetype&gmEXE_EXPLICIT_ONLY))
+          start->implicit_action = true; // may have implicit actions
+        else{ // there may be implicit calls
+          if(rec_level>0 && have_start_node>=0){ // this means that the graph is not inherited by recursion 
+                                               // (now rec_level is static!)
+            LOGMSG(vblWARN,"gmManager::mark_distributed: recursively entering graph construction without initialized gmManager instance!\n"
+                           "                             Note: gmManager instance should be global to use it in implicit calls!\n",0);
+          }
+        }  
+        have_start_node = idcount; //=0
+      }
+    }
+    else{
+      have_start_node = 0; // temporary
+      int res = mark_node("start",gmNODE_PREV,gmStatusLink());
+      have_start_node = idcount;
+      if(mode&gmMODE_WORKER)
+        return res;
+    }
   }
+  if(mode&gmMODE_WORKER)
+    return 0;
+  if((write_files&gmFILES_CLEANUP))
+    link_cleanup();
   // check mode
   if(exetype==gmEXE_SERIAL){ // all tasks performed at once
     if(!construct_only)
@@ -746,8 +798,7 @@ int gmManager::mark_distributed(){
     start_distr=1;
     return 1;
   }
-  if(mode&gmMODE_WORKER)
-    return 0;
+  
   if(mode&gmMODE_CONSTRUCT){
     start_distr=1;
     updated_status();
@@ -757,15 +808,16 @@ int gmManager::mark_distributed(){
   if(graph_error)
     LOGMSG(vblWARN,fmt("gmManager.mark_distributed: clearing the error status '%d' of the previous subgraph execution!", graph_error),0);
   graph_error=0;
-
+  
   // go to construction mode
   mode|=gmMODE_CONSTRUCT;
-
+  
   if(exetype&gmEXE_EXPLICIT_ONLY)  // executes nodes only as external routines/ callbacks
     return 0;
 
   // setting maximal construction node
   distr_node=idcount;
+  int have_start_node_tmp = have_start_node;
 
   // HERE RECURSION STARTS
   rec_level++;
@@ -775,28 +827,38 @@ int gmManager::mark_distributed(){
   catch(task_finished){}
   rec_level--;
 
-
-  // switching to worker mode to finish local tasks
+ 
+ 
+  // switching to final worker mode to finish local tasks
   // (swith back in execute())
   mode&=~gmMODE_CONSTRUCT;
   mode|=gmMODE_WORKER;
-
-
-  if(graph_error){
+  mode|=gmMODE_FINAL;
+  
+  if(graph_error){ 
      LOGMSG(vblWARN,fmt("gmManager.mark_distributed: execution of the subgraph failed with the status '%d', skipping the failed subgraph", graph_error),0);
-     max_node=-1; // don't break from worker mode
-     wnodes.clear(); // wnodes is empty in this case
+     //max_node=-1; // don't break from worker mode
+     //wnodes.clear(); // wnodes is empty in this case
      // here change the status of the remaining threads
   }
 
-
-  idcount=distr_node;
+  // restoring
+  idcount = distr_node;
+  have_start_node = have_start_node_tmp;
 
   return 1; // go on in worker mode
 }
 
 
-
+gmNodeID gmManager::advance_nodeid(){
+  if(have_start_node==-1)
+    return 0; 
+  //if(graph->root<0)
+    //return 0;
+  //gmNodeID tmp=idcount;
+  idcount++;
+  return idcount;
+}
 
 
 int gmManager::execute(bool wait, int cleanup, int max_schedules){
@@ -822,7 +884,7 @@ int gmManager::execute(bool wait, int cleanup, int max_schedules){
 
   if(mode&gmMODE_WORKER){
     if(max_node<0){ // returning from the skipped subgraph or from serial pass
-      mode=gmMODE_LOCAL;
+      mode=gmMODE_LOCAL; 
       if(exetype==gmEXE_SERIAL)
         return 1; // serial pass
       else
@@ -834,7 +896,7 @@ int gmManager::execute(bool wait, int cleanup, int max_schedules){
     if(res){ // end_node reached, switching to local mode
       check_jobs(); // marking just finished local nodes as processed, clering threads
       mode=gmMODE_LOCAL;
-      if(start_as_worker)
+      if(start_as_worker) 
         exit(0); // should never arrive here since the end node is local
       updated_status();
       if(write_files&gmFILES_CLEANUP)
@@ -842,16 +904,16 @@ int gmManager::execute(bool wait, int cleanup, int max_schedules){
     }
     return res;
   }
-
-
+   
+  
   //mode&=~gmMODE_CONSTRUCT;
 	unset_mode(gmMODE_CONSTRUCT);
   entered_exec = true;
-
+ 
   // applying graph algorithm
-  if(!graph->pending_threads_count()) // had no threads before
+  if(!graph->pending_threads_count()) // had no threads before 
     graph->process_start();
-
+  
   nfailed=0;
   nstarted=0;
   nfinished=0;
@@ -863,14 +925,14 @@ int gmManager::execute(bool wait, int cleanup, int max_schedules){
   bool wait_break= false;
 
   if(continue_exec){
-
-    if(graph->pending_threads_count()) // had threads before
+    
+    if(graph->pending_threads_count()) // had threads before 
       check_jobs(&nfailed);
 
 		int iter = 0;
     while( !wait_break && (need_more = create_jobs(graph_error)) ){
       updated_status();
-
+			
      /*
      9.  Execute the worker tasks of step 7, collect all
         files corresponding to outgoing data links of the subgraphs' nodes
@@ -878,7 +940,7 @@ int gmManager::execute(bool wait, int cleanup, int max_schedules){
         the subgraph tasks finishes.*/
       if(!queue_jobs())
         continue; // no actively running jobs remain
-      while(!check_jobs(&nfailed)){ // check the status of running jobs until at least one is finished
+      while(!check_jobs(&nfailed)){ // check the status of running jobs until at least one is finished 
         updated_status();
         if(!wait){
           wait_break=true;
@@ -888,7 +950,7 @@ int gmManager::execute(bool wait, int cleanup, int max_schedules){
         //sleep(200);
       }
 			iter++;
-			if(max_schedules>0 && iter>=max_schedules)
+			if(max_schedules>0 && iter>=max_schedules) 
 				break;
     }
     updated_status();
@@ -917,10 +979,10 @@ int gmManager::execute(bool wait, int cleanup, int max_schedules){
   // for 'finish' node passes local job to the local gridmd_main
   // and this instance of gridmd_main throws task_finished from queue_jobs
   // (graph_error=1)
-  // 2. all graph nodes are processed (nothing to do, graph_error=0)
+  // 2. all graph nodes are processed (nothing to do, graph_error=0) 
   if(!(exetype&gmEXE_EXPLICIT_ONLY))  // no need to throw if we are in explicit mode
-    throw task_finished();
-
+    throw task_finished(); 
+     
   if(nfailed)
     return -((int)nfailed);
   return need_more ? (job_state_changed() ? 1: 2 ) : 0;
@@ -965,28 +1027,28 @@ bool gmManager::create_jobs(int &graph_error){
   size_t new_threads = graph->get_new_threads_count();
   //if(new_treads)
     //updated_status();
-  nstarted+= new_threads;
+  nstarted+= new_threads; 
   return need_more;
 }
 
 int gmManager::_mark_node(const string &name){
   int tmode = get_mode();
-  if(mode==gmMODE_LOCAL && rec_level==0){
+  if(mode==gmMODE_LOCAL && rec_level==0){ 
     if(entered_exec)
       mode|=gmMODE_CONSTRUCT; // temporarily switching to  construction mode
     else {
-      if(!have_start_node){ // add node first, then mark_distributed
+      if(have_start_node<0){ // add node first, then mark_distributed
         mode|=gmMODE_CONSTRUCT;
       }
-      else
+      else 
         mark_distributed();// automatically swithching to distributed regime or going to the next subgraph
     }
   }
   if(mode&gmMODE_CONSTRUCT && // construction mode, begining the construction
     check_distrnode()){ // checking that we are above distrnode
-
+    
     gmNodeID prev_node=graph->get_prev_node(); // get the default previous node
-
+    
     gmNode *node= new sysGraphNode((const char *)name.c_str());//new gmSimpleNode<>(name.c_str(),0);
     // setting the properties
     node->userprop=tmpprop;
@@ -1001,7 +1063,9 @@ int gmManager::_mark_node(const string &name){
     gmNodeID this_node=graph->add_node(node,groupid);
 		node->id = this_node;
     idcount=this_node;
-
+    if(!(exetype&gmEXE_EXPLICIT_ONLY)) // this node may have implicit code blocks
+      node->implicit_action = true;
+    
     //callback->NodeStateChanged(this_node,gmNS_NO_NODE,gmNS_UNPROC);
     if(tmpstate!=gmNS_NO_NODE)
       set_node_state(tmpstate,this_node); // also writes graph
@@ -1009,24 +1073,25 @@ int gmManager::_mark_node(const string &name){
       if(graph_update>=2) // writing the graphwiz file
         write_graph();
     }
-    if(!have_start_node){
-      have_start_node = true;
+    if(have_start_node<0){
+      have_start_node = idcount;
       mark_distributed();
     }
-
+    
   }
   else{
-    advance_nodeid();
-    have_start_node = true;
+    if(have_start_node<0)
+      have_start_node = idcount;
+    advance_nodeid(); 
   }
 
   if(mode&gmMODE_CONSTRUCT && entered_exec) // returning to local mode if in exec
     copy_mode(tmode); //mode&=~gmMODE_CONSTRUCT;
-
+  
   return process_cur_node();
-
+  
 }
-
+ 
 struct name_cmp{
   refvector<sysGraphNode> &nodes;
   name_cmp(refvector<sysGraphNode> &nodes_):nodes(nodes_){}
@@ -1038,8 +1103,8 @@ struct name_cmp{
 ///\en Selects nodes into a vector
 int gmManager::select_nodes(vector< pair<int,int> > &nodes, gmSelector selector, bool input, int def_port, int closest_to) const {
   // analyzing preset values
-  if(selector.id==gmNODE_PREV || (selector.id==gmNODE_AUTO && selector.str==""
-                                  && !selector.nodevec.size() &&
+  if(selector.id==gmNODE_PREV || (selector.id==gmNODE_AUTO && selector.str=="" 
+                                  && !selector.nodevec.size() && 
                                   !selector.nodestates.size())){ // full auto = previous node
     selector.id=idcount-dprev;
     if(selector.id<0)
@@ -1057,7 +1122,7 @@ int gmManager::select_nodes(vector< pair<int,int> > &nodes, gmSelector selector,
   if(res<0)
     return res;
   if(selector.nodevec.size() || selector.nodestates.size()) // no need to filter further ??
-    return res;
+    return res; 
   if(closest_to>0 && selector.dup_sel==gmSEL_NEAREST && selector.id==gmNODE_AUTO){
     // sorting by equal names
     sort(nodes.begin(),nodes.end(),name_cmp(graph->nodes));
@@ -1103,15 +1168,19 @@ int gmManager::load_resources(const char *filename){
     if(mode!=gmMODE_LOCAL)
       return 0;
   }
+  int nloaded=0;
+# ifndef NO_XML
   XMLFile xmldoc(filename);
   xmlNodePtr root = xmldoc.getRootNode();
   if(!root)
     return LOGERR(0,fmt("gmManager.load_resources: failed to open XML file '%s'",filename),0);
-  int nloaded=0;
   std::vector<xmlNodePtr> nodes = xmldoc.getAllChildren(root);
   FOR_EACH_LOOP(std::vector<xmlNodePtr>, nodes, node)
     if( xmldoc.getNodeName(*node) == "scheduler" )
       nloaded += sched->Load(xmldoc, *node);
+# else
+  LOGMSG(vblWARN,"gmManager::load_resources: NO_XML compiler option used -- can't load/save resource descriptions.\n",0); 
+# endif
 
   return nloaded;
 }
@@ -1121,7 +1190,9 @@ int gmManager::save_resources(const char *filename){
     // only for local mode
     if(mode!=gmMODE_LOCAL)
       return 0;
-  }
+  } 
+  
+# ifndef NO_XML  
   XMLFile xmldoc;
   xmlNodePtr root = xmldoc.createDoc("flowgraph");
 
@@ -1129,16 +1200,20 @@ int gmManager::save_resources(const char *filename){
   xmlNodePtr reslist = xmldoc.addElement(root, "scheduler");;
   sched->Save(xmldoc, reslist);
 
-  xmldoc.dumpToFile(filename);
-
+  xmldoc.dumpToFile(filename,1);
+  
+# else
+  LOGMSG(vblWARN,"gmManager::save_resources: NO_XML compiler option used -- can't load/save resource descriptions.\n",0); 
+# endif
   return 1;
 }
 
 
 int gmManager::save_state(const char *filename){
-
+  
   gmScopeLock scopeLock(mutex);
 
+# ifndef NO_XML
   XMLFile xmldoc;
   xmlNodePtr root = xmldoc.createDoc("flowgraph");
 
@@ -1155,7 +1230,7 @@ int gmManager::save_state(const char *filename){
       continue;
     int id=graph->g[*vi].nodeid;
     sysGraphNode &node=*(graph->nodes[id]);
-
+    
     // <node> element
     xmlNodePtr xmlnode = xmldoc.addElement(root, "node");
     xmldoc.addAttribute(xmlnode,"id",fmt("n%d",id));
@@ -1192,7 +1267,7 @@ int gmManager::save_state(const char *filename){
 
     if(node.GetLabel()!="")
       xmldoc.addElement(xmlnode, "label", node.GetLabel());
-
+		
 		// data
 		if(node.userprop.string_data.size()){
 			xmlNodePtr datanode =  xmldoc.addElement(xmlnode, "data");
@@ -1208,9 +1283,9 @@ int gmManager::save_state(const char *filename){
   for(ei=ei_start;ei!=ei_end;++ei){
     int id=graph->edgeid[*ei];
     sysGraphLink &link=*(graph->links[id]);
-
+    
     xmlNodePtr xmlnode = xmldoc.addElement(root, "link");
-
+    
     int type=link.GetType();
     xmldoc.addAttribute(xmlnode,"id",fmt("l%d",id));
     xmldoc.addAttribute(xmlnode,"node0",fmt("n%d",graph->g[source(*ei,graph->g)].nodeid));
@@ -1220,7 +1295,7 @@ int gmManager::save_state(const char *filename){
     if(type!=gmLINK_HARD)
       xmldoc.addAttribute(xmlnode,"port1",fmt("%d",link.destport));
     string stype;
-
+    
     if(type==gmLINK_HARD)
       stype="hard";
     else if(type==gmLINK_DATA)
@@ -1253,7 +1328,7 @@ int gmManager::save_state(const char *filename){
     xmldoc.addAttribute(xthread,"id",fmt("%d",i));
     int rid=threads[i].resource_id;
 		//if(rid<0) // don't record local threads
-			//continue;
+			//continue; 
     xmldoc.addAttribute(xthread,"resource",rid>=0 ? sched->resources[rid]->name : "local");
     if(rid>=0)
       xmldoc.addAttribute(xthread,"jobid",threads[i].jobid);
@@ -1283,7 +1358,7 @@ int gmManager::save_state(const char *filename){
       xmldoc.addElement(xthread, "stdout", threads[i].stdout_);
     if(threads[i].stderr_!="")
       xmldoc.addElement(xthread, "stderr", threads[i].stderr_);
-
+    
     // output link ids
     for(int j=0; j<(int)threads[i].odlinks.size(); j++){
       xmlNodePtr node1 = xmldoc.addElement(xthread, "odlink");
@@ -1302,7 +1377,7 @@ int gmManager::save_state(const char *filename){
     xmlNodePtr xgroup = xmldoc.addElement(xgroups, "group");
     xmldoc.addAttribute(xgroup,"jobid",sched->wdgroup[i].jobid);
     xmldoc.addAttribute(xgroup,"resource",sched->wdgroup[i].resource);
-    xmldoc.addAttribute(xgroup,"head_node",fmt("%d",sched->wdgroup[i].head_nodeid));
+    xmldoc.addAttribute(xgroup,"head_node",fmt("%d",sched->wdgroup[i].head_nodeid));    
   }
 
   // events
@@ -1323,12 +1398,16 @@ int gmManager::save_state(const char *filename){
   if(!outfile) return LOGERR(-100,fmt("gmManager.save_state: failed to open file '%s' for output",filename),0);
   fprintf(outfile, "%s", (const char *)buf.c_str());
   fclose(outfile);
+# else
+  LOGMSG(vblWARN,"gmManager::save_state: NO_XML compiler option used -- can't load/save sates.\n",0); 
+# endif
 
   return 1;
 }
 
 int gmManager::load_state(const char *filename, int &d_node){
   int res=0;
+# ifndef NO_XML
   std::vector<xmlNodePtr> children;
 
   xmlNodePtr root = NULL;
@@ -1340,7 +1419,7 @@ int gmManager::load_state(const char *filename, int &d_node){
   catch(xml_error){}
   if(!root)
     return LOGERR(-100,fmt("gmManager.load_state: failed to open XML file '%s'",filename),0);
-
+  
   try {  // catching xml_error
     vector<gmGraph::wthread_t> &threads=graph->threads;
     //threads.clear(); !!!!!
@@ -1368,7 +1447,7 @@ int gmManager::load_state(const char *filename, int &d_node){
         return LOGERR(-2,fmt("gmManager.load_state: invalid id value (%d) of a thread from file '%s'",tid,filename),0);
       if((int)threads.size()<=tid)
         threads.resize(tid+1);
-
+      
       gmdString resource=xmldoc.parseOptionalAttribute(*node1,"resource","local");
       if(resource=="local"){
         threads[tid].resource_id=-1;
@@ -1395,7 +1474,7 @@ int gmManager::load_state(const char *filename, int &d_node){
         threads[tid].state=4;
       else if(!sscanf((const char *)state.c_str(),"%d",&threads[tid].state))
         return LOGERR(-4,fmt("gmManager.load_state: invalid state '%s' of thread %d from file '%s'",(const char *)state.c_str(),tid,filename),0);
-
+      
       if(threads[tid].state==-1 && threads[tid].exetype!=gmEXE_LOCAL) // restart all incomplete remote threads
         threads[tid].state=2;
 
@@ -1409,7 +1488,7 @@ int gmManager::load_state(const char *filename, int &d_node){
         threads[tid].stopped=true;
 
       threads[tid].jobid=xmldoc.parseOptionalAttribute(*node1,"jobid","");
-
+      
       if(threads[tid].state==3 && threads[tid].jobid!="" && !threads[tid].stopped) // try to recover failed threads with valid jobids
         threads[tid].state=0;  // executing
 
@@ -1484,7 +1563,7 @@ int gmManager::load_state(const char *filename, int &d_node){
       } // event
     }
 
-    // reading nodes
+    // reading nodes 
     children = xmldoc.getChildsByName(root, "node");
     FOR_EACH_LOOP(std::vector<xmlNodePtr>, children, node) {
       int id;
@@ -1517,17 +1596,17 @@ int gmManager::load_state(const char *filename, int &d_node){
       vector<int> &nodthreads=graph->g[*vi].threads;
       nodthreads.clear();
       graph->g[*vi].thread_start=0;
-
+      
       std::vector<xmlNodePtr> children1 = xmldoc.getChildsByName(*node, "thread");
       FOR_EACH_LOOP(std::vector<xmlNodePtr>, children1, node1) {
         int tid;
         tid = xmldoc.parseIntAttribute(*node1,"id");
         if(tid<0 || tid>=(int)threads.size())
           return LOGERR(-10,fmt("gmManager.load_state: id %d of a thread from file '%s', node %d is out of range",tid,filename,id),0);
-
+        
 				//if(threads[tid].rid<0) // don't process old local threads
 					//continue;
-
+				
 				nodthreads.push_back(tid);
         // assigning the node state
         /* this is now done via event stack
@@ -1540,7 +1619,7 @@ int gmManager::load_state(const char *filename, int &d_node){
           */
         // adding this node to thread
         threads[tid].nodes.push_back(*vi);
-
+        
         //if the node is local above distr_node, mark its threads as restarting (require to restart local threads)
         if(nid>distr_node  && gnode.GetFinal() && (full_restart || threads[tid].state==0) )
           threads[tid].state=2;
@@ -1548,7 +1627,7 @@ int gmManager::load_state(const char *filename, int &d_node){
         if(threads[tid].state==1 || threads[tid].state==3)
           graph->g[*vi].thread_start++;
       } // thread
-
+	   
       // data
       children1 = xmldoc.getChildsByName(*node, "data");
       FOR_EACH_LOOP(std::vector<xmlNodePtr>, children1, node1) {
@@ -1566,6 +1645,9 @@ int gmManager::load_state(const char *filename, int &d_node){
       filename, err.xpath.c_str()),0
     );
   }
+# else
+  LOGMSG(vblWARN,"gmManager::load_state: NO_XML compiler option used -- can't load/save sates.\n",0); 
+# endif
 
   return res;
 }
@@ -1585,7 +1667,7 @@ int gmManager::link_cleanup(){
       node_comp[child_index]=current_index; //cross-indexing
       if(graph->g[child_index].flag!=gmNS_PROC)
         comp_state[current_index]=0;
-
+      
     }
     if(comp_state[current_index]==0)
       continue;
@@ -1594,7 +1676,7 @@ int gmManager::link_cleanup(){
       gmGraph::graph_t::in_edge_iterator ei, ei_end;
       boost::tie(ei,ei_end)=in_edges(child_index,graph->g); // obtaining incoming links for the node
       for(;ei!=ei_end;++ei){
-        int i=graph->edgeid[*ei];
+        int i=graph->edgeid[*ei]; 
         if(i>=0 && graph->links[i]->GetType()&gmLINK_DATA && !(graph->links[i]->state&0x1)){ // this is the data link
           gmdString destname=graph->links[i]->GetDestName();
           if(gmdFileExists(destname)){
@@ -1606,7 +1688,7 @@ int gmManager::link_cleanup(){
       }
     }
   }
-  // now finding the processed clusters having output links only to processed clusters
+  // now finding the processed clusters having output links only to processed clusters 
   BOOST_FOREACH(int current_index, components) {
     if(comp_state[current_index]==0) // not processed
       continue;
@@ -1615,7 +1697,7 @@ int gmManager::link_cleanup(){
       gmGraph::graph_t::out_edge_iterator ei, ei_end;
       boost::tie(ei,ei_end)=out_edges(child_index,graph->g); // obtaining outgoing links for the node
       for(;ei!=ei_end;++ei){
-        int i=graph->edgeid[*ei];
+        int i=graph->edgeid[*ei]; 
         if(i>=0 && graph->links[i]->GetType()&gmLINK_DATA && !(graph->links[i]->state&0x2)){ // this is the data link
           int s=target(*ei,graph->g);
           if(comp_state[node_comp[s]]==1){ // the target cluster is also processed, may delete
@@ -1649,7 +1731,7 @@ gmNode *gmManager::_node_ptr(int nodeid) const{
   }
   if(nodeid<0 || nodeid>=(int)graph->nodes.size())
     return NULL;
-  return
+  return 
     graph->nodes[nodeid];
 }
 
@@ -1657,7 +1739,7 @@ gmNode *gmManager::_node_ptr(int nodeid) const{
 gmEdge *gmManager::get_edge_ptr(int edgeid) const{
   if(edgeid<0 || edgeid>=(int)graph->links.size())
     return NULL;
-  return
+  return 
     graph->links[edgeid];
 }
 
@@ -1705,7 +1787,7 @@ int gmManager::block(const string &blockname, bool cond){
   if(blockname!=""){
     if(blocks.find(blockname)==blocks.end())
       blocks[blockname]=graph->add_group(blockname);
-  }
+  }  
   return 1;
 }
 
@@ -1723,7 +1805,7 @@ int gmManager::make_node_group(gmSelector nodes){
   int hits=0, gid=-1;
   for(size_t i=0;i<inputs.size();i++){
     gmNode *nodep=_node_ptr(inputs[i].first);
-    if(nodep){
+    if(nodep){ 
       //if(nodep->userprop.workdir_id>=0 && nodep->userprop.workdir_id!=sched->get_group_count())// already set differently
       //  LOGERR(-2,fmt("gmManager.make_node_group: node %d already belongs to group %d, setting skipped",inputs[i].first,nodep->userprop.workdir_id),0);
       //else{
@@ -1761,9 +1843,9 @@ int gmManager::assign_to_group(int groupid, gmSelector nodes){
   int hits = 0;
   for(size_t i=0;i<inputs.size();i++){
     gmNode *nodep=_node_ptr(inputs[i].first);
-    if(nodep){
+    if(nodep){ 
       nodep->userprop.workdir_id= groupid;
-      // linking to graoh display group
+      // linking to graoh display group 
       int gid=graph->find_group(fmt("workdir group %d",nodep->userprop.workdir_id)); // group for displaying
       if(gid>=0)
         graph->gmap[inputs[i].first] = gid; // linking
@@ -1779,7 +1861,7 @@ int gmManager::assign_to_group(int groupid, gmSelector nodes){
   return -4; // added nothing
 }
 
-///\en Set an action object associated with the node. OnExecute() will be called for that object when node executes.
+///\en Set an action object associated with the node. OnExecute() will be called for that object when node executes.  
 ///    \return Number of affected nodes.
 int gmManager::set_node_action(const gmNodeAction &action, gmSelector nodes){
   if(!in_construction())
@@ -1807,7 +1889,7 @@ int gmManager::set_node_action(const gmNodeAction &action, gmSelector nodes){
 }
 
 
-///\en Sets a new name to selected node(s).
+///\en Sets a new name to selected node(s). 
 ///    \return Number of affected nodes.
 int gmManager::set_node_name(const std::string &newname, gmSelector nodes){
   if(!in_construction())
@@ -1834,7 +1916,7 @@ int gmManager::set_node_action(const std::string &command, gmSelector nodes){
     return 0;
   if(nodes.id==gmNODE_NEXT){ // reserving for next nodes
     tmpprop.application_call=command; // action is command
-    tmpact.reset(NULL);
+    tmpact.reset(NULL); 
     return 1;
   }
   if(nodes.id==gmNODE_AUTO) // auto means current
@@ -1879,7 +1961,7 @@ int gmManager::fetch_node_files(gmSelector nodes, const std::vector< pair<std::s
   // fetching
   int res, nfiles = 0;
   for(size_t i=0;i<inputs.size();i++){
-    res = sched->fetch_node_files(graph,inputs[i].first,files);
+    res = sched->fetch_node_files(graph,inputs[i].first,files);   
     if(res>0)
       nfiles++;
   }
@@ -1900,11 +1982,11 @@ int gmManager::set_node_state(enum gmNODE_STATES state, gmSelector nodes){
     state==gmNS_PROC ||
     state==gmNS_FAIL ||
     state==gmNS_WAIT ;
-
+    
   if(!allowed)
     return -1; // all other states can not be set manually
 
-
+  
   std::vector< std::pair<int,int> > inputs;
   if(select_nodes(inputs,nodes,false, -1, idcount)<0)
     return LOGERR(-1,fmt("gmManager.set_node_state: no nodes found that match input_node specifier '%s', function skipped",(const char *)nodes.to_string().c_str()),0);
@@ -1915,20 +1997,20 @@ int gmManager::set_node_state(enum gmNODE_STATES state, gmSelector nodes){
     // some nodes have internal states and cannot be assigned a new state
     if(gns==gmNS_EXE   ||
       gns==gmNS_TARG || gns==gmNS_TEMP){
-      LOGMSG(vblWARN,fmt("gmManager.set_node_state: trying to assign a new state for node%d being processed, skipped",inputs[i].first),0);
+      LOGMSG(vblWARN,fmt("gmManager.set_node_state: trying to assign a new state for node%d being processed, skipped",inputs[i].first),0); 
       continue;
     }
     gmNODE_STATES prev = graph->set_node_state_by_id(inputs[i].first,state,true);
     if(prev!=gmNS_NO_NODE && prev!=state)
       hits++;
     if(state==gmNS_UNPROC)
-      graph->unprocess_recursively_by_id(inputs[i].first);  // marks nodes as unprocessed by recursively following outgoing links
+      graph->unprocess_recursively_by_id(inputs[i].first);  // marks nodes as unprocessed by recursively following outgoing links     
   }
-
+  
 
   if(hits && graph_update>=2) // writing the graphwiz file
     write_graph();
-
+  
 
   return hits; //(int)inputs.size();
 }
@@ -1999,9 +2081,4 @@ int gmManager::process_cur_node(){
 
 const vector< std::pair<gmNodeID, gmNODE_STATES> >& gmManager::get_event_stack() const {
   return graph->event_stack;
-}
-
-int gridmd_main(int argc, char **argv)
-{
-  return 0;
 }

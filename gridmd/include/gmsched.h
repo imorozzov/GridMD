@@ -162,7 +162,7 @@ public:
   ///     \return <0 on error: -1 means that the naem exists
   int add_resource(const gmResourceDescr &rdescr, const string &name="", bool reload=false);
 
-
+# ifndef NO_XML
   ///\en Saves the scheduler appending the resources as chidren to the given node
   int Save(XMLFile& xmldoc, xmlNodePtr node){
     for(size_t i=0;i<resources.size();i++){
@@ -176,6 +176,7 @@ public:
   ///    \return the number of loaded resources
   int Load(XMLFile& xmldoc, xmlNodePtr node, bool clear=false, bool reload=false);
 
+# endif
 
   size_t queue_jobs(gmGraph *graph, int exetype);
 

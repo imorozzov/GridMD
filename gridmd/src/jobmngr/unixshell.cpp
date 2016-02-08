@@ -30,6 +30,19 @@ int gmShellUnix::execute(const gmdString& cmd, gmdArrayString& out, gmdArrayStri
   return execute_end(res, out, err);
 }
 
+static gmdString escape_space(gmdString path)
+{
+    gmdString ret;
+    ret.reserve(path.size() + 10);
+    for(size_t i =0; i<path.size(); i++  )
+    {
+        char c = path[i];
+        if(c==' ')
+            ret += '^';
+        ret += c;
+    }
+    return ret;
+}
 
 int gmShellUnix::cp_execute(const gmdString& cmd) {
   gmdArrayString out, err;
@@ -55,7 +68,8 @@ int gmShellUnix::StageIn(pCSTR locpath, pCSTR rempath, unsigned flags){
     return StageIn_end(locpath, rpath, flags);
 
   gmdString cmd = (flags & RECURSIVE) ? "cp -fr " : "cp -f ";
-  cp_execute(cmd + locpath + " " + rpath);
+  //cp_execute(cmd +" \'"+ locpath + "\' \'" + rpath+"\'");
+  cp_execute(cmd +" " +escape_space(locpath) +" " +escape_space(rpath) );
   
   return StageIn_end(locpath, rpath, flags);
 }
@@ -68,7 +82,8 @@ int gmShellUnix::StageOut(pCSTR locpath, pCSTR rempath, unsigned flags){
     return StageOut_end(locpath, rpath, flags);
 
   gmdString cmd = (flags & RECURSIVE) ? "cp -fr " : "cp -f ";
-  cp_execute(cmd + rpath + " " + locpath);
+  //cp_execute(cmd +" \'"+ rpath + "\' \'" + locpath+"\'");
+  cp_execute(cmd +" " +escape_space(rpath) +" " +escape_space(locpath) );
   
   return  StageOut_end(locpath, rpath, flags);
 }

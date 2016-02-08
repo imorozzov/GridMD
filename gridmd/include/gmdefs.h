@@ -41,6 +41,7 @@ enum gmMODES{
   gmMODE_MANAGER=0x1,///<\en Same as gmMODE_CONSTRUCT
   gmMODE_CONSTRUCT=0x1, ///<\en Construction mode in which the graph is assembled
   gmMODE_WORKER=0x2, ///<\en Worker mode for execution of the worker nodes
+  gmMODE_FINAL=0x4, ///<\en used in combination with worker mode to process final node branch serially
 };
 
 
