@@ -7,9 +7,12 @@ option(USE_LIBSSH "Use libssh" ON)
 option(USE_LIBSSH2 "Use libssh2" OFF)
 option(WITH_XML "Enable XML support via libxml2" ON)
 option(USE_WXWIDGETS "Use WxWidgets library" OFF)
+if(WIN32)
+set(BUILD_SHARED OFF)
+else(WIN32)
 option(BUILD_SHARED "Build GridMD as shared library" ON)
+endif(WIN32)
 option(BUILD_EXAMPLES "Build all examples" ON)
-
 
 if(WIN32)
   add_definitions("-D_CRT_SECURE_NO_WARNINGS")
