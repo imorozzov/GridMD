@@ -8,19 +8,31 @@
  *
  *   This source code is Free Software and distributed under the terms of wxWidgets license (www.wxwidgets.org) 
  *
- *   $Revision: 1.37 $
- *   $Date: 2015/06/17 19:37:59 $
- *   @(#) $Header: /home/plasmacvs/source_tree/gridmd/src/gmsched.cpp,v 1.37 2015/06/17 19:37:59 valuev Exp $
+ *   $Revision: 1.41 $
+ *   $Date: 2016/02/08 08:16:59 $
+ *   @(#) $Header: /home/plasmacvs/source_tree/gridmd/src/gmsched.cpp,v 1.41 2016/02/08 08:16:59 valuev Exp $
  *
  *****************************************************************************/
 /*
 $Source: /home/plasmacvs/source_tree/gridmd/src/gmsched.cpp,v $
-$Revision: 1.37 $
+$Revision: 1.41 $
 $Author: valuev $
-$Date: 2015/06/17 19:37:59 $
+$Date: 2016/02/08 08:16:59 $
 */
 /*s****************************************************************************
  * $Log: gmsched.cpp,v $
+ * Revision 1.41  2016/02/08 08:16:59  valuev
+ * working examples
+ *
+ * Revision 1.40  2016/02/05 19:04:45  valuev
+ * implicit workflow fixes
+ *
+ * Revision 1.39  2016/02/04 16:41:04  valuev
+ * serial final job execution
+ *
+ * Revision 1.38  2016/02/02 12:15:35  valuev
+ * fixing mutex
+ *
  * Revision 1.37  2015/06/17 19:37:59  valuev
  * sweep farm restructured
  *
@@ -214,6 +226,7 @@ int gmScheduler::add_resource(const gmResourceDescr &rdescr, const string &name,
   return (int)resources.size()-1;
 }
 
+# ifndef NO_XML
 
 int gmScheduler::Load(XMLFile& xmldoc, xmlNodePtr node, bool clear, bool reload){
   if(clear)
@@ -242,7 +255,7 @@ int gmScheduler::Load(XMLFile& xmldoc, xmlNodePtr node, bool clear, bool reload)
   return nloaded;
 }
 
-
+# endif
 
 
 // returns true if the name is directory
@@ -542,7 +555,11 @@ size_t gmScheduler::queue_jobs(gmGraph *graph, int exetype){
       bool failed_link=false;
       int linktype = graph->links[graph->edgeid[threads[i].idlinks[j]]]->GetType();
       gmdString filename, destname;
-      bool trg_local = get_idlink_filenames(graph,threads[i].idlinks[j],filename,destname,threads[i].recursive);
+      bool thread_local = (threads[i].exetype==gmEXE_LOCAL || threads[i].exetype==gmEXE_SERIAL); //threads[i].recursive
+      if(thread_local && (linktype&gmLINK_DATA) && !(sys->write_files&gmFILES_LOCAL)) // in this case files are not used for data links
+        continue; // don't check
+
+      bool trg_local = get_idlink_filenames(graph,threads[i].idlinks[j],filename,destname,thread_local);
       if(trg_local)  // should have arrived to local filename, otherwise should be accessible by (modified) filename
         filename=destname; 
       
@@ -564,8 +581,8 @@ size_t gmScheduler::queue_jobs(gmGraph *graph, int exetype){
         // since there is an output check, this is possible only when the data was produced and then removed
         const char *msg = fmt("gmManager.prepare_links: there is no data for link '%s' produced by processed node %d, restarting source node",(const char *)filename.c_str(),source(threads[i].idlinks[j],graph->g));
         LOGMSG(vblWARN,msg,0);
-        threads[i].state=5; // thread cancelled
-        threads[i].restarts=-2; // try to restart
+        threads[i].state=5; // 5; // thread cancelled
+        //threads[i].restarts=-2; // try to restart
         threads[i].error_code = gmERR_FILE;
         threads[i].error_message = msg;
         // mark source node as unprocessed
@@ -578,9 +595,10 @@ size_t gmScheduler::queue_jobs(gmGraph *graph, int exetype){
     // check that we have where to copy output to
     for(size_t j=0;j<threads[i].odlinks.size();j++){
       gmdString filename, destname;
-      bool trg_local = get_odlink_filenames(graph,threads[i].odlinks[j],filename,destname , threads[i].recursive);       
+      bool thread_local = (threads[i].exetype==gmEXE_LOCAL || threads[i].exetype==gmEXE_SERIAL); //threads[i].recursive
+      bool trg_local = get_odlink_filenames(graph,threads[i].odlinks[j],filename,destname , thread_local);       
       // check directory tree 
-      if((trg_local||threads[i].recursive) && !check_or_create_dir(destname)){
+      if((trg_local||thread_local) && !check_or_create_dir(destname)){
         const char *msg = fmt("gmManager.prepare_links: can't create path for link '%s' that has to be produced by node %d, marking the node as failed",(const char *)destname.c_str(),source(threads[i].odlinks[j],graph->g));
         LOGMSG(vblWARN,msg,0);
         threads[i].state=5; // thread cancelled
@@ -590,7 +608,6 @@ size_t gmScheduler::queue_jobs(gmGraph *graph, int exetype){
         // mark source node as failed
         graph->set_node_state(source(threads[i].odlinks[j],graph->g),gmNS_FAIL);
         graph->set_node_error(source(threads[i].odlinks[j],graph->g), threads[i].error_code, threads[i].error_message);
-
       }
     }
      
@@ -600,31 +617,7 @@ size_t gmScheduler::queue_jobs(gmGraph *graph, int exetype){
       nrunning++;
       continue;
     }
-    
-    if(threads[i].exetype==gmEXE_SERIAL){ // finish node found
-      vector<gmGraph::wthread_t> &threads=graph->threads;
-      sys->wnodes.clear();
-      sys->wnodes.start_record();
-      sys->max_node=-1;
-      for(size_t ii=0;ii<threads.size();ii++){ // 
-        if(threads[ii].state>=1) // finished, failed, restarting ..
-          continue;
-        for(size_t j=0;j<threads[ii].nodes.size();j++){
-          int inode=sys->graph->g[threads[ii].nodes[j]].nodeid;
-          sys->wnodes.next_record(inode);
-          if(sys->max_node<inode)
-            sys->max_node=inode;
-          // marking nodes as processed
-          sys->graph->set_node_state(threads[ii].nodes[j],gmNS_UNPROC);
-          //sys->graph->g[threads[ii].nodes[j]].flag=gmGraph::PROC;
-        }
-        threads[ii].exetype=gmEXE_SERIAL; 
-      }
-      sys->wnodes.end_record();
-      threads[i].state=0; // executing, to be analyzed by check_jobs
-      throw task_finished(); // this must be processed in local mode
-    }
-    
+     
     if(threads[i].exetype&gmEXE_REMOTE){ // resource_id must be valid here
       gmResource *res=resources[threads[i].resource_id];
        
@@ -653,7 +646,7 @@ size_t gmScheduler::queue_jobs(gmGraph *graph, int exetype){
           //else{} // can't find group resource, proceed?
         }
         if(failed){
-          threads[i].state=2;
+          threads[i].state=2; // 2 means try to restart
           nrunning++;
           continue;
         }
@@ -783,10 +776,18 @@ size_t gmScheduler::queue_jobs(gmGraph *graph, int exetype){
     if(threads[i].exetype&gmEXE_LOCAL && threads[i].resource_id==-1){ // local and not assigned yet
       threads[i].exetype=gmEXE_LOCAL; 
       LOGMSG(vblMESS3,"locally",0);
+    }
+    else if(threads[i].exetype==gmEXE_SERIAL){
+      LOGMSG(vblMESS3,"locally and serially",0);
+      threads[i].state=0; // mark this thread as executing
+    }
+
+    if(/*threads[i].exetype==gmEXE_SERIAL ||*/ threads[i].exetype==gmEXE_LOCAL){ // performing associated actions, for serial threads they are executed in process_curnode()
       //threads[i].state=1; // mark this thread as finished 
       threads[i].state=0; // mark this thread as executing
+      
       if(exetype&gmEXE_EXPLICIT_ONLY){
-        //HERE execute local nodes
+        //HERE execute local nodes and actions
         for(size_t j=0;j<jobset.size() /*threads[i].nodes.size()*/;j++){
           int res=0;
           for(size_t k=0;k<jobset[j].size();k++){
@@ -804,9 +805,9 @@ size_t gmScheduler::queue_jobs(gmGraph *graph, int exetype){
                 threads[i].error_message = msg;
                 break;
               }
-							else if(res==gmREDO) // redo requested
-								threads[i].needs_redo = 1;
-							else
+						  else if(res==gmREDO) // redo requested
+							  threads[i].needs_redo = 1;
+						  else
                 threads[i].needs_redo = 0;
             }
 
@@ -828,7 +829,7 @@ size_t gmScheduler::queue_jobs(gmGraph *graph, int exetype){
           } // k
         }
       }
-      else{ // recursion mechanism
+      else{ // recursion mechanism to execute associated code blocks, local actions are also executed in recursive calls by process_curnode()
         LOGMSG(vblMESS3,"recursively",0);
         //threads[i].state=1; // mark this thread as finished 
         threads[i].state=0; // mark this thread as executing
@@ -851,16 +852,37 @@ size_t gmScheduler::queue_jobs(gmGraph *graph, int exetype){
           }   
         }*/
 
+        // saving counters
+        int idcount_tmp = sys->idcount;
+        int have_start_node_tmp = sys->have_start_node; 
+
         sys->rec_level++;
         try{
           // argc, argv define the subgraph
           gridmd_main(sys->_argc+1,myargv); // executes nodes locally
         }
         catch(task_finished){} // terminated because maximal node is reached
+        /*if((sys->write_files&gmFILES_LOCAL)){ // moving local links to their destinations
+          for(size_t j=0;j<threads[i].odlinks.size();j++){
+            gmdString filename, destname;
+            bool trg_local = get_odlink_filenames(graph,threads[i].odlinks[j],filename,destname , false);  // simulating nonlocal thread
+            LOGMSG(vblMESS3,fmt("Moving file '%s'->'%s'",(const char *)filename.c_str(),(const char *)destname.c_str()),0);
+            if(gmdCopyFile(filename,destname)){
+              gmdRemoveFile(filename);
+            }
+          }
+        }*/
         sys->rec_level--;
         
+        // restoring
+        sys->idcount = idcount_tmp;
+        sys->have_start_node = have_start_node_tmp; 
+
         delete [] myargv;
       }
+      nrunning++;
+    } //local
+    else if(threads[i].exetype==gmEXE_SERIAL){
       nrunning++;
     }
   }
@@ -885,6 +907,7 @@ size_t gmScheduler::check_jobs(gmGraph *graph, size_t *pfailed, int thread_id, b
   }*/
   size_t nfinished=0;
   size_t nfailed=0;
+  bool found_finish = false; // indicates that local finish node is among the excuting nodes
   for(size_t i=0/*graph->thread_start*/;i<threads.size();i++){
     if(thread_id>=0 && (int)i!=thread_id) // select given thtread id only
       continue;
@@ -1033,10 +1056,13 @@ size_t gmScheduler::check_jobs(gmGraph *graph, size_t *pfailed, int thread_id, b
 
     }
     else if(threads[i].state==0 && (threads[i].exetype==gmEXE_LOCAL || threads[i].exetype==gmEXE_SERIAL)){
-      threads[i].state=1; // local threads arrive here being finished 
+      if(threads[i].exetype==gmEXE_LOCAL)
+        threads[i].state=1; // local threads arrive here being actually finished 
       // check the files
       for(size_t j=0;j<threads[i].odlinks.size();j++){ // checking the output files
         int linktype = graph->links[graph->edgeid[threads[i].odlinks[j]]]->GetType();
+        if((linktype&gmLINK_DATA) && !(sys->write_files&gmFILES_LOCAL)) // in this case files are not used for data links
+          continue; 
         
         gmdString filename, destname;
         bool trg_local=get_odlink_filenames(graph,threads[i].odlinks[j],filename,destname,threads[i].recursive);
@@ -1076,11 +1102,37 @@ size_t gmScheduler::check_jobs(gmGraph *graph, size_t *pfailed, int thread_id, b
         }
       }
     }
+    if(threads[i].exetype==gmEXE_SERIAL){ // finish node found
+      if(threads[i].state==0 || threads[i].state==2){ // any unfinished serial thread (even failed) must exit with throw
+        if(!found_finish){ 
+          sys->wnodes.clear();
+          sys->wnodes.start_record();
+          sys->max_node=-1;
+          found_finish = true; // mark for throw task_finished()
+        }
+      }
+      if(threads[i].state==0){ // executing: collect the node list
+        for(size_t j=0;j<threads[i].nodes.size();j++){
+          int inode=sys->graph->g[threads[i].nodes[j]].nodeid;
+          sys->wnodes.next_record(inode);
+          if(sys->max_node<inode)
+            sys->max_node=inode;
+          // marking nodes as processed
+          sys->graph->set_node_state(threads[i].nodes[j],gmNS_PROC);
+          //sys->graph->set_node_state(threads[i].nodes[j],gmNS_UNPROC);
+          //sys->graph->g[threads[i].nodes[j]].flag=gmGraph::PROC;
+        }
+        sys->wnodes.end_record();
+        //threads[i].state=0; // executing, to be analyzed by check_jobs
+        //throw task_finished(); // this must be processed in local mode
+        threads[i].state=1;  // mark as finished
+      }
+    }
     
     if(threads[i].state>0){ // finished or failed
       nfinished++;
       int was_restart=0; 
-      if(threads[i].state==2){ // checking wether we can restart this thread
+      if(threads[i].state==2){ // candidate to fail: checking wether we can restart this thread
         if(threads[i].restarts>=0 && !stop && !threads[i].stopped){ // stop leads to thread failure
           int restart_lim=0;
           for(size_t j=0;j<threads[i].nodes.size();j++){ // marking nodes as processed
@@ -1090,13 +1142,17 @@ size_t gmScheduler::check_jobs(gmGraph *graph, size_t *pfailed, int thread_id, b
           }
 
           threads[i].restarts++;
-          if(threads[i].restarts>restart_lim)
+          if(threads[i].restarts>restart_lim){
             threads[i].state=3; // limit reached, no restart possible
+            LOGMSG(vblWARN,fmt("gmManager.check_jobs: maximum number of restarts for a job reached, cancelling the thread."),0);
+          }
           else 
             was_restart=1;
         }
         else
           threads[i].state=3; // job is unconditionally failed
+        if(threads[i].state==3 && threads[i].exetype==gmEXE_SERIAL) // job is unconditionally failed and we proceed serially
+          sys->graph_error = 1; // set graph error to indicate that something failed in serial mode 
       }
       // setting node states if it was not a file thread
       //if(!threads[i].read){
@@ -1122,6 +1178,8 @@ size_t gmScheduler::check_jobs(gmGraph *graph, size_t *pfailed, int thread_id, b
       if(was_restart){
         LOGMSG(vblWARN,fmt("gmManager.check_jobs: attempting to rerun the job with id = %s after a failure!", (const char *)cur_jobid.c_str()),0);
         threads[i].jobid="";  // must indicate a duplicate thread here
+        if(threads[i].exetype==gmEXE_SERIAL) // if the thread is restarting, cancel going to serial mode
+          found_finish = false; // cancel throwing task_finished(), resubmit this thread
       }
       else{
         // removing the finished thread from nodal list
@@ -1147,6 +1205,11 @@ size_t gmScheduler::check_jobs(gmGraph *graph, size_t *pfailed, int thread_id, b
     }
   }
   // analyse the cleanup list
+  //...
+  
+  if(found_finish)
+    throw task_finished(); // this must be processed in serial worker mode
+
 
   if(pfailed)
     *pfailed=nfailed;

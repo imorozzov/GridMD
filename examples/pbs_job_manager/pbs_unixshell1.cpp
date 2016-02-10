@@ -14,6 +14,8 @@
 #include "jobmngr/pbsmngr.h"
 #include "jobmngr/unixshell.h"
 
+int gridmd_main(int, char**) {return 0;}
+
 int main(int argc, char *argv[])
 {
   // Initialization of gmdWindows library

@@ -8,19 +8,37 @@
  *
  *   This source code is Free Software and distributed under the terms of wxWidgets license (www.wxwidgets.org) 
  *
- *   $Revision: 1.71 $
- *   $Date: 2015/06/17 19:37:59 $
- *   @(#) $Header: /home/plasmacvs/source_tree/gridmd/include/gridmd.h,v 1.71 2015/06/17 19:37:59 valuev Exp $
+ *   $Revision: 1.77 $
+ *   $Date: 2016/02/08 08:16:59 $
+ *   @(#) $Header: /home/plasmacvs/source_tree/gridmd/include/gridmd.h,v 1.77 2016/02/08 08:16:59 valuev Exp $
  *
  *****************************************************************************/
 /*
 $Source: /home/plasmacvs/source_tree/gridmd/include/gridmd.h,v $
-$Revision: 1.71 $
+$Revision: 1.77 $
 $Author: valuev $
-$Date: 2015/06/17 19:37:59 $
+$Date: 2016/02/08 08:16:59 $
 */
 /*s****************************************************************************
  * $Log: gridmd.h,v $
+ * Revision 1.77  2016/02/08 08:16:59  valuev
+ * working examples
+ *
+ * Revision 1.76  2016/02/05 19:04:45  valuev
+ * implicit workflow fixes
+ *
+ * Revision 1.75  2016/02/04 16:41:04  valuev
+ * serial final job execution
+ *
+ * Revision 1.74  2016/02/03 16:41:18  valuev
+ * fixes
+ *
+ * Revision 1.73  2016/02/02 12:15:34  valuev
+ * fixing mutex
+ *
+ * Revision 1.72  2015/07/17 18:23:05  valuev
+ * working with vs8
+ *
  * Revision 1.71  2015/06/17 19:37:59  valuev
  * sweep farm restructured
  *
@@ -493,6 +511,7 @@ struct gmResourceDescr{
   void init(const int res_type_ = gmRES_DEFAULT_TYPE,
     const int shell_type_ = gmSHELL_DEFAULT_TYPE, int active_ = 1);
 
+# ifndef NO_XML
   ///\en Saves description as a child of the given XmlNode.
   ///    \param [out] parent pointer to the node for which a child will be created
   ///    \param [out] name is the name of the resource 
@@ -506,7 +525,7 @@ struct gmResourceDescr{
   ///    \param [in] name is the name of the resource 
   ///    \return >0 on success, <0 otherwise
   int Load(XMLFile& xmldoc, xmlNodePtr parent, gmdString &name);
-
+# endif
   ///\en Creates an instance of job manager corresponding to this descriptor
   ///    \return a pointer to created object (must be deleted with delete) , NULL on error
   gmJobManager *CreateJobManager(gmShell *shell = NULL) const;
@@ -662,10 +681,10 @@ public:
 ///  Mutex should be recursive.
 class gmMutex{
 public:
-    virtual void lock() =0;
-    virtual void unlock() =0;
+    virtual void lock()  {};
+    virtual void unlock() {};
 
-    static gmMutex& voidMutex;
+    static gmMutex voidMutex;
 protected:
     virtual ~gmMutex() {}
 };
@@ -712,7 +731,10 @@ protected:
   string name;
   int mode;
   int exetype;
+  
   gmNodeID idcount;
+  int have_start_node; ///<\en id of the first node in distributed section ('start' or other was added), for compatibility with older versions
+  
   int dprev; ///<\en distance to previous node (default 1)
   gmNodeID end_node;
   gmNodeID max_node; ///<\en maximal allowed nodeid (for working mode)
@@ -725,8 +747,6 @@ protected:
   int del_files;
   int last_loaded_event; ///<\en id of the last event loaded from saved event stack when restarting
   string restart_file;
-
-  bool have_start_node; ///<\en true if the first node ('start' or other was added), for compatibility with older versions
 
   typedef refmap<string, gmLinkData> data_map_t;
   data_map_t data_rep;
@@ -756,7 +776,7 @@ protected:
   int link_cleanup();
 
   ///\en Level of recursion in gridmd_main() calls
-  int rec_level;
+  static int rec_level;
   ///\en Indicates that graph error (deadlock or such) happened during the execution
   int graph_error;
   
@@ -1023,12 +1043,30 @@ public:
       start_distr=0;
     }
     //node_property(gmNODE_AUTO)->SetLocal();
-    mark_node(name,input,t,srcport);
-    gmNodeProp *prop=&(_node_ptr(get_curnode())->userprop); // node should always be OK
-    prop->local=true; // end node must be local
-    prop->final=true; 
-    return execute()>=0 ? 1 : 0;
-    
+    int res = mark_node(name,input,t,srcport);
+    //have_start_node = -1 - idcount; //  prerare for next distributed section
+    if(mode&gmMODE_WORKER){
+      have_start_node = -1 - idcount; //  prerare for next distributed section
+      if(distr_node<=idcount){
+        if(mode&gmMODE_FINAL){
+          mode = gmMODE_LOCAL; // returning to local mode
+          have_start_node = -1 - idcount; //  prerare for next distributed section
+        }
+        return res; // return the result of mark_node
+      }
+      else return 0; // skip previous section
+    }
+    if(in_construction()){
+      //have_start_node = -1 - idcount; //  prerare for next distributed section
+      gmNodeProp *prop=&(_node_ptr(get_curnode())->userprop); // node should always be OK
+      prop->local=true; // end node must be local
+      prop->final=true; 
+      return execute()>=0 ? 1 : 0;
+    }
+    else{
+      have_start_node = -1 - idcount; //  prerare for next distributed section
+      return 0;
+    }
   }
 
   ///\en Same as above for hard links.
@@ -1311,14 +1349,9 @@ public:
     return v;
   }
    
+  gmNodeID advance_nodeid();
 
-  gmNodeID advance_nodeid(){
-    if(!have_start_node)
-      return 0; 
-    //gmNodeID tmp=idcount;
-    idcount++;
-    return idcount;
-  }
+  
 
   ///\en Get current node ID.
   gmNodeID get_curnode() const {
@@ -1337,6 +1370,8 @@ public:
   /// checks that the node with given ID belongs to the subgraph being executed
   /// throws exception when the subgraph is finished
   int check_subgraph(gmNodeID node){
+    //if(mode==gmMODE_LOCAL)
+      //return 0; // change to finding final nodes
     if(node==-1 || (max_node>=0 && node>max_node)){ // max_node=-1 is reserved for serial execution
       if(rec_level==0 || (write_files&gmFILES_LOCAL)){
         dump_data(); // dumping all repository variables into files

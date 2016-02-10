@@ -61,9 +61,9 @@ int gridmd_main(int argc,char* argv[]){
   gmExperiment.set_link_files(gmFILES_LOCAL | gmFILES_CLEANUP);
 
   // Set the execution mode
-  gmExperiment.set_execution(gmEXE_SERIAL);  // Serial execution where the GridMD calls are ignored
+  //gmExperiment.set_execution(gmEXE_SERIAL);  // Serial execution where the GridMD calls are ignored
   //gmExperiment.set_execution(gmEXE_CONSTRUCT_ONLY);  // Construction of the execution graph
-  //gmExperiment.set_execution(gmEXE_LOCAL);  // Construction of the execution graph and/or
+  gmExperiment.set_execution(gmEXE_LOCAL);  // Construction of the execution graph and/or
                                             // execution of the selected (all) nodes on the local host
   //gmExperiment.set_execution(gmEXE_REMOTE); // Construction and execution on the remote system(s).
   //                                          // Please set up resources as explained below.

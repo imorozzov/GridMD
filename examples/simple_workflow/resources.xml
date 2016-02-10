@@ -1,19 +1,88 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0"?>
 <flowgraph>
   <scheduler>
-	  <!-- Please edit the field marked by '###' symbols at least -->
-    <resource name="my_resource" type="pbs" active="1">
-      <session type="plink" login="###YOUR_LOGIN###" host="###REMOTE_HOST###">
-        <ssh_path>C:\Program Files\PuTTY\plink.exe</ssh_path>
-        <scp_path>C:\Program Files\PuTTY\pscp.exe</scp_path>
-        <cfg>-load "###PUTTY_CONFIG_NAME###"</cfg>
+    <resource name="morozov@nwo5_pbs_full" active="0">
+      <session type="plink">
+        <dump_commands>false</dump_commands>
+        <home_dir>/home/morozov</home_dir>
+        <home_dir_win>c:\Documents and Settings\Igor</home_dir_win>
+        <host>nwo5.ihed.ras.ru</host>
+        <local_remove>false</local_remove>
+        <login>morozov</login>
+        <plink_args>-load "nwo5 (morozov)"</plink_args>
+        <plink_att_num>3</plink_att_num>
+        <plink_path>C:\Program Files\PuTTY\plink.exe</plink_path>
+        <plink_retry_delay>1000</plink_retry_delay>
+        <pscp_path>C:\Program Files\PuTTY\pscp.exe</pscp_path>
+        <rem_perm_dir>/home/morozov/perm_dir</rem_perm_dir>
+        <rem_tmp_dir>/home/morozov/.gmJobManager</rem_tmp_dir>
       </session>
-      <application name="simple_workflow.exe">
-        <!-- <prefix>export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/opt/wxwidgets/build_icc/lib/</prefix> -->
-        <postfix></postfix>
-        <location>###YOUR_PATH###/examples/simple_workflow/unix/Obj_gnu/</location>
+      <job_manager type="pbs" timing="no">
+        <end_job_cmd>echo Finishing</end_job_cmd>
+        <init_job_cmd>echo Starting</init_job_cmd>
+        <job_name_prefix>text_xml_</job_name_prefix>
+        <jobs_limit>2</jobs_limit>
+        <mpi_enabled>false</mpi_enabled>
+        <mpi_run_cmd>mpiexec -boot</mpi_run_cmd>
+        <pbs_path>/usr/local/bin</pbs_path>
+        <pre_subm_cmd>echo Pre submission command</pre_subm_cmd>
+        <qsub_args>-q mpi</qsub_args>
+        <save_job_info>true</save_job_info>
+        <wait_delay>2000</wait_delay>
+        <wait_timeout>60000</wait_timeout>
+      </job_manager>
+      <application name="workflow_skeletons.exe">
+        <postfix>echo Postfix</postfix>
+        <prefix>export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/home/valuev/wxwidgets/build_icc/lib/:/opt/intel/cmkl/10.0.1.014/lib/em64t/</prefix>
+        <progdir>/share/home/valuev/trans1/source_tree/mdapp/workflow_skeletons/unix/Obj_ihedt_icc10/</progdir>
       </application>
-      <job_template queue="-q seq"/>
+    </resource>
+    <resource name="morozov@nwo5_pbs_min" active="1">
+      <session type="plink" host="nwo5.ihed.ras.ru" login="morozov">
+        <plink_args>-load "nwo5 (morozov)"</plink_args>
+      </session>
+      <job_manager type="pbs" timing="no"/>
+      <application/>
+    </resource>
+    <resource name="imorozov@lomonosov" active="0">
+      <session type="plink" host="lomonosov.parallel.ru" login="imorozov">
+        <plink_args>-load "Lomonosov (imorozov)"</plink_args>
+        <rem_tmp_dir>~/_scratch/.gmJobManager</rem_tmp_dir>
+      </session>
+      <job_manager type="slurm" timing="no">
+        <init_job_cmd>which impi</init_job_cmd>
+        <job_name_prefix>text_xml_</job_name_prefix>
+        <pre_subm_cmd>module add impi/4.1.0; echo test</pre_subm_cmd>
+        <sbatch_args>--partition=test</sbatch_args>
+        <slurm_cmd_mpi>ompi</slurm_cmd_mpi>
+        <slurm_cmd_serial>srun</slurm_cmd_serial>
+        <slurm_path>/usr/bin</slurm_path>
+      </job_manager>
+      <application/>
+    </resource>
+    <resource name="mingw@local" active="0">
+      <session type="mingw">
+        <bash_path>c:\Apps\MinGW\msys\1.0\bin\bash.exe</bash_path>
+        <home_dir>/home/Igor</home_dir>
+        <home_dir_win>c:\Apps\MinGW\msys\1.0\home\Igor</home_dir_win>
+        <rem_tmp_dir>gmJobManager</rem_tmp_dir>
+      </session>
+      <job_manager type="wsh" timing="no">
+        <script_type>bash</script_type>
+        <stat_read_delay>100</stat_read_delay>
+        <stat_read_ntries>10</stat_read_ntries>
+      </job_manager>
+      <application/>
+    </resource>
+    <resource name="winapi@local" active="0">
+      <session type="cmd">
+        <rem_tmp_dir>c:\gmJobManager</rem_tmp_dir>
+      </session>
+      <job_manager type="win" timing="no">
+        <kill_delay>50</kill_delay>
+        <kill_ntries>10</kill_ntries>
+      </job_manager>
+      <application/>
     </resource>
   </scheduler>
 </flowgraph>

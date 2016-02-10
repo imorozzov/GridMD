@@ -154,3 +154,13 @@ Makefile
 
 #Qt Creator project files
 CMakeLists.txt.user
+
+#Netbeans
+nbproject
+
+#Emacs
+.dir-locals.el
+\#*\#
+
+#Mac
+.DS_Store

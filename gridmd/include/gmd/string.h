@@ -95,6 +95,8 @@ public:
 
   gmdChar& operator[](int n) { return at(n); }
 
+   gmdChar& operator[](size_t n) { return at(n); }
+
   gmdChar Last() const { return at(Len()-1); }
 
   friend gmdString operator+(const gmdString& string1, const gmdString& string2);

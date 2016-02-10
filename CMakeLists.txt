@@ -10,6 +10,12 @@ option(USE_WXWIDGETS "Use WxWidgets library" OFF)
 option(BUILD_SHARED "Build GridMD as shared library" ON)
 option(BUILD_EXAMPLES "Build all examples" ON)
 
+
+if(WIN32)
+  add_definitions("-D_CRT_SECURE_NO_WARNINGS")
+	add_definitions("-D_SCL_SECURE_NO_WARNINGS")
+endif(WIN32)
+
 if (BUILD_SHARED)
   set(BUILDCONF SHARED)
 else(BUILD_SHARED)
@@ -29,17 +35,17 @@ endif (USE_WXWIDGETS)
 
 
 
-
 if (USE_LIBSSH)
   find_package(LibSSH)
-  if(LIBSSH_LIBRARY)
+  if(LIBSSH_FOUND)
     add_definitions("-DUSING_LIBSSH")
-    set(LINKED_LIBS ${LINKED_LIBS} ${LIBSSH_LIBRARY})
-    include_directories(LIBSSH_INCLUDE_DIR)
-  else(LIBSSH_LIBRARY)
+    set(LINKED_LIBS ${LINKED_LIBS} ${LIBSSH_LIBRARIES})
+    include_directories(${LIBSSH_INCLUDE_DIRS})
+    message("LibSSH include dir: ${LIBSSH_INCLUDE_DIRS}")
+  else(LIBSSH_LIBRARIES)
     set(USE_LIBSSH OFF)
     message("LibSSH not found!")
-  endif(LIBSSH_LIBRARY)
+  endif(LIBSSH_FOUND)
 endif(USE_LIBSSH)
 
 
@@ -55,6 +61,14 @@ if (USE_LIBSSH2)
 endif(USE_LIBSSH2)
 
 if (WITH_XML)
+  #LibXML also needs iconv
+  find_package(Iconv)
+  if (ICONV_FOUND)
+    include_directories(${ICONV_INCLUDE_DIR})
+    set(LINKED_LIBS ${LINKED_LIBS} ${ICONV_LIBRARIES})
+  else(ICONV_FOUND)
+    set(WITH_XML OFF)
+  endif(ICONV_FOUND)
   find_package(LibXml2)
   if(LIBXML2_FOUND)
     include_directories(${LIBXML2_INCLUDE_DIR})
@@ -62,11 +76,14 @@ if (WITH_XML)
   else(LIBXML2_FOUND)
     set(WITH_XML OFF)
   endif(LIBXML2_FOUND)
+  include_directories(${CMAKE_CURRENT_SOURCE_DIR}/gridmd/include/gmd/xml)
+else(WITH_XML)
+  add_definitions("-DNO_XML")
 endif(WITH_XML)
 
-if(NOT WITH_XML)
-  add_definitions("-DNO_XML")
-endif(NOT WITH_XML)
+#if(NOT WITH_XML)
+#  add_definitions("-DNO_XML")
+#endif(NOT WITH_XML)
 
 include_directories(${Boost_INCLUDE_DIR})
 
