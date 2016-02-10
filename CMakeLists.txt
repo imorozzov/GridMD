@@ -69,7 +69,8 @@ if(NOT WITH_XML)
 endif(NOT WITH_XML)
 
 include_directories(${Boost_INCLUDE_DIR})
-find_package(LibXml2 REQUIRED)
+
+#find_package(LibXml2 REQUIRED)
 
 
 #build ivutils library
