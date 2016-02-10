@@ -1170,14 +1170,19 @@ int gmManager::load_resources(const char *filename){
   }
   int nloaded=0;
 # ifndef NO_XML
-  XMLFile xmldoc(filename);
-  xmlNodePtr root = xmldoc.getRootNode();
-  if(!root)
-    return LOGERR(0,fmt("gmManager.load_resources: failed to open XML file '%s'",filename),0);
-  std::vector<xmlNodePtr> nodes = xmldoc.getAllChildren(root);
-  FOR_EACH_LOOP(std::vector<xmlNodePtr>, nodes, node)
-    if( xmldoc.getNodeName(*node) == "scheduler" )
-      nloaded += sched->Load(xmldoc, *node);
+  try{
+    XMLFile xmldoc(filename);
+    xmlNodePtr root = xmldoc.getRootNode();
+    if(!root)
+      return LOGERR(0,fmt("gmManager.load_resources: failed to open XML file '%s'",filename),0);
+    std::vector<xmlNodePtr> nodes = xmldoc.getAllChildren(root);
+    FOR_EACH_LOOP(std::vector<xmlNodePtr>, nodes, node)
+      if( xmldoc.getNodeName(*node) == "scheduler" )
+        nloaded += sched->Load(xmldoc, *node);
+  }
+  catch(xml_error){
+    return LOGERR(0,fmt("gmManager::load_resources: can't load resources from '%s'\n",filename), 0); 
+  }
 # else
   LOGMSG(vblWARN,"gmManager::load_resources: NO_XML compiler option used -- can't load/save resource descriptions.\n",0); 
 # endif
