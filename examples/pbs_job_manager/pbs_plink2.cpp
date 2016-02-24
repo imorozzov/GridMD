@@ -55,7 +55,7 @@ int main(int argc, char *argv[])
 
     // Initialization of the job manager
     gmPBSManager mngr(shell);  // use the second argument to select the PBS queue
-    mngr.SetParam("/usr/local/bin", "GMD"); // "GMD" - префикс для имени задач в PBS
+    mngr.SetParam("job_name_prefix", "GMD"); // "GMD" - префикс для имени задач в PBS
 
     // Initialization of the job which will be used as a template
     gmJob job_template;
@@ -77,21 +77,22 @@ int main(int argc, char *argv[])
       // The job will be detached automatically on the local gmJob object deletion
     }
 
-    // Restoting of all jobs with the given user id
-    JobList joblist = mngr.RestoreAll("batch");
-
-    // Fetching the results without waiting for the job completion
-    int i = 0;
-    for each(gmJob* pjob in joblist) {
-    // If your compiler does not support 'for each' operator
-    // replace this line by the following two lines:
-    //   FOR_EACH_LOOP(JobList, joblist, ppjob) {
-    //   gmJob *pjob = *ppjob;   
-      printf("Restored job %s, state = %s\n",
-             pjob->GetID().c_str(), gmJob::StateName(pjob->LastState()));
-      pjob->AddOutFile( "../example2-out",
-                        gmdString::Format("result%d.txt", i++), gmJob::TEXT );
+    // Restoting jobs using their ids 
+    // and fetching temporary results without waiting for jobs completion
+    for(int i=0; i<njobs; i++) {
+      gmdString jobname = gmdString::Format("batch-%d", i);
+      printf("Restoring job %s... ", jobname);
+      gmJob* pjob = mngr.Restore(jobname);
+      if(pjob) {
+        printf("SUCCESS, job state = %s\n", gmJob::StateName(pjob->LastState()));
+        pjob->AddOutFile( "../example2-out",
+                          gmdString::Format("result%d.txt", i), gmJob::TEXT );
+      }
+      else
+        puts("FAILED!");
     }
+
+    // Fetching final results
     puts("Waiting for completion and fetching results...");
     res = mngr.FetchAll(true);  // change to 'false' to wait for the job completion
     printf("Exit code of FetachAll: %s\n", gmJob::StateName(res));
