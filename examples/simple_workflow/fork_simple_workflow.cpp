@@ -32,8 +32,8 @@ int main(int argc,char* argv[]){
   // The following command enables output of information messages (vblALLMESS),
   // warnings and errors (vblALLBAD). Remove 'vblALLMESS' to get rid of 
   // many information messages during execurion.
-  // The program is interrupted on errors (vblERR).
-  message_logger::global().set_levels(vblALLBAD | vblALLMESS, vblERR);
+  // The program is interrupted on all errors (vblERR) or fatal errors vblFATAL.
+  message_logger::global().set_levels(vblALLBAD | vblALLMESS, vblFATAL /*vblERR*/);
   
   // All distributed code should be put into gridmd_main() function
   int res= gridmd_main(argc, argv);

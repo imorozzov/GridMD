@@ -72,7 +72,7 @@ if (WITH_XML)
   else(ICONV_FOUND)
     set(WITH_XML OFF)
   endif(ICONV_FOUND)
-  find_package(LibXml2)
+  find_package(LibXml2 REQUIRED)
   if(LIBXML2_FOUND)
     include_directories(${LIBXML2_INCLUDE_DIR})
     set(LINKED_LIBS ${LINKED_LIBS} ${LIBXML2_LIBRARIES})
@@ -89,7 +89,12 @@ endif(WITH_XML)
 #endif(NOT WITH_XML)
 
 include_directories(${Boost_INCLUDE_DIR})
-find_package(LibXml2 REQUIRED)
+
+#find_package(LibXml2 REQUIRED)
+
+if(WIN32)
+set(LINKED_LIBS ${LINKED_LIBS} userenv)
+endif(WIN32)
 
 
 #build ivutils library
