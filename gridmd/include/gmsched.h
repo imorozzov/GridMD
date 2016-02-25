@@ -198,7 +198,7 @@ public:
 
   int stage_out_files(gmJob *job, const std::vector< pair<std::string, std::string> > &files);
 
-  bool get_idlink_filenames(gmGraph *graph, gmGraph::graph_t::edge_descriptor edge, gmdString &filename, gmdString &destname, bool thread_local_=false);
+  bool get_idlink_filenames(gmGraph *graph, gmGraph::graph_t::edge_descriptor edge, gmdString &filename, gmdString &destname, gmdString &filename2, bool thread_local_=false);
   bool get_odlink_filenames(gmGraph *graph, gmGraph::graph_t::edge_descriptor edge, gmdString &filename, gmdString &destname, bool thread_local_=false);
 
   int stop_node_threads(gmGraph *graph, int nid, bool fetch_results);
