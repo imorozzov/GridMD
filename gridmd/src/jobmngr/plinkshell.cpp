@@ -128,7 +128,10 @@ int gmShellPlink::execute(const gmdString& cmd, gmdArrayString& out, gmdArrayStr
     if( !errmsg.StartsWith("Unable to open connection") ) break;
   }
   
-  if(i >= plink_att_num) return set_err(CONNECTION_ERROR, errmsg);
+  if(i >= plink_att_num){ 
+    execute_end(-1, out, err); // pausing timer
+    return  set_err(CONNECTION_ERROR, errmsg);
+  }
 
   return execute_end(res, out, err);
 }
