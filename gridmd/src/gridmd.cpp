@@ -727,8 +727,10 @@ void gmManager::_init_params(){
 
 
 gmManager::~gmManager(){
-  if((write_files&gmFILES_CLEANUP))
+  if((write_files&gmFILES_CLEANUP)){
     link_cleanup();
+    //gmdRmdir(sched->workdir+"/"+name.c_str()+".tmp");  // dangerous
+  }
   delete graph;
   delete sched;
 }
@@ -1683,11 +1685,16 @@ int gmManager::link_cleanup(){
       for(;ei!=ei_end;++ei){
         int i=graph->edgeid[*ei]; 
         if(i>=0 && graph->links[i]->GetType()&gmLINK_DATA && !(graph->links[i]->state&0x1)){ // this is the data link
-          gmdString destname=graph->links[i]->GetDestName();
-          if(gmdFileExists(destname)){
-            LOGMSG(vblMESS3,fmt("Removing the file '%s'",(const char *)destname.c_str()),0);
-            gmdRemoveFile(destname);
-            graph->links[i]->state|=0x1;
+          gmdString destname, filename, filename2;
+          sched->get_idlink_filenames(graph,*ei,filename,destname,filename2,false);
+          gmdString files[] = {destname, filename, filename2};
+          for(int i=0;i<3;i++){
+            //gmdString destname=graph->links[i]->GetDestName();
+            if(gmdFileExists(files[i])){
+              LOGMSG(vblMESS3,fmt("Removing the file '%s'",(const char *)files[i].c_str()),0);
+              gmdRemoveFile(files[i]);
+              graph->links[i]->state|=0x1;
+            }
           }
         }
       }

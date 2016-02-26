@@ -270,14 +270,14 @@ bool is_dirname(const gmdString &filename){
 }
 
 // gets unique temporary names for a link, modifies filename and destname 
-void get_tmp_names(gmdString &filename, gmdString &destname, bool remote_to_local, const gmdString &prefix, int source_nodeid,int target_nodeid, int linkid){
+void get_tmp_names(gmdString &filename, gmdString &destname, bool remote_to_local, const gmdString &prefix, int source_nodeid,int target_nodeid, int linkid, bool check_dir = true){
   int flags = 0;
   bool has_wildcards = false;
   if(filename.Find('*') != gmdNOT_FOUND || filename.Find('?') != gmdNOT_FOUND) // has wildcards
     has_wildcards = true;
 
   gmdString result = prefix+gmdString::Format("/link%d_n%d-n%d/",linkid, source_nodeid, target_nodeid);
-  if(!check_or_create_dir(result)){
+  if(check_dir && !check_or_create_dir(result)){
     LOGMSG(vblWARN,fmt("get_tmp_names: failed to create local directory '%s'!",(const char *)result.c_str()),0);
   }
 
@@ -332,11 +332,11 @@ bool gmScheduler::get_idlink_filenames(gmGraph *graph, gmGraph::graph_t::edge_de
 
   filename2 = filename;
   if(!src_local && !trg_local && !thread_local_){ // both nonlocal, use tmp file
-    get_tmp_names(filename,destname,false,workdir+"/"+sys->name.c_str()+".tmp",source_nodeid,target_nodeid,graph->edgeid[edge]);
+    get_tmp_names(filename,destname,false,workdir+"/"+sys->name.c_str()+".tmp",source_nodeid,target_nodeid,graph->edgeid[edge], false);
     //filename=get_tmp_name(filename,source_nodeid,destname,target_nodeid,graph->edgeid[edge]);
   }
   else{
-    get_tmp_names(filename2,destname,false,workdir+"/"+sys->name.c_str()+".tmp",source_nodeid,target_nodeid,graph->edgeid[edge]);
+    get_tmp_names(filename2,destname,false,workdir+"/"+sys->name.c_str()+".tmp",source_nodeid,target_nodeid,graph->edgeid[edge], false);
   }
   return trg_local;
 }
@@ -578,7 +578,7 @@ size_t gmScheduler::queue_jobs(gmGraph *graph, int exetype){
             if(!gmdFileExists(filename2))
               failed_link=true;
             else{
-              LOGMSG(vblWARN,fmt("gmManager.queue_jobs: file '%s' is found in alternative location '%s', node locality changed?\n",filename.c_str(), filename2.c_str()),0);
+              LOGMSG(vblWARN,fmt("gmManager.queue_jobs: file '%s' is found in alternative location '%s', node locality changed?\n",(const char *)filename.c_str(), (const char *)filename2.c_str()),0);
               if(thread_local) // correcting the local placement
                 filename = destname; 
               // need to copy

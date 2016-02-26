@@ -51,7 +51,7 @@ int main(int argc,char* argv[]){
   // warnings and errors (vblALLBAD). Remove 'vblALLMESS' to get rid of 
   // many information messages during execurion.
   // The program is interrupted on errors (vblERR).
-  message_logger::global().set_levels(vblALLBAD | vblALLMESS, vblERR);
+  message_logger::global().set_levels(vblALLBAD | vblALLMESS, vblFATAL /*vblERR*/);
   
 
    // When uncommented, the data for the data links will be transfered
@@ -62,9 +62,9 @@ int main(int argc,char* argv[]){
   // Set the execution mode
   //gmExperiment.set_execution(gmEXE_SERIAL);  // Serial execution where the GridMD calls are ignored
   //gmExperiment.set_execution(gmEXE_CONSTRUCT_ONLY);  // Construction of the execution graph
-  gmExperiment.set_execution(gmEXE_LOCAL);  // Construction of the execution graph and/or
+  //gmExperiment.set_execution(gmEXE_LOCAL);  // Construction of the execution graph and/or
                                             // execution of the selected (all) nodes on the local host
-  //gmExperiment.set_execution(gmEXE_REMOTE); // Construction and execution on the remote system(s).
+  gmExperiment.set_execution(gmEXE_REMOTE); // Construction and execution on the remote system(s).
   //                                          // Please set up resources as explained below.
   // Information about external applications, available resource managers and
   // accounts on the remote systems can be stored to XML file (see template in
