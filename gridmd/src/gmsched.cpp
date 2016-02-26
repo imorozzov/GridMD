@@ -787,6 +787,9 @@ size_t gmScheduler::queue_jobs(gmGraph *graph, int exetype){
         threads[i].error_code = classify_jm_error(res->pjm.ptr(),gmERR_EXECUTION); // TODO: classify errors properly
         threads[i].error_message = msg;
         nrunning++;
+
+        // if Submit fails we must delete job manually !!!
+        delete job;
       }
       else{
         threads[i].jobid=(const char *)job->GetID().c_str();
