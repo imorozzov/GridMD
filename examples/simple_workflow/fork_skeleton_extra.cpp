@@ -50,8 +50,8 @@ int main(int argc,char* argv[]){
   // The following command enables output of information messages (vblALLMESS),
   // warnings and errors (vblALLBAD). Remove 'vblALLMESS' to get rid of 
   // many information messages during execurion.
-  // The program is interrupted on errors (vblERR).
-  message_logger::global().set_levels(vblALLBAD | vblALLMESS, vblFATAL /*vblERR*/);
+  // The program is interrupted on fatal errors (vblFATAL). 
+  message_logger::global().set_levels(vblALLBAD | vblALLMESS, /*vblFATAL*/ vblERR);
   
 
    // When uncommented, the data for the data links will be transfered
@@ -72,6 +72,8 @@ int main(int argc,char* argv[]){
   // in order to use 'gmEXE_REMOTE' execution type. Alternatively you can create
   // an instance of gmResourceDescr, fill in the corresponding fields and pass it
   // to the gmExperiment.add_resource() function.
+  // NOTE: it is possible to use load_resources before gmExperiment.init(), however,
+  // when using vblERR load_resources mail fail in worker mode
   gmExperiment.load_resources(resfile.c_str());
 
   // Remove '& (~gmGV_NODESTATE)' to get additional information about node states
@@ -91,6 +93,7 @@ int main(int argc,char* argv[]){
 int gridmd_main(int argc,char* argv[]){
 
   // GridMD initialization and processing of the command line arguments
+  // should be placed in gridmd_main to work in implicit mode
   gmExperiment.init(argc,argv);
 
  

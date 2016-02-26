@@ -1004,7 +1004,7 @@ size_t gmScheduler::check_jobs(gmGraph *graph, size_t *pfailed, int thread_id, b
           const char *msg = fmt("gmManager.check_jobs: unable to fetch results for the job with id = %s, marking as failed!", (const char *)pjob->GetID().c_str());
           LOGMSG(vblWARN,msg,0);
           threads[i].state=2;
-          threads[i].error_code = classify_jm_error(jm,gmERR_EXECUTION);
+          threads[i].error_code = classify_jm_error(jm,gmERR_EXECUTION); // gmERR_FILE ?
           threads[i].error_message = msg;
         }
         else{ 
