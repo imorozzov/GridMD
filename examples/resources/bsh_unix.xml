@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+<flowgraph>
+  <scheduler>
+    <resource name="localhost" active="1">
+      <session type="unix">
+      </session>
+      <job_manager type="bsh" timing="no">
+      </job_manager>
+      <application name="numeric_integration">
+        <progdir>/home/ivan/Projects/build/examples/simple_workflow/</progdir>
+	<postfix>echo Job finished at localhost</postfix>
+      </application>
+    </resource>
+  </scheduler>
+</flowgraph>
