@@ -31,6 +31,9 @@ if (USE_WXWIDGETS) #find boost headers
   include(${wxWidgets_USE_FILE})
   set(LINKED_LIBS ${LINKED_LIBS} ${wxWidgets_LIBRARIES})
   include_directories(${CMAKE_CURRENT_SOURCE_DIR}/wxint)
+
+  #QtCreator adds
+  include(${CMAKE_CURRENT_SOURCE_DIR}/qtcreator.cmake)
 else(USE_WXWIDGETS) #find boost compiled
   find_package(Boost REQUIRED filesystem timer system regex)
   set(LINKED_LIBS ${LINKED_LIBS} ${Boost_LIBRARIES})

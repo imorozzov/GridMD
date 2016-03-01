@@ -9,4 +9,6 @@
 #define gmdString  wxString
 #define gmdNOT_FOUND wxNOT_FOUND
 
+#define WXSTRING_ADAPTER(string)  static_cast<const char*>(string)
+
 #endif

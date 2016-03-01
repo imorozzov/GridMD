@@ -175,6 +175,7 @@ $Date: 2016/02/08 08:16:59 $
 *******************************************************************************/
 
 #include <gmd/filefn.h>
+#include <gmdefs.h>
 
 # include "gridmd.h"
 # include "workflow.h"
@@ -383,14 +384,14 @@ int gmResourceDescr::Save(XMLFile& xmldoc, xmlNodePtr parent, const gmdString &n
 
   // Node <resource>
   resource = xmldoc.addElement(parent, "resource");
-  xmldoc.addAttribute(resource, "name", name=="" ? session.login+"@"+session.host : name);
+  xmldoc.addAttribute(resource, "name", name=="" ? WXSTRING_ADAPTER(session.login+"@"+session.host) : WXSTRING_ADAPTER(name));
   xmldoc.addAttribute(resource, "active", fmt("%d",active));
   
   // Node <session>
   xmlNodePtr node = xmldoc.addElement(resource, "session");
   xmldoc.addAttribute(node, "type", gmShellTypeName[session.shell_type]);
-  if(!session.host.IsEmpty()) xmldoc.addAttribute(node, "host", session.host);
-  if(!session.login.IsEmpty()) xmldoc.addAttribute(node, "login", session.login);
+  if(!session.host.IsEmpty()) xmldoc.addAttribute(node, "host", WXSTRING_ADAPTER(session.host));
+  if(!session.login.IsEmpty()) xmldoc.addAttribute(node, "login", WXSTRING_ADAPTER(session.login));
   
   FOR_EACH_LOOP(gmExtraParHash, session.param, it)
     xmldoc.addElement(node, (const char *)it->first.c_str(), (const char *)it->second.c_str());
@@ -405,7 +406,7 @@ int gmResourceDescr::Save(XMLFile& xmldoc, xmlNodePtr parent, const gmdString &n
 
   // Node <application>
   node = xmldoc.addElement(resource, "application");
-  if(!progname.IsEmpty()) xmldoc.addAttribute(node, "name", progname);
+  if(!progname.IsEmpty()) xmldoc.addAttribute(node, "name", WXSTRING_ADAPTER(progname));
 
   if(!postfix.IsEmpty()) xmldoc.addElement(node, "postfix", (std::string)postfix);
   if(!prefix.IsEmpty()) xmldoc.addElement(node, "prefix", (std::string)prefix);

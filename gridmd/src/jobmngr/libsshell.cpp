@@ -520,7 +520,7 @@ int gmShellLibssh::execute(const gmdString& cmd, gmdArrayString& out, gmdArraySt
   for(int iatt = 0; iatt < read_att_num; iatt++) {
     if(iatt && log_verbosity >= 1)
       LOGJOBMSG(fmt("StageOut error: %s\nRetrying, attempt %d/%d\n",
-                    error_msg.c_str(), iatt+1, read_att_num));
+                    WXSTRING_ADAPTER(error_msg), iatt+1, read_att_num));
     clear_err();
 
     for(int i=0; i<2; i++) {
@@ -636,7 +636,7 @@ int gmShellLibssh::StageOut(pCSTR locpath, pCSTR rempath, unsigned flags){
   for(int iatt = 0; iatt < read_att_num; iatt++) {
     if(iatt && log_verbosity >=1)
       LOGJOBMSG(fmt("StageOut error: %s\nRetrying, attempt %d/%d\n",
-                    error_msg.c_str(), iatt+1, read_att_num));
+                    WXSTRING_ADAPTER(error_msg), iatt+1, read_att_num));
     clear_err();
 
     if( open_scp_session(mode, rempath) )

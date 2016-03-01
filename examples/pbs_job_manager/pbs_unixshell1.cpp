@@ -80,7 +80,7 @@ int main(int argc, char *argv[])
     // Job submission
     res = job->Submit("test");
     gmdString id = job->GetID();
-    printf("State after submission: %s, id = %s\n", gmJob::StateName(res), id.c_str());
+    printf("State after submission: %s, id = %s\n", gmJob::StateName(res), WXSTRING_ADAPTER(id));
 
     gmdSleep(2);  // Usually after 2 seconds the jobs is started
 

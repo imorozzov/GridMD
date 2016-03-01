@@ -11,6 +11,7 @@ typedef std::basic_string<gmdChar> gmdStringBase;
 #define gmdSTRING_MAXLEN gmdStringBase::npos
 enum { gmdNOT_FOUND = -1 };
 
+#define WXSTRING_ADAPTER(string)  static_cast<const char*>(string)
 
 class gmdString : public gmdStringBase {
 public:

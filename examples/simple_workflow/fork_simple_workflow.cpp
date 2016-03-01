@@ -51,9 +51,9 @@ int gridmd_main(int argc,char* argv[]){
   if(argc>1){
     std::string arg1 = argv[1];
     if(arg1=="-h" || arg1=="--help" || arg1=="/?"){
-      gmdFileName prog = argv[0];
+      gmdFileName prog(WXSTRING_ADAPTER(argv[0]));
       printf("Usage: %s [--help]|[-l <resource_file>]\n"
-              "         -l  specify resource file to load, default is resources.xml\n",prog.GetFullName().c_str());
+              "         -l  specify resource file to load, default is resources.xml\n", WXSTRING_ADAPTER(prog.GetFullName()));
       return 0;
     }
     if(arg1=="-l" && argc>2)
