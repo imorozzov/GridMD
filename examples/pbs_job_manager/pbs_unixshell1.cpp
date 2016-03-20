@@ -12,7 +12,7 @@
 #include <gmd/app.h>
 #include <gmd/utils.h>
 #include "jobmngr/pbsmngr.h"
-#include "jobmngr/unixshell.h"
+#include "jobmngr/libsshell.h"
 
 int gridmd_main(int, char**) {return 0;}
 
@@ -43,7 +43,7 @@ int main(int argc, char *argv[])
     message_logger::global().set_levels(vblALL,vblALLBAD);
 
     // Initialization of the shell
-    gmShellUnix shell;
+    gmShellLibssh shell("grebennikov", "nwo5.ihed.ras.ru");
 
     // Creation of the persistent remote directory
     // (needed for the first run only)
@@ -51,9 +51,9 @@ int main(int argc, char *argv[])
     shell.MkDir("tmp/remote_dir");
 
     // Copying of the persistent files
-    shell.StageIn("../input/permfile.txt", "tmp/remote_dir");
+    shell.StageIn("input/permfile.txt", "tmp/remote_dir");
     // For text files the full remote file name should be specified ("tmp/remote_dir/prog.sh")!
-    shell.StageIn("text:../input/prog.sh", "tmp/remote_dir/prog.sh");
+    shell.StageIn("input/prog.sh", "tmp/remote_dir/prog.sh");
 
     // Attribute for execution of the script prog.sh
     shell.Execute("chmod u+x tmp/remote_dir/prog.sh");
@@ -64,15 +64,15 @@ int main(int argc, char *argv[])
 
     // Initialization of the job manager
     gmPBSManager mngr(shell);  // use the second argument to select the PBS queue
-    mngr.SetParam("/usr/local/bin", "GMD"); // "GMD" is the prefix for the PBS jobs
+    mngr.SetParam("job_name_prefix", "GMD"); // "GMD" is the prefix for the PBS jobs
 
     // Initialization of the job
     gmJob* job = mngr.CreateJob();
     job->command = "$HOME/tmp/remote_dir/prog.sh 1 2"; // execution command path and arguments
     // Input files and directories
-    job->AddInFile("../input/infile1.txt", "", gmJob::TEXT);
-    job->AddInFile("../input/infile2.txt", "", gmJob::TEXT);
-    job->AddInFile("../input/indir", "");
+    job->AddInFile("input/infile1.txt", "", gmJob::TEXT);
+    job->AddInFile("input/infile2.txt", "", gmJob::TEXT);
+    job->AddInFile("input/indir", "", gmJob::RECURSIVE);
     job->AddInFile("tmp/remote_dir/permfile.txt", "", gmJob::REMOTE); // этот файл будет взят из каталога на удаленной системе
 
     printf("State before submission: %s\n", gmJob::StateName(job->GetState()));
@@ -85,7 +85,7 @@ int main(int argc, char *argv[])
     gmdSleep(2);  // Usually after 2 seconds the jobs is started
 
     // Copying of an intermediate result (a file from the working directory)
-    res = job->StageOut("../example1-out-inter", "outfile.txt", gmJob::TEXT | gmJob::CREATEPATH);
+    res = job->StageOut("example1-out-inter", "outfile.txt", gmJob::TEXT | gmJob::CREATEPATH);
     printf("File uploaded with the exit code: %d\n", res);
 
     // Detaching from the job manager. After Detach the remote job is still
@@ -101,12 +101,12 @@ int main(int argc, char *argv[])
 
     if(res && res != JOB_FAILED) {
       // Output files and directories
-      job->AddOutFile("../example1-out-final", "outfile.txt", gmJob::TEXT | gmJob::CREATEPATH);
-      job->AddOutFile("../example1-out-final", "outdir");
+      job->AddOutFile("example1-out-final", "outfile.txt", gmJob::TEXT | gmJob::CREATEPATH);
+      job->AddOutFile("example1-out-final", "outdir", gmJob::RECURSIVE | gmJob::CREATEPATH);
       job->AddOutFile("tmp/remote_dir", "permfile.txt", gmJob::REMOTE); // этот файл будет скопирован в каталог на удаленной системе
       // Files to store stdout and stderr
-      job->AddOutFile("../example1-out-final/out", "STDOUT");
-      job->AddOutFile("../example1-out-final/err", "STDERR");
+      job->AddOutFile("example1-out-final/out", "STDOUT");
+      job->AddOutFile("example1-out-final/err", "STDERR");
 
       // Waiting for the job completion and fetching the results
       //mngr.wait_timeout = 15000;  // uncommend this to set a timeout
@@ -115,7 +115,7 @@ int main(int argc, char *argv[])
     }
 
     // Removing the temporary directory on the remote source and the job object
-    job->Clear();
+    //job->Clear();
   }
   catch(gmJobException &e){ (void)e; }
 
