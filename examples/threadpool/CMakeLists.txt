@@ -1,0 +1,4 @@
+project(threadpool_example)
+
+add_executable(threadpool_example threadpool_example.cpp)
+target_link_libraries(threadpool_example gridmd)
