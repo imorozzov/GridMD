@@ -16,6 +16,14 @@ endif(WITH_XML)
 file(GLOB GRIDMD_CORE_SOURCES RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} "src/*.cpp")
 file(GLOB GRIDMD_CORE_HEADERS RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} "include/*.h")
 
+#Threadpool sources
+if(USE_WXWIDGETS)
+  file(GLOB THREADPOOL_SOURCES RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} "src/threadpool/*.cpp")
+  file(GLOB THREADPOOL_HEADERS RELATIVE ${CMAKE_CURRENT_SOURCE_DIR} "include/threadpool/*.h")
+  set(GRIDMD_CORE_SOURCES ${GRIDMD_CORE_SOURCES} ${THREADPOOL_SOURCES})
+  set(GRIDMD_CORE_HEADERS ${GRIDMD_CORE_HEADERS} ${THREADPOOL_HEADERS})
+endif(USE_WXWIDGETS)
+
 #Jobmngr sources
 message("Not including DeisaManager and SHManager since they are not used")
 set(GRIDMD_SOURCES ${GRIDMD_CORE_SOURCES} ${GRIDMD_SOURCES} "src/jobmngr/jobmngr.cpp" "src/jobmngr/jobmngrbase.cpp" "src/jobmngr/gmshell.cpp" "src/jobmngr/pbsmngr.cpp" "src/jobmngr/bshmngr.cpp" "src/jobmngr/slurmmngr.cpp")
@@ -39,3 +47,4 @@ if (USE_LIBSSH2)
   set(GRIDMD_SOURCES ${GRIDMD_SOURCES} "src/jobmngr/libssh2shell.cpp")
   set(GRIDMD_HEADERS ${GRIDMD_HEADERS} "include/jobmngr/libssh2shell.h")
 endif(USE_LIBSSH2)
+
