@@ -36,7 +36,7 @@ void gmThreadPool::SubmitTask(gmTask *task)
     {
         wxMutexLocker lock(mQueueMutex);
         mTasks.push_back(task);
-        task->SetStatus(gmTask::gmTASK_IDLE);
+        task->SetStatus(gmTask::gmTASK_POOLED);
     }
     mQueueNotifier.Signal();
 }
