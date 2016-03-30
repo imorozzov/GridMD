@@ -5,14 +5,14 @@
 gmTask::gmTask() :
     mThread(NULL),
     mExited(mResultMutex),
-    mStatus(gmTASK_IDLE),
-    mTaskResult(INVALID_TASK_RESULT)
+    mStatus(gmTASK_POOLED),
+    mTaskResult(GMTASK_INVALID_RESULT)
 {
 }
 
 int gmTask::Result()
 {
-    int ret = INVALID_TASK_RESULT; //TODO: throw custom exception
+    int ret = GMTASK_INVALID_RESULT; //TODO: throw custom exception
 
     wxMutexLocker lock(mResultMutex);
     while(Status() == gmTASK_POOLED)
@@ -24,34 +24,13 @@ int gmTask::Result()
     return ret;
 }
 
-gmTask::gmTASK_STATUS gmTask::Status()
+gmTASK_STATUS gmTask::Status()
 {
     wxMutexLocker lock(mStatusMutex);
     return mStatus;
 }
 
-wxString gmTask::strStatus()
-{
-    wxString result;
-    switch(Status()) {
-    case gmTASK_IDLE:
-        result = wxT("Idle");
-        break;
-    case gmTASK_POOLED:
-        result = wxT("Pooled");
-        break;
-    case gmTASK_PROCESSED:
-        result = wxT("Processed");
-        break;
-    case gmTASK_FAILED:
-        result = wxT("Failed");
-        break;
-    case gmTASK_FINISHED:
-        result = wxT("Finished");
-        break;
-    }
-    return result;
-}
+
 
 
 void gmTask::Kill()
@@ -60,7 +39,7 @@ void gmTask::Kill()
         mThread->Kill();
         delete mThread;
         ResetThread();
-        SetStatus(gmTask::gmTASK_FAILED);
+        SetStatus(gmTASK_CANCELED);
     }
 }
 
@@ -73,7 +52,7 @@ bool gmTask::ResetThread(gmThread *thread)
     return false;
 }
 
-void gmTask::SetStatus(gmTask::gmTASK_STATUS status)
+void gmTask::SetStatus(gmTASK_STATUS status)
 {
     wxMutexLocker lock(mStatusMutex);
     mStatus = status;

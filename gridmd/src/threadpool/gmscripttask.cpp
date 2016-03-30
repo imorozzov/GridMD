@@ -5,7 +5,7 @@ gmScriptTask::gmScriptTask(const char *command):
     mCommand(command)
 {}
 
-gmTask::gmTASK_TYPE gmScriptTask::Type() const
+gmTASK_TYPE gmScriptTask::Type() const
 {
     return gmTASK_COMMAND;
 }

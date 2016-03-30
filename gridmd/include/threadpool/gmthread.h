@@ -7,20 +7,23 @@ class gmTask;
 class gmThreadPool;
 
 class gmThread : public wxThread
-{
-public:
+{ 
+protected:
+
     gmThread(gmThreadPool *pool);
     virtual ~gmThread();
-    void Start();
-
-protected:
     virtual ExitCode Entry();
 
-private:
+    void Start();
     void StartTask();
+
+private:
 
     gmTask* mCurrentTask;
     gmThreadPool* mPool;
+
+    friend class gmThreadPool;
+    friend class gmTask;
 };
 
 #endif // THREAD_H

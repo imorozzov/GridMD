@@ -24,72 +24,75 @@ int main(int argc,char* argv[]){
         return -1;
     }
 
-    gmThreadPool* pool = new gmThreadPool;
-    std::vector<gmTask*> tasks;
+    {
+        gmThreadPool pool;
+        std::vector<gmTaskID> tasks;
 
-    std::cout << "Fill pool with 50 tasks..." << std::endl;
-    for (int i = 0; i < 50; ++i) {
-        tasks.push_back(new gmMainTask(gridmd_main, i, NULL));
-    }
+        std::cout << "Fill pool with 50 tasks (1 sec time each)..." << std::endl;
+        for (int i = 0; i < 50; ++i) {
+            tasks.push_back(pool.CreateGMMainTask(gridmd_main, i, NULL));
+        }
 
-    wxSleep(1);
+        wxSleep(2);
+        for (int i = 0; i < 50; ++i) {
+            pool.TaskResult(tasks.at(i));
+        }
 
-    for (int i = 0; i < 50; ++i) {
-        pool->SubmitTask(tasks.at(i));
-    }
+        std::cout << "Add 14 long time task in pool (120 sec each)" << std::endl;
+        std::vector<gmTaskID> longTasks;
 
-    for (int i = 0; i < 50; ++i) {
-        tasks.at(i)->Result();
-    }
+        for (int i = 0; i < 14; ++i) {
+            longTasks.push_back(pool.CreateScriptTask("sleep 120s"));
+        }
 
-    std::cout << "Add 7 long time task in pool" << std::endl;
-    std::vector<gmTask*> longTasks;
-
-    for (int i = 0; i < 7; ++i) {
-        longTasks.push_back(new gmScriptTask("sleep 120s"));
-    }
-
-    wxSleep(1);
-
-    for (int i = 0; i < 7; ++i) {
-        pool->SubmitTask(longTasks.at(i));
-    }
-
-    for (int i = 0; i < 7; ++i) {
         wxSleep(1);
-        std::cout << "Long task at " << i << " is " << longTasks.at(i)->strStatus() << std::endl;
+        for (int i = 0; i < 14; ++i) {
+            wxSleep(1);
+            std::cout << "Long task at " << i << " is " << pool.StrTaskStatus(longTasks.at(i)) << std::endl;
+        }
+
+        std::cout << "After 5 seconds all of long tasks will be killed.." << std::endl;
+        for(int i = 5; i > 0; --i) {
+            std::cout << i << "s" << std::endl;
+            wxSleep(1);
+        }
+
+        for (int i = 0; i < 14; ++i) {
+            pool.RemoveTask(longTasks.at(i));
+        }
+
+        std::cout << "Long tasks have been killed! Print Their Status:" << std::endl;
+        for (int i = 0; i < 14; ++i) {
+            std::cout << "Long task at " << i << " is " << pool.StrTaskStatus(longTasks.at(i)) << std::endl;
+        }
+
+        tasks.clear();
+        std::cout << "Fill pool with 50 tasks (1 sec time each)..." << std::endl;
+        for (int i = 0; i < 50; ++i) {
+            tasks.push_back(pool.CreateGMMainTask(gridmd_main, i, NULL));
+        }
+
+        wxSleep(2);
+        for (int i = 0; i < 25; ++i) {
+            pool.TaskResult(tasks.at(i));
+        }
+
+//        wxSleep(3);
+//        std::cout << "Add new 3 long tasks (120 sec time each)... And kill pool while tasks are processed." << std::endl;
+//        longTasks.clear();
+
+//        for (int i = 0; i < 3; ++i) {
+//            longTasks.push_back(pool.CreateScriptTask("sleep 120s"));
+//        }
+
+//        for (int i = 0; i < 3; ++i) {
+//            wxSleep(1);
+//            std::cout << "Long task at " << i << " is " << pool.StrTaskStatus(longTasks.at(i)) << std::endl;
+//        }
+
+//        wxSleep(3);
+//        std::cout << "Kill thread pool!" << std::endl;
     }
-
-    std::cout << "After 5 seconds all of long tasks will be killed.." << std::endl;
-    for(int i = 5 ;i > 0; --i) {
-        std::cout << i << "s" << std::endl;
-        wxSleep(1);
-    }
-
-    for (int i = 0; i < 7; ++i) {
-        longTasks.at(i)->Kill();
-    }
-
-    std::cout << "Long tasks have been killed!" << std::endl;
-
-    for (int i = 0; i < 7; ++i) {
-        std::cout << "Long task at " << i << " is " << longTasks.at(i)->strStatus() << std::endl;
-    }
-
-    wxSleep(3);
-    std::cout << "Add new tasks..." << std::endl;
-
-    for (int i = 0; i < 50; ++i) {
-        pool->SubmitTask(tasks.at(i));
-    }
-
-    wxSleep(2);
-
-    for (int i = 0; i < 50; ++i) {
-        tasks.at(i)->Result();
-    }
-
-    delete pool;
     gmdUninitialize();
     return 0;
 }

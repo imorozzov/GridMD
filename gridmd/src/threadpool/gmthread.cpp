@@ -12,10 +12,6 @@ gmThread::gmThread(gmThreadPool *pool):
 
 gmThread::~gmThread()
 {
-    if (IsAlive()) {
-        mPool->mQueueNotifier.Broadcast();
-        Wait();
-    }
     if (mPool->mIsRunning)
     {
         {
@@ -23,13 +19,8 @@ gmThread::~gmThread()
             mPool->mThreads.erase(std::find(mPool->mThreads.begin(), mPool->mThreads.end(), this));
             mPool->mThreadsNotifier.Signal();
         }
-        {
-            wxMutexLocker lock(mPool->mQueueMutex);
-            std::list<gmTask*>::iterator itCurTask = std::find(mPool->mTasks.begin(), mPool->mTasks.end(), mCurrentTask);
-            if (itCurTask != mPool->mTasks.end())
-                mPool->mTasks.erase(itCurTask);
-        }
     }
+    Wait();
 }
 
 void gmThread::Start()
@@ -45,14 +36,14 @@ wxThread::ExitCode gmThread::Entry()
         mCurrentTask = NULL;
         {
             wxMutexLocker lock(mPool->mQueueMutex);
-            while(mPool->mIsRunning && mPool->mTasks.empty())
+            while(mPool->mIsRunning && mPool->mTasksList.empty())
                 mPool->mQueueNotifier.Wait();
 
             if (!mPool->mIsRunning)
                 break;
 
-            mCurrentTask = mPool->mTasks.front();
-            mPool->mTasks.pop_front();
+            mCurrentTask = mPool->mTasksList.front();
+            mPool->mTasksList.pop_front();
         }
         StartTask();
     }
@@ -66,9 +57,9 @@ void gmThread::StartTask()
 
         wxMutexLocker lock(mCurrentTask->mResultMutex);
         mCurrentTask->ResetThread(this);
-        mCurrentTask->SetStatus(gmTask::gmTASK_PROCESSED);
+        mCurrentTask->SetStatus(gmTASK_PROCESSED);
         mCurrentTask->mTaskResult = mCurrentTask->Run();
-        mCurrentTask->SetStatus(gmTask::gmTASK_FINISHED);
+        mCurrentTask->SetStatus(gmTASK_FINISHED);
         mCurrentTask->ResetThread();
         mCurrentTask->mExited.Signal();
         mCurrentTask = NULL;
