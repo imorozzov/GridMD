@@ -4,8 +4,6 @@
 #include <wx/thread.h>
 #include <gmdefs.h>
 
-#define GMTASK_INVALID_RESULT -1
-
 class gmThread;
 
 class gmTask

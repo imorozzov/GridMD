@@ -53,7 +53,7 @@ gmTaskID gmThreadPool::CreateScriptTask(const char *command)
 
 int gmThreadPool::TaskResult(gmTaskID taskID)
 {
-    int result = GMTASK_INVALID_RESULT;
+    int result = GMPOOLTASK_INVALID_RESULT;
 
     if(IsValidIndex(taskID)) {
         gmTask* task = mTasksMap[taskID];
@@ -73,24 +73,24 @@ gmTASK_STATUS gmThreadPool::TaskStatus(gmTaskID taskID)
     return gmTASK_INVALID_STATUS;
 }
 
-wxString gmThreadPool::StrTaskStatus(gmTaskID taskID)
+gmdString gmThreadPool::StrTaskStatus(gmTaskID taskID)
 {
-    wxString result;
+    gmdString result;
     switch(TaskStatus(taskID)) {
     case gmTASK_INVALID_STATUS:
-        result = wxT("Invalid Status");
+        result = "Invalid Status";
         break;
     case gmTASK_POOLED:
-        result = wxT("Pooled");
+        result = "Pooled";
         break;
     case gmTASK_PROCESSED:
-        result = wxT("Processed");
+        result = "Processed";
         break;
     case gmTASK_CANCELED:
-        result = wxT("Canceled");
+        result = "Canceled";
         break;
     case gmTASK_FINISHED:
-        result = wxT("Finished");
+        result = "Finished";
         break;
     }
     return result;

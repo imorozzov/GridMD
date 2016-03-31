@@ -1,7 +1,7 @@
 #ifndef GMMAINTASK_H
 #define GMMAINTASK_H
 
-#include "threadpool/gmtask.h"
+#include "gmtask.h"
 #include <gmdefs.h>
 
 class gmMainTask : public gmTask

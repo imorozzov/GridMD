@@ -1,18 +1,32 @@
 #include <iostream>
+
+#ifdef WITH_WXWIDGETS
 #include <wx/utils.h>
+#endif
+
 #include "gridmd.h"
+#include <gmd/threadpool.h>
+
 
 using namespace gridmd;
 
-#include <threadpool/gmthreadpool.h>
-#include <threadpool/gmmaintask.h>
-#include <threadpool/gmscripttask.h>
-
+#ifdef WITH_WXWIDGETS
 wxMutex streamMutex;
+#endif
+
+void sleep(int seconds) {
+#ifdef WITH_WXWIDGETS
+    wxSleep(seconds);
+#endif
+}
 
 int gridmd_main(int argc, char* argv[]) {
-    wxSleep(1);
+
+    sleep(1);
+    #ifdef WITH_WXWIDGETS
     wxMutexLocker lock(streamMutex);
+    #endif
+
     std::cout << "Task at " << argc << " is executed" << std::endl;
     throw task_finished();
 }
@@ -25,7 +39,7 @@ int main(int argc,char* argv[]){
     }
 
     {
-        gmThreadPool pool;
+        gmdThreadPool pool;
         std::vector<gmTaskID> tasks;
 
         std::cout << "Fill pool with 50 tasks (1 sec time each)..." << std::endl;
@@ -33,7 +47,8 @@ int main(int argc,char* argv[]){
             tasks.push_back(pool.CreateGMMainTask(gridmd_main, i, NULL));
         }
 
-        wxSleep(2);
+        sleep(2);
+
         for (int i = 0; i < 50; ++i) {
             pool.TaskResult(tasks.at(i));
         }
@@ -45,16 +60,17 @@ int main(int argc,char* argv[]){
             longTasks.push_back(pool.CreateScriptTask("sleep 120s"));
         }
 
-        wxSleep(1);
+        sleep(1);
+
         for (int i = 0; i < 14; ++i) {
-            wxSleep(1);
+            sleep(1);
             std::cout << "Long task at " << i << " is " << pool.StrTaskStatus(longTasks.at(i)) << std::endl;
         }
 
         std::cout << "After 5 seconds all of long tasks will be killed.." << std::endl;
         for(int i = 5; i > 0; --i) {
             std::cout << i << "s" << std::endl;
-            wxSleep(1);
+            sleep(1);
         }
 
         for (int i = 0; i < 14; ++i) {
@@ -66,32 +82,32 @@ int main(int argc,char* argv[]){
             std::cout << "Long task at " << i << " is " << pool.StrTaskStatus(longTasks.at(i)) << std::endl;
         }
 
-        tasks.clear();
-        std::cout << "Fill pool with 50 tasks (1 sec time each)..." << std::endl;
-        for (int i = 0; i < 50; ++i) {
-            tasks.push_back(pool.CreateGMMainTask(gridmd_main, i, NULL));
-        }
-
-        wxSleep(2);
-        for (int i = 0; i < 25; ++i) {
-            pool.TaskResult(tasks.at(i));
-        }
-
-//        wxSleep(3);
-//        std::cout << "Add new 3 long tasks (120 sec time each)... And kill pool while tasks are processed." << std::endl;
-//        longTasks.clear();
-
-//        for (int i = 0; i < 3; ++i) {
-//            longTasks.push_back(pool.CreateScriptTask("sleep 120s"));
+//        tasks.clear();
+//        std::cout << "Fill pool with 50 tasks (1 sec time each)..." << std::endl;
+//        for (int i = 0; i < 50; ++i) {
+//            tasks.push_back(pool.CreateGMMainTask(gridmd_main, i, NULL));
 //        }
 
-//        for (int i = 0; i < 3; ++i) {
-//            wxSleep(1);
-//            std::cout << "Long task at " << i << " is " << pool.StrTaskStatus(longTasks.at(i)) << std::endl;
+//        sleep(2);
+//        for (int i = 0; i < 25; ++i) {
+//            pool.TaskResult(tasks.at(i));
 //        }
 
-//        wxSleep(3);
-//        std::cout << "Kill thread pool!" << std::endl;
+        sleep(3);
+        std::cout << "Add new 3 long tasks (120 sec time each)... And kill pool while tasks are processed." << std::endl;
+        longTasks.clear();
+
+        for (int i = 0; i < 3; ++i) {
+            longTasks.push_back(pool.CreateScriptTask("sleep 120s"));
+        }
+
+        for (int i = 0; i < 3; ++i) {
+            sleep(1);
+            std::cout << "Long task at " << i << " is " << pool.StrTaskStatus(longTasks.at(i)) << std::endl;
+        }
+
+        sleep(3);
+        std::cout << "Kill thread pool!" << std::endl;
     }
     gmdUninitialize();
     return 0;

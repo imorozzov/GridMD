@@ -1,18 +1,17 @@
 #include "threadpool/gmtask.h"
 #include "threadpool/gmthread.h"
-#include <wx/string.h>
 
 gmTask::gmTask() :
     mThread(NULL),
     mExited(mResultMutex),
     mStatus(gmTASK_POOLED),
-    mTaskResult(GMTASK_INVALID_RESULT)
+    mTaskResult(GMPOOLTASK_INVALID_RESULT)
 {
 }
 
 int gmTask::Result()
 {
-    int ret = GMTASK_INVALID_RESULT; //TODO: throw custom exception
+    int ret = GMPOOLTASK_INVALID_RESULT; //TODO: throw custom exception
 
     wxMutexLocker lock(mResultMutex);
     while(Status() == gmTASK_POOLED)
