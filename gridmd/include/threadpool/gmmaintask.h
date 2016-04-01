@@ -2,7 +2,6 @@
 #define GMMAINTASK_H
 
 #include "gmtask.h"
-#include <gmdefs.h>
 
 class gmMainTask : public gmTask
 {

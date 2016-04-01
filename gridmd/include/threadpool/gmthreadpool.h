@@ -2,7 +2,7 @@
 #define THREADPOOL_H
 
 #include <wx/thread.h>
-#include <gmdefs.h>
+#include <threadpool/gmthreaddefs.h>
 #include <gmd/string.h>
 #include <list>
 #include <map>
@@ -37,7 +37,7 @@ public:
     ///    \return task id
     gmTaskID CreateGMMainTask(int (*gridmd_main)(int, char*[]), int argc, char* argv[]);
 
-    ///\en Creates new tasks of script execution and puts it in tasks queue.
+    ///\en Creates new task of script execution and puts it in tasks queue.
     ///    Set task status in \a gmTASK_POOLED.
     ///    \return task id
     gmTaskID CreateScriptTask(const char* command);

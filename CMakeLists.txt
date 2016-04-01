@@ -25,13 +25,13 @@ else(BUILD_SHARED)
   set(BUILDCONF STATIC)
 endif(BUILD_SHARED)
 if (USE_WXWIDGETS) #find boost headers
-  add_definitions("-DWITH_WXWIDGETS")
+  add_definitions("-DUSING_WXWIDGETS")
   find_package(Boost REQUIRED)
   find_package(wxWidgets REQUIRED base)
   include_directories(${wxWidgets_INCLUDE_DIRS})
   include(${wxWidgets_USE_FILE})
   set(LINKED_LIBS ${LINKED_LIBS} ${wxWidgets_LIBRARIES})
-  include_directories(${CMAKE_CURRENT_SOURCE_DIR}/gridmd/include/threadpool)
+  #include_directories(${CMAKE_CURRENT_SOURCE_DIR}/gridmd/include/threadpool)
   include_directories(${CMAKE_CURRENT_SOURCE_DIR}/wxint)
 
   #QtCreator adds

@@ -2,7 +2,7 @@
 #define TASK_H
 
 #include <wx/thread.h>
-#include <gmdefs.h>
+#include "threadpool/gmthreaddefs.h"
 
 class gmThread;
 

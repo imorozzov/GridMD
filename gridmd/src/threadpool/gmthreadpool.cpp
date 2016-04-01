@@ -101,6 +101,7 @@ gmTASK_TYPE gmThreadPool::TaskType(gmTaskID taskID)
     if(IsValidIndex(taskID))
         return mTasksMap.at(taskID)->Type();
 
+
     return gmTASK_INVALID_TYPE;
 }
 

@@ -6,6 +6,7 @@
 
 #include "gridmd.h"
 #include <gmd/threadpool.h>
+#include "gmd/string.h"
 
 
 using namespace gridmd;
@@ -39,6 +40,7 @@ int main(int argc,char* argv[]){
     }
 
     {
+        gmdString str;
         gmdThreadPool pool;
         std::vector<gmTaskID> tasks;
 

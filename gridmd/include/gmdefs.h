@@ -111,30 +111,6 @@ enum gmRESULTS {
 	gmREDO = 2,
 };
 
-
-enum gmTASK_TYPE {
-    gmTASK_INVALID_TYPE = 0,
-    gmTASK_GRIDMD_MAIN,
-    gmTASK_COMMAND
-};
-
-enum gmTASK_STATUS {
-    gmTASK_INVALID_STATUS = 0,
-    gmTASK_POOLED,
-    gmTASK_PROCESSED,
-    gmTASK_CANCELED,
-    gmTASK_FINISHED
-};
-
-#define GMPOOLTASK_INVALID_RESULT -1
-
-#ifdef WITH_WXWIDGETS
-#include <wx/defs.h>
-typedef wxUIntPtr gmTaskID;
-#else
-typedef size_t gmTaskID;
-#endif
-
 class gmManager;
 class gmLinkData;
 template <class T>
