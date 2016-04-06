@@ -1,22 +1,21 @@
 #include <iostream>
 
-#ifdef WITH_WXWIDGETS
+#ifdef USING_WXWIDGETS
 #include <wx/utils.h>
 #endif
 
-#include "gridmd.h"
+#include <gridmd.h>
 #include <gmd/threadpool.h>
-#include "gmd/string.h"
 
 
 using namespace gridmd;
 
-#ifdef WITH_WXWIDGETS
+#ifdef USING_WXWIDGETS
 wxMutex streamMutex;
 #endif
 
 void sleep(int seconds) {
-#ifdef WITH_WXWIDGETS
+#ifdef USING_WXWIDGETS
     wxSleep(seconds);
 #endif
 }
@@ -24,7 +23,7 @@ void sleep(int seconds) {
 int gridmd_main(int argc, char* argv[]) {
 
     sleep(1);
-    #ifdef WITH_WXWIDGETS
+    #ifdef USING_WXWIDGETS
     wxMutexLocker lock(streamMutex);
     #endif
 
@@ -40,7 +39,6 @@ int main(int argc,char* argv[]){
     }
 
     {
-        gmdString str;
         gmdThreadPool pool;
         std::vector<gmTaskID> tasks;
 

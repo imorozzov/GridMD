@@ -1,7 +1,7 @@
 #ifndef WXTHREADPOOL_H
 #define WXTHREADPOOL_H
 
-#include "threadpool/gmthreadpool.h"
+#include <wxthreadpool/include/gmthreadpool.h>
 
 #define gmdThreadPool gmThreadPool
 

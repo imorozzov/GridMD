@@ -2,10 +2,11 @@
 #define THREADPOOL_H
 
 
-#include <gmdefs.h>
+#include <gmthreaddefs.h>
 #include <gmd/string.h>
 #include <list>
 #include <map>
+#include <logexc.h>
 
 class gmTask;
 class gmThread;
@@ -19,24 +20,23 @@ public:
 
     gmTaskID CreateGMMainTask(int (*gridmd_main)(int, char*[]), int argc, char* argv[])
     {
-        std::cout << "gmdThreadPool::CreateGMMainTask(int (*gridmd_main)(int, char*[]), int argc, char* argv[]) is not implemented" << std::endl;
-        return 0;
+        return LOGERR(GMPOOLTASK_INVALID_ID, "gmdThreadPool::CreateGMMainTask(int (*gridmd_main)(int, char*[]),"
+                                             "int argc, char* argv[]) is not implemented", false);
     }
     gmTaskID CreateScriptTask(const char* command)
     {
-        std::cout << "gmdThreadPool::CreateScriptTask(const char* command) is not implemented" << std::endl;
-        return 0;
+        return LOGERR(GMPOOLTASK_INVALID_ID, "gmdThreadPool::CreateScriptTask(const char* command) "
+                                             "is not implemented", false);
     }
 
     int TaskResult(gmTaskID taskID)
     {
-        std::cout << "gmdThreadPool::TaskResult(gmTaskID taskID) is not implemented" << std::endl;
-        return GMPOOLTASK_INVALID_RESULT;
+        return LOGERR(GMPOOLTASK_INVALID_RESULT, "gmdThreadPool::TaskResult(gmTaskID taskID) "
+                                                 "is not implemented", false);
     }
 
     gmTASK_STATUS TaskStatus(gmTaskID taskID)
     {
-        std::cout << "gmdThreadPool::TaskStatus(gmTaskID taskID) is not implemented" << std::endl;
         return gmTASK_INVALID_STATUS;
     }
 
@@ -64,17 +64,19 @@ public:
     }
 
     gmTASK_TYPE TaskType(gmTaskID taskID) {
-        std::cout << "gmdThreadPool::TaskType(gmTaskID taskID) is not implemented" << std::endl;
-        return gmTASK_INVALID_TYPE;
+        return static_cast<gmTASK_TYPE>(LOGERR(gmTASK_INVALID_TYPE, "gmdThreadPool::TaskType(gmTaskID taskID) "
+                                           "is not implemented", false));
     }
 
     void RemoveTask(gmTaskID taskID) {
-        std::cout << "gmdThreadPool::RemoveTask(gmTaskID taskID) is not implemented" << std::endl;
+        LOGMSG(vblOERR, "gmdThreadPool::RemoveTask(gmTaskID taskID) "
+                                    "is not implemented", false);
+
     }
 
     bool IsValidIndex(gmTaskID taskID) {
-         std::cout << "gmdThreadPool::IsValidIndex(gmTaskID taskID) is not implemented" << std::endl;
-         return false;
+         LOGMSG(vblOERR, "gmdThreadPool::IsValidIndex(gmTaskID taskID) "
+                        "is not implemented", false);
     }
 };
 
