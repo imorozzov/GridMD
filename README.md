@@ -11,6 +11,8 @@ GridMD library is free software. The full licence is available in the file
 
 Home project web page: http://gridmd.sourceforge.net/
 
+Doxygen documentation page: http://imorozzov.github.io/GridMD/
+
 ## File structure
 ```
 /-gridmd                  Main directory for the library source files
