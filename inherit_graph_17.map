@@ -1,0 +1,5 @@
+<map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
+<area shape="rect" id="node1" href="$structgm_file_link.html" title="Category structure for indicating the file link to gmManager::mark_node() function. " alt="" coords="5,31,91,57"/>
+<area shape="rect" id="node2" href="$structgm_status_link.html" title="Category structure for indicating the file link to gmManager::mark_node() function. " alt="" coords="145,5,247,32"/>
+<area shape="rect" id="node3" href="$structgm_wildcard_link.html" title="Category structure for indicating a link by a set of files referenced by wildcards to gmManager::mark..." alt="" coords="139,56,253,83"/>
+</map>

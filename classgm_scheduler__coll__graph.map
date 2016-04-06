@@ -1,0 +1,11 @@
+<map id="gmScheduler" name="gmScheduler">
+<area shape="rect" id="node3" href="$classgm_manager.html" title="Main interface class to access workflow functions. " alt="" coords="579,221,669,248"/>
+<area shape="rect" id="node2" href="$classrefvector.html" title="refvector\&lt; gmShell \&gt;" alt="" coords="19,361,160,388"/>
+<area shape="rect" id="node4" href="$classgm_manager_callback.html" title="Call&#45;back events, sent by gmManager. Set of events may be extended. " alt="" coords="306,44,446,71"/>
+<area shape="rect" id="node5" href="$classrefmap.html" title="refmap\&lt; string, gmLinkData \&gt;" alt="" coords="281,95,471,121"/>
+<area shape="rect" id="node6" href="$classmngptr.html" title="mngptr\&lt; gmNodeAction \&gt;" alt="" coords="291,145,461,172"/>
+<area shape="rect" id="node7" href="$structgm_node_prop.html" title="Properties of the node affected by the user configurable settings. " alt="" coords="327,196,425,223"/>
+<area shape="rect" id="node8" href="$classgm_mutex.html" title="mutex is used to lock access to file&#45;stored information, like &#39;restor file&#39; and &#39;*.dot graph&#39;. " alt="" coords="339,285,413,312"/>
+<area shape="rect" id="node9" href="$classint__pack.html" title="class for packing integers " alt="" coords="341,336,411,363"/>
+<area shape="rect" id="node10" href="$classrefvector.html" title="refvector\&lt; gmResource \&gt;" alt="" coords="6,412,173,439"/>
+</map>
