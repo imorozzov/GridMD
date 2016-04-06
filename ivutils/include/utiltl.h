@@ -1,10 +1,7 @@
 # ifndef _UTILTL
 # define _UTILTL
 
-/*e @file utiltl.h
-    @brief Useful templates (iterators, modifiers, etc)
-  
-**/
+/// \file utiltl.h \brief Useful templates (iterators, modifiers, etc)
 
 #include <iterator>
 #include <complex>
