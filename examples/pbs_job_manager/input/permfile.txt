@@ -1,2 +1,0 @@
-This file accumulates the calculation results
-
