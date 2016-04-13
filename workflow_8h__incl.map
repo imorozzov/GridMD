@@ -1,5 +1,6 @@
 <map id="workflow.h" name="workflow.h">
 <area shape="rect" id="node16" href="$refobj_8h.html" title="Smart pointers. " alt="" coords="89,244,155,271"/>
-<area shape="rect" id="node18" href="$gridmd_8h.html" title="Classes for GridMD workflow interface. " alt="" coords="203,87,276,114"/>
-<area shape="rect" id="node20" href="$gmnode_8h.html" title="Classes for workflow graph nodes. " alt="" coords="248,169,327,196"/>
+<area shape="rect" id="node18" href="$gridmd_8h.html" title="Classes for GridMD workflow interface. " alt="" coords="259,87,332,114"/>
+<area shape="rect" id="node20" href="$gmnode_8h.html" title="Classes for workflow graph nodes. " alt="" coords="160,169,239,196"/>
+<area shape="rect" id="node21" href="$gmdefs_8h.html" title="Forvard definitions for type(s) and functions declared at gridmd.h. " alt="" coords="203,244,278,271"/>
 </map>

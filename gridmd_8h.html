@@ -68,14 +68,15 @@
 <code>#include &quot;jobmngr/jobmngr.h&quot;</code><br />
 <code>#include &quot;jobmngr/gmshell.h&quot;</code><br />
 <code>#include &quot;<a class="el" href="gmnode_8h.html">gmnode.h</a>&quot;</code><br />
-<code>#include &quot;gmdefs.h&quot;</code><br />
+<code>#include &quot;<a class="el" href="gmdefs_8h.html">gmdefs.h</a>&quot;</code><br />
 </div><div class="textblock"><div class="dynheader">
 Include dependency graph for gridmd.h:</div>
 <div class="dyncontent">
 <div class="center"><img src="gridmd_8h__incl.png" border="0" usemap="#gridmd_8h" alt=""/></div>
 <map name="gridmd_8h" id="gridmd_8h">
 <area shape="rect" id="node2" href="refobj_8h.html" title="Smart pointers. " alt="" coords="71,155,138,181"/>
-<area shape="rect" id="node7" href="gmnode_8h.html" title="Classes for workflow graph nodes. " alt="" coords="191,80,269,107"/>
+<area shape="rect" id="node7" href="gmnode_8h.html" title="Classes for workflow graph nodes. " alt="" coords="197,80,276,107"/>
+<area shape="rect" id="node9" href="gmdefs_8h.html" title="Forvard definitions for type(s) and functions declared at gridmd.h. " alt="" coords="277,155,351,181"/>
 </map>
 </div>
 </div><div class="textblock"><div class="dynheader">
@@ -142,7 +143,7 @@ Enumerations</h2></td></tr>
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 Functions</h2></td></tr>
 <tr class="memitem:aa127193da348e59007d840e63f54e228"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="aa127193da348e59007d840e63f54e228"></a>
-std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="gridmd_8h.html#aa127193da348e59007d840e63f54e228">gmGetStateName</a> (gmNODE_STATES state)</td></tr>
+std::string&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="gridmd_8h.html#aa127193da348e59007d840e63f54e228">gmGetStateName</a> (<a class="el" href="gmdefs_8h.html#a55b35cbb7b36b712fdd3d68cd0de532a">gmNODE_STATES</a> state)</td></tr>
 <tr class="memdesc:aa127193da348e59007d840e63f54e228"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns string representation of node state. <br /></td></tr>
 <tr class="separator:aa127193da348e59007d840e63f54e228"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a3419249a61b2e7f4abb21abf0a0f75ec"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="gridmd_8h.html#a3419249a61b2e7f4abb21abf0a0f75ec">gridmd_main</a> (int argc, char **argv)</td></tr>
@@ -162,29 +163,29 @@ int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="names
 <tr class="separator:ab7aa493ac5fe46a26e1433d85e81913a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ac071cb766f53bcc48b37aa9ad8e5a4d5"><td class="memTemplParams" colspan="2"><a class="anchor" id="ac071cb766f53bcc48b37aa9ad8e5a4d5"></a>
 template&lt;class link_type &gt; </td></tr>
-<tr class="memitem:ac071cb766f53bcc48b37aa9ad8e5a4d5"><td class="memTemplItemLeft" align="right" valign="top">int&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespacegridmd.html#ac071cb766f53bcc48b37aa9ad8e5a4d5">gridmd::end_distributed</a> (const string &amp;name=&quot;finish&quot;, gmSelector input=gmNODE_NOOUTPUTS, const link_type &amp;t=<a class="el" href="structgm_hard_link.html">gmHardLink</a>(), int srcport=-1)</td></tr>
+<tr class="memitem:ac071cb766f53bcc48b37aa9ad8e5a4d5"><td class="memTemplItemLeft" align="right" valign="top">int&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespacegridmd.html#ac071cb766f53bcc48b37aa9ad8e5a4d5">gridmd::end_distributed</a> (const string &amp;name=&quot;finish&quot;, gmSelector input=<a class="el" href="gmdefs_8h.html#a89b2d48f155a9a6664e93d7ad40c345eac8e779fb3ee0e2f5a935911e4e9c447b">gmNODE_NOOUTPUTS</a>, const link_type &amp;t=<a class="el" href="structgm_hard_link.html">gmHardLink</a>(), int srcport=-1)</td></tr>
 <tr class="memdesc:ac071cb766f53bcc48b37aa9ad8e5a4d5"><td class="mdescLeft">&#160;</td><td class="mdescRight"><a class="el" href="classgm_manager.html#a2514f6c10286b47c248eccd802e8ced6">gmManager::end_distributed()</a> called for the global gmExperiment <br /></td></tr>
 <tr class="separator:ac071cb766f53bcc48b37aa9ad8e5a4d5"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ad835f5b8483f290d91d6d6ff9d3cba8a"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ad835f5b8483f290d91d6d6ff9d3cba8a"></a>
-int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacegridmd.html#ad835f5b8483f290d91d6d6ff9d3cba8a">gridmd::end_distributed</a> (const string &amp;name=&quot;finish&quot;, gmSelector input=gmNODE_NOOUTPUTS)</td></tr>
+int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacegridmd.html#ad835f5b8483f290d91d6d6ff9d3cba8a">gridmd::end_distributed</a> (const string &amp;name=&quot;finish&quot;, gmSelector input=<a class="el" href="gmdefs_8h.html#a89b2d48f155a9a6664e93d7ad40c345eac8e779fb3ee0e2f5a935911e4e9c447b">gmNODE_NOOUTPUTS</a>)</td></tr>
 <tr class="memdesc:ad835f5b8483f290d91d6d6ff9d3cba8a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Same as above for hard links. <br /></td></tr>
 <tr class="separator:ad835f5b8483f290d91d6d6ff9d3cba8a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ad361b237c4472da1632f2d24b6b029c6"><td class="memTemplParams" colspan="2"><a class="anchor" id="ad361b237c4472da1632f2d24b6b029c6"></a>
 template&lt;class link_type &gt; </td></tr>
-<tr class="memitem:ad361b237c4472da1632f2d24b6b029c6"><td class="memTemplItemLeft" align="right" valign="top">int&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespacegridmd.html#ad361b237c4472da1632f2d24b6b029c6">gridmd::mark_node</a> (const string &amp;name, <a class="el" href="classgm_selector.html">gmSelector</a> input=gmNODE_PREV, const link_type &amp;t=<a class="el" href="structgm_hard_link.html">gmHardLink</a>(), int srcport=-1)</td></tr>
+<tr class="memitem:ad361b237c4472da1632f2d24b6b029c6"><td class="memTemplItemLeft" align="right" valign="top">int&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespacegridmd.html#ad361b237c4472da1632f2d24b6b029c6">gridmd::mark_node</a> (const string &amp;name, <a class="el" href="classgm_selector.html">gmSelector</a> input=<a class="el" href="gmdefs_8h.html#a89b2d48f155a9a6664e93d7ad40c345ea79d5bc5fb1e72912dbb2039ae5ca1c2e">gmNODE_PREV</a>, const link_type &amp;t=<a class="el" href="structgm_hard_link.html">gmHardLink</a>(), int srcport=-1)</td></tr>
 <tr class="memdesc:ad361b237c4472da1632f2d24b6b029c6"><td class="mdescLeft">&#160;</td><td class="mdescRight">See <a class="el" href="classgm_manager.html#af226f7934194a6299fa47f2730e31f1c">gmManager::mark_node()</a> <br /></td></tr>
 <tr class="separator:ad361b237c4472da1632f2d24b6b029c6"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a775258088dcd71e782ae65bd3a815611"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a775258088dcd71e782ae65bd3a815611"></a>
-int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacegridmd.html#a775258088dcd71e782ae65bd3a815611">gridmd::mark_node</a> (const string &amp;name, <a class="el" href="classgm_selector.html">gmSelector</a> input=gmNODE_PREV)</td></tr>
+int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacegridmd.html#a775258088dcd71e782ae65bd3a815611">gridmd::mark_node</a> (const string &amp;name, <a class="el" href="classgm_selector.html">gmSelector</a> input=<a class="el" href="gmdefs_8h.html#a89b2d48f155a9a6664e93d7ad40c345ea79d5bc5fb1e72912dbb2039ae5ca1c2e">gmNODE_PREV</a>)</td></tr>
 <tr class="memdesc:a775258088dcd71e782ae65bd3a815611"><td class="mdescLeft">&#160;</td><td class="mdescRight">See <a class="el" href="classgm_manager.html#af226f7934194a6299fa47f2730e31f1c">gmManager::mark_node()</a> <br /></td></tr>
 <tr class="separator:a775258088dcd71e782ae65bd3a815611"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aeb3d7e818e9621c320531fa89e7c5450"><td class="memTemplParams" colspan="2"><a class="anchor" id="aeb3d7e818e9621c320531fa89e7c5450"></a>
 template&lt;class link_type &gt; </td></tr>
-<tr class="memitem:aeb3d7e818e9621c320531fa89e7c5450"><td class="memTemplItemLeft" align="right" valign="top">int&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespacegridmd.html#aeb3d7e818e9621c320531fa89e7c5450">gridmd::node</a> (const string &amp;name, <a class="el" href="classgm_selector.html">gmSelector</a> input=gmNODE_PREV, const link_type &amp;t=<a class="el" href="structgm_hard_link.html">gmHardLink</a>(), int srcport=-1)</td></tr>
+<tr class="memitem:aeb3d7e818e9621c320531fa89e7c5450"><td class="memTemplItemLeft" align="right" valign="top">int&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespacegridmd.html#aeb3d7e818e9621c320531fa89e7c5450">gridmd::node</a> (const string &amp;name, <a class="el" href="classgm_selector.html">gmSelector</a> input=<a class="el" href="gmdefs_8h.html#a89b2d48f155a9a6664e93d7ad40c345ea79d5bc5fb1e72912dbb2039ae5ca1c2e">gmNODE_PREV</a>, const link_type &amp;t=<a class="el" href="structgm_hard_link.html">gmHardLink</a>(), int srcport=-1)</td></tr>
 <tr class="memdesc:aeb3d7e818e9621c320531fa89e7c5450"><td class="mdescLeft">&#160;</td><td class="mdescRight">See <a class="el" href="classgm_manager.html#af226f7934194a6299fa47f2730e31f1c">gmManager::mark_node()</a> <br /></td></tr>
 <tr class="separator:aeb3d7e818e9621c320531fa89e7c5450"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a208c206fd8aaa577d09142961dd3c75b"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a208c206fd8aaa577d09142961dd3c75b"></a>
-int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacegridmd.html#a208c206fd8aaa577d09142961dd3c75b">gridmd::node</a> (const string &amp;name, <a class="el" href="classgm_selector.html">gmSelector</a> input=gmNODE_PREV)</td></tr>
+int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacegridmd.html#a208c206fd8aaa577d09142961dd3c75b">gridmd::node</a> (const string &amp;name, <a class="el" href="classgm_selector.html">gmSelector</a> input=<a class="el" href="gmdefs_8h.html#a89b2d48f155a9a6664e93d7ad40c345ea79d5bc5fb1e72912dbb2039ae5ca1c2e">gmNODE_PREV</a>)</td></tr>
 <tr class="memdesc:a208c206fd8aaa577d09142961dd3c75b"><td class="mdescLeft">&#160;</td><td class="mdescRight">See <a class="el" href="classgm_manager.html#af226f7934194a6299fa47f2730e31f1c">gmManager::mark_node()</a> <br /></td></tr>
 <tr class="separator:a208c206fd8aaa577d09142961dd3c75b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a561fb2a5b87346795471d7e02e2399f6"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a561fb2a5b87346795471d7e02e2399f6"></a>
