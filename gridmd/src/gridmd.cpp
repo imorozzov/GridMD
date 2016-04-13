@@ -625,6 +625,10 @@ int gmManager::init(const string &name_, bool restart, bool recalc_locals, const
 }
 
 int gmManager::init(int &argc, charDoublePtr &argv, const string &name_){
+  gmManager *substitute = thread_redirect(this);
+  if(substitute)
+    return substitute->init(argc,argv,name_);
+
   gmScopeLock scopeLock(mutex);
   if(mode==gmMODE_LOCAL && rec_level==0){
     _argc=argc;

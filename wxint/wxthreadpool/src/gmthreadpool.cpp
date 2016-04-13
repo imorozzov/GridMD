@@ -135,7 +135,7 @@ void gmThreadPool::RemoveTask(gmTaskID taskID)
 bool gmThreadPool::IsValidIndex(gmTaskID taskID)
 {
     wxMutexLocker lock(mQueueMutex);
-    return mTasksMap.count(taskID);
+    return (mTasksMap.count(taskID)!=0);
 }
 
 

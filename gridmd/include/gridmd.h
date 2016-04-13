@@ -849,6 +849,11 @@ protected:
 		return continue_exec;
 	}
 
+  ///\en Redirection function. Should return a pointer to unique independent copy of the object for each thread.
+  gmManager *thread_redirect(const gmManager *from_where){
+    return NULL;
+  }
+
 public:
 
   ///\en Constructor. The optional \a mode parameter specifies the mode in
