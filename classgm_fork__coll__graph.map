@@ -1,12 +1,12 @@
 <map id="gmFork&lt; split_tt, branch_tt, merge_tt &gt;" name="gmFork&lt; split_tt, branch_tt, merge_tt &gt;">
-<area shape="rect" id="node2" href="$classgm_manager.html" title="Main interface class to access workflow functions. " alt="" coords="343,171,433,197"/>
-<area shape="rect" id="node6" href="$classgm_scheduler.html" title="Scheduler managing different resources. " alt="" coords="611,103,709,129"/>
-<area shape="rect" id="node3" href="$classgm_manager_callback.html" title="Call&#45;back events, sent by gmManager. Set of events may be extended. " alt="" coords="31,44,171,71"/>
-<area shape="rect" id="node4" href="$classrefmap.html" title="refmap\&lt; string, gmLinkData \&gt;" alt="" coords="6,95,197,121"/>
-<area shape="rect" id="node5" href="$classmngptr.html" title="mngptr\&lt; gmNodeAction \&gt;" alt="" coords="17,145,186,172"/>
-<area shape="rect" id="node7" href="$classrefvector.html" title="refvector\&lt; gmShell \&gt;" alt="" coords="317,29,459,56"/>
-<area shape="rect" id="node8" href="$classrefvector.html" title="refvector\&lt; gmResource \&gt;" alt="" coords="305,80,471,107"/>
-<area shape="rect" id="node9" href="$structgm_node_prop.html" title="Properties of the node affected by the user configurable settings. " alt="" coords="53,196,150,223"/>
-<area shape="rect" id="node10" href="$classgm_mutex.html" title="mutex is used to lock access to file&#45;stored information, like &#39;restor file&#39; and &#39;*.dot graph&#39;. " alt="" coords="64,285,139,312"/>
-<area shape="rect" id="node11" href="$classint__pack.html" title="class for packing integers " alt="" coords="66,336,137,363"/>
+<area shape="rect" id="node2" href="$classgm_manager.html" title="Main interface class to access workflow functions. " alt="" coords="345,171,436,197"/>
+<area shape="rect" id="node6" href="$classgm_scheduler.html" title="Scheduler managing different resources. " alt="" coords="618,103,715,129"/>
+<area shape="rect" id="node3" href="$classgm_manager_callback.html" title="Call&#45;back events, sent by gmManager. Set of events may be extended. " alt="" coords="34,44,171,71"/>
+<area shape="rect" id="node4" href="$classrefmap.html" title="refmap\&lt; string, gmLinkData \&gt;" alt="" coords="5,95,200,121"/>
+<area shape="rect" id="node5" href="$classmngptr.html" title="mngptr\&lt; gmNodeAction \&gt;" alt="" coords="17,145,188,172"/>
+<area shape="rect" id="node7" href="$classrefvector.html" title="refvector\&lt; gmShell \&gt;" alt="" coords="318,29,463,56"/>
+<area shape="rect" id="node8" href="$classrefvector.html" title="refvector\&lt; gmResource \&gt;" alt="" coords="305,80,476,107"/>
+<area shape="rect" id="node9" href="$structgm_node_prop.html" title="Properties of the node affected by the user configurable settings. " alt="" coords="55,196,150,223"/>
+<area shape="rect" id="node10" href="$classgm_mutex.html" title="mutex is used to lock access to file&#45;stored information, like &#39;restor file&#39; and &#39;*.dot graph&#39;. " alt="" coords="65,285,140,312"/>
+<area shape="rect" id="node11" href="$classint__pack.html" title="class for packing integers " alt="" coords="68,336,137,363"/>
 </map>

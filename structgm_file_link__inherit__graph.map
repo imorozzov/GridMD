@@ -1,4 +1,4 @@
 <map id="gmFileLink" name="gmFileLink">
-<area shape="rect" id="node2" href="$structgm_status_link.html" title="Category structure for indicating the file link to gmManager::mark_node() function. " alt="" coords="5,80,107,107"/>
-<area shape="rect" id="node3" href="$structgm_wildcard_link.html" title="Category structure for indicating a link by a set of files referenced by wildcards to gmManager::mark..." alt="" coords="131,80,245,107"/>
+<area shape="rect" id="node2" href="$structgm_status_link.html" title="Category structure for indicating the file link to gmManager::mark_node() function. " alt="" coords="5,80,104,107"/>
+<area shape="rect" id="node3" href="$structgm_wildcard_link.html" title="Category structure for indicating a link by a set of files referenced by wildcards to gmManager::mark..." alt="" coords="128,80,240,107"/>
 </map>

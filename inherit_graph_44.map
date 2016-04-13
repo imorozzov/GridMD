@@ -1,4 +1,4 @@
 <map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
-<area shape="rect" id="node1" href="$classmessage__logger.html" title="Logger class to control (computational) function behaviour when something requiring user attention ha..." alt="" coords="5,5,120,32"/>
-<area shape="rect" id="node2" href="$classstdfile__logger.html" title="message logger for which std and error streams may be specified " alt="" coords="169,5,266,32"/>
+<area shape="rect" id="node1" href="$classmessage__logger.html" title="Logger class to control (computational) function behaviour when something requiring user attention ha..." alt="" coords="5,5,121,32"/>
+<area shape="rect" id="node2" href="$classstdfile__logger.html" title="message logger for which std and error streams may be specified " alt="" coords="169,5,268,32"/>
 </map>
