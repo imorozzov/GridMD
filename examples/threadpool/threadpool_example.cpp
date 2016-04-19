@@ -7,7 +7,6 @@
 #include <gridmd.h>
 #include <gmd/threadpool.h>
 
-
 using namespace gridmd;
 
 #ifdef USING_WXWIDGETS
@@ -94,10 +93,10 @@ int main(int argc,char* argv[]){
 //        }
 
         sleep(3);
-        std::cout << "Add new 3 long tasks (120 sec time each)... And kill pool while tasks are processed." << std::endl;
+        std::cout << "Add new 50 long tasks (120 sec time each)... And kill pool while tasks are processed." << std::endl;
         longTasks.clear();
 
-        for (int i = 0; i < 3; ++i) {
+        for (int i = 0; i < 50; ++i) {
             longTasks.push_back(pool.CreateScriptTask("sleep 120s"));
         }
 

@@ -42,13 +42,9 @@ void gmTask::Kill()
     }
 }
 
-bool gmTask::ResetThread(gmThread *thread)
+void gmTask::ResetThread(gmThread *thread)
 {
-    if (!mThread) {
-        mThread = thread;
-        return true;
-    }
-    return false;
+    mThread = thread;
 }
 
 void gmTask::SetStatus(gmTASK_STATUS status)

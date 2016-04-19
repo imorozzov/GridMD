@@ -36,14 +36,14 @@ wxThread::ExitCode gmThread::Entry()
         mCurrentTask = NULL;
         {
             wxMutexLocker lock(mPool->mQueueMutex);
-            while(mPool->mIsRunning && mPool->mTasksList.empty())
+            while(mPool->mIsRunning && mPool->mTasksQueue.empty())
                 mPool->mQueueNotifier.Wait();
 
             if (!mPool->mIsRunning)
                 break;
 
-            mCurrentTask = mPool->mTasksList.front();
-            mPool->mTasksList.pop_front();
+            mCurrentTask = mPool->mTasksQueue.front();
+            mPool->mTasksQueue.pop_front();
         }
         StartTask();
     }
@@ -61,6 +61,14 @@ void gmThread::StartTask()
         mCurrentTask->mTaskResult = mCurrentTask->Run();
         mCurrentTask->SetStatus(gmTASK_FINISHED);
         mCurrentTask->ResetThread();
+
+        {
+            wxMutexLocker lock(mPool->mRedirectorsMutex);
+            std::map<const std::type_info*, gmRedirectorBase*>::iterator mapIter = mPool->mRedirectorsMap.begin();
+            if (mapIter != mPool->mRedirectorsMap.end())
+                mapIter->second->RemoveObject();
+        }
+
         mCurrentTask->mExited.Signal();
         mCurrentTask = NULL;
     }

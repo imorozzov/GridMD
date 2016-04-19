@@ -6,6 +6,9 @@
 #include <gmd/string.h>
 #include <list>
 #include <map>
+#include <typeinfo>
+
+#include <wxthreadpool/include/gmredirector.h>
 
 /** \file gmthreadpool.h
     \en \brief Class that implements GridMD Thread Pool.
@@ -14,7 +17,6 @@
 
 class gmTask;
 class gmThread;
-
 
 ///\en GridMD Thread Pool implementation using wxWidgets.
 class gmThreadPool : public wxThread
@@ -63,12 +65,12 @@ public:
     ///    \a gmTASK_INVALID_STATUS -- is returned if \a taskID index is not valid (see \ref gmThreadPool::IsValidIndex()).
     ///    \param taskID
     ///    \return Task status
-    gmTASK_STATUS TaskStatus(gmTaskID taskID);
+    gmTASK_STATUS TaskStatus(gmTaskID taskID) const;
 
 
     ///\en Returns string representation of \ref gmThreadPool::TaskStatus().
     ///    \return String representation of tasks status
-    gmdString StrTaskStatus(gmTaskID taskID);
+    gmdString StrTaskStatus(gmTaskID taskID) const;
 
     ///\en Gets task type.
     ///    Possible return values are:\n
@@ -77,7 +79,7 @@ public:
     ///    \a gmTASK_INVALID_TYPE -- is returned if \a taskID index is not valid (see \ref gmThreadPool::IsValidIndex()).
     ///    \param taskID
     ///    \return Task type
-    gmTASK_TYPE TaskType(gmTaskID taskID);
+    gmTASK_TYPE TaskType(gmTaskID taskID) const;
 
     ///\en Removes task with \a taskID index from pool queue and destroys it.
     ///    After call to this function \ref gmThreadPool::IsValidIndex()
@@ -94,7 +96,18 @@ public:
     ///    and \ref gmThreadPool::RemoveTask() makes \a taskID index invalid.
     ///    \param taskID
     ///    \return Is task with \a taskID valid
-    bool IsValidIndex(gmTaskID taskID);
+    bool IsValidIndex(gmTaskID taskID) const;
+
+    template <typename T>
+    void RegisterPrototypedRedirector(const T& prototype) {
+        wxMutexLocker lock(mRedirectorsMutex);
+        std::map<const std::type_info*, gmRedirectorBase*>::iterator mapIter = mRedirectorsMap.find(&typeid(T));
+        if (mapIter != mRedirectorsMap.end())
+            delete mapIter->second;
+        mRedirectorsMap[&typeid(T)] = new gmRedirectorPrototyped<T>(prototype);
+    }
+
+    static gmRedirectorBase* GetRedirector(const std::type_info &typeInfo);
 
 protected:
     virtual ExitCode Entry();
@@ -105,16 +118,30 @@ private:
 
     size_t mThreadsCount;
     bool mIsRunning;
-    wxMutex mQueueMutex;
+    mutable wxMutex mQueueMutex;
     wxCondition mQueueNotifier;
     wxMutex mThreadsMutex;
     wxCondition mThreadsNotifier;
 
     std::list<gmThread*> mThreads;
-    std::list<gmTask*> mTasksList;
+    std::list<gmTask*> mTasksQueue;
     std::map<gmTaskID, gmTask*> mTasksMap;
+
+    struct TypeInfoComparator {
+        bool operator()(const std::type_info* left, const std::type_info* right) const {
+            return left->before(*right);
+        }
+    };
+
+    static wxMutex mRedirectorsMutex;
+    static std::map<const std::type_info*, gmRedirectorBase*, TypeInfoComparator> mRedirectorsMap;
 
     friend class gmThread;
 };
+
+
+
+
+
 
 #endif // THREADPOOL_H

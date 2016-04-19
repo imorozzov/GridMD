@@ -2,10 +2,15 @@
 #include <wxthreadpool/include/gmthread.h>
 #include <wxthreadpool/include/gmmaintask.h>
 #include <wxthreadpool/include/gmscripttask.h>
+#include <wxthreadpool/include/gmredirector.h>
 
 #include <wx/hashmap.h>
 #include <algorithm>
 #include <utility>
+
+
+std::map<const std::type_info*, gmRedirectorBase*, gmThreadPool::TypeInfoComparator> gmThreadPool::mRedirectorsMap;
+wxMutex gmThreadPool::mRedirectorsMutex;
 
 gmThreadPool::gmThreadPool(size_t threads):
     wxThread(wxTHREAD_JOINABLE),
@@ -39,6 +44,10 @@ gmThreadPool::~gmThreadPool()
     for(; tasksIter != mTasksMap.end(); ++tasksIter) {
         delete tasksIter->second;
     }
+
+    std::map<const std::type_info*, gmRedirectorBase*>::iterator mapIter = mRedirectorsMap.begin();
+    for(;mapIter != mRedirectorsMap.end();++mapIter)
+        delete mapIter->second;
 }
 
 gmTaskID gmThreadPool::CreateGMMainTask(int (*gridmd_main)(int, char *[]), int argc, char *argv[])
@@ -56,7 +65,7 @@ int gmThreadPool::TaskResult(gmTaskID taskID)
     int result = GMPOOLTASK_INVALID_RESULT;
 
     if(IsValidIndex(taskID)) {
-        gmTask* task = mTasksMap[taskID];
+        gmTask* task = mTasksMap.at(taskID);
         result = task->Result();
         mTasksMap.erase(taskID);
         delete task;
@@ -65,7 +74,7 @@ int gmThreadPool::TaskResult(gmTaskID taskID)
     return result;
 }
 
-gmTASK_STATUS gmThreadPool::TaskStatus(gmTaskID taskID)
+gmTASK_STATUS gmThreadPool::TaskStatus(gmTaskID taskID) const
 {
     if(IsValidIndex(taskID))
         return mTasksMap.at(taskID)->Status();
@@ -73,7 +82,7 @@ gmTASK_STATUS gmThreadPool::TaskStatus(gmTaskID taskID)
     return gmTASK_INVALID_STATUS;
 }
 
-gmdString gmThreadPool::StrTaskStatus(gmTaskID taskID)
+gmdString gmThreadPool::StrTaskStatus(gmTaskID taskID) const
 {
     gmdString result;
     switch(TaskStatus(taskID)) {
@@ -96,7 +105,7 @@ gmdString gmThreadPool::StrTaskStatus(gmTaskID taskID)
     return result;
 }
 
-gmTASK_TYPE gmThreadPool::TaskType(gmTaskID taskID)
+gmTASK_TYPE gmThreadPool::TaskType(gmTaskID taskID) const
 {
     if(IsValidIndex(taskID))
         return mTasksMap.at(taskID)->Type();
@@ -118,13 +127,20 @@ void gmThreadPool::RemoveTask(gmTaskID taskID)
         task = mapIter->second;
 
         if(task->Status() == gmTASK_POOLED) {
-            std::list<gmTask*>::iterator itCurTask = std::find(mTasksList.begin(), mTasksList.end(), task);
-            if (itCurTask != mTasksList.end())
-                mTasksList.erase(itCurTask);
+            std::list<gmTask*>::iterator itCurTask = std::find(mTasksQueue.begin(), mTasksQueue.end(), task);
+            if (itCurTask != mTasksQueue.end())
+                mTasksQueue.erase(itCurTask);
         }
         else
             if (task->Status() == gmTASK_PROCESSED) {
+                gmThreadId idToDelete = task->mThread->GetId();
                 task->Kill();
+                {
+                    wxMutexLocker lock(mRedirectorsMutex);
+                    std::map<const std::type_info*, gmRedirectorBase*>::iterator mapIter = mRedirectorsMap.begin();
+                    for(;mapIter != mRedirectorsMap.end(); ++mapIter)
+                        mapIter->second->RemoveObject(idToDelete);
+                }
             }
     }
 
@@ -132,18 +148,27 @@ void gmThreadPool::RemoveTask(gmTaskID taskID)
     delete task;
 }
 
-bool gmThreadPool::IsValidIndex(gmTaskID taskID)
+bool gmThreadPool::IsValidIndex(gmTaskID taskID) const
 {
     wxMutexLocker lock(mQueueMutex);
     return mTasksMap.count(taskID);
 }
 
+gmRedirectorBase *gmThreadPool::GetRedirector(const std::type_info &typeInfo)
+{
+    wxMutexLocker lock(mRedirectorsMutex);
+    std::map<const std::type_info*, gmRedirectorBase*>::const_iterator mapIter = mRedirectorsMap.find(&typeInfo);
+    if (mapIter != mRedirectorsMap.end())
+        return mapIter->second;
+    else
+        return NULL;
+}
 
 gmTaskID gmThreadPool::SubmitTask(gmTask *task)
 {
     {
         wxMutexLocker lock(mQueueMutex);
-        mTasksList.push_back(task);
+        mTasksQueue.push_back(task);
     }
     mQueueNotifier.Signal();
     mTasksMap[wxPointerHash()(task)] = task;
@@ -170,4 +195,5 @@ wxThread::ExitCode gmThreadPool::Entry()
     }
     return static_cast<ExitCode>(0);
 }
+
 

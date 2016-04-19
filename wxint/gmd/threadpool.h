@@ -1,8 +1,8 @@
-#ifndef WXTHREADPOOL_H
-#define WXTHREADPOOL_H
+#ifndef GRIDMD_THREADPOOL_H
+#define GRIDMD_THREADPOOL_H
 
 #include <wxthreadpool/include/gmthreadpool.h>
 
 #define gmdThreadPool gmThreadPool
 
-#endif // WXTHREADPOOL_H
+#endif // GRIDMD_THREADPOOL_H

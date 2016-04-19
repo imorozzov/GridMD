@@ -21,7 +21,7 @@ private:
     int Result();
     void Kill();
 
-    bool ResetThread(gmThread *thread = NULL);
+    void ResetThread(gmThread *thread = NULL);
     void SetStatus(gmTASK_STATUS status);
 
     gmThread* mThread;
