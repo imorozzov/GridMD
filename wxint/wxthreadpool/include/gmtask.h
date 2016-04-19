@@ -6,6 +6,12 @@
 
 class gmThread;
 
+
+/** \file gmtask.h
+**/
+
+
+///\en Base class for tasks executed by the \ref gmThreadPool.
 class gmTask
 {
 protected:

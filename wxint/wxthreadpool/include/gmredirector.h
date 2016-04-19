@@ -7,11 +7,25 @@
 #include <map>
 #include <wx/thread.h>
 
+
+/** \file gmredirector.h
+    \en \brief Classes that implements logic to support one unique copy of
+               arbitary type object for each \ref gmTask execution using \ref gmThreadPool.
+
+**/
+
 class gmThreadPool;
 
+
+///\en Class used to abstract from the specialization of \ref gmRedirector based classes.
 class gmRedirectorBase {
 public:
+
+    ///\en Method to check the specialization of derived template classes.
+    ///    It can be useful to distinguish various \ref gmRedirector based classes specializations.
+    ///    \return std::type_info object of derived template class specialized type.
     virtual const std::type_info& ObjectTypeInfo() const = 0;
+
     virtual void RemoveObject(gmThreadId idToDelete = wxThread::GetCurrentId()) = 0;
 
 protected:
@@ -23,10 +37,16 @@ protected:
     friend class gmThreadPool;
 };
 
+///\en Class used to store one unique instance of specialized type for
+///    each of the individual \ref gmTask executions by the \ref gmThreadPool.
 template <typename T>
 class gmRedirector : public gmRedirectorBase
 {
 public:
+
+    ///\en Removes object mapped with \a idToDelete thread index.
+    ///    By default, removes object mapped with a \a caller thread.
+    ///\param idToDelete Thread index to delete object that is mapped with.
     virtual void RemoveObject(gmThreadId idToDelete = wxThread::GetCurrentId()) {
         wxMutexLocker lock(mMutex);
         typename std::map<gmThreadId, T*>::iterator iter = mObjectsMap.find(idToDelete);
@@ -35,6 +55,9 @@ public:
         mObjectsMap.erase(idToDelete);
     }
 
+
+    ///\en Gets object mapped with a \a caller thread.
+    ///\return Pointer to object mapped with a \a caller thread.
     T* GetObject() const {
         wxMutexLocker lock(mMutex);
         if (wxThread::IsMain())
@@ -70,6 +93,9 @@ protected:
     friend class gmThreadPool;
 };
 
+
+///\en Class to store a prototype to get it's unique copy
+/// for each of executed \ref gmTask in \ref gmThreadPool.
 template <typename T>
 class gmRedirectorPrototyped : public gmRedirector<T>
 {

@@ -20,6 +20,11 @@ void sleep(int seconds) {
 #endif
 }
 
+/** \file redirector_example.cpp
+    \en \brief Example that tests and illustates various \ref gmRedirector use cases.
+
+**/
+
 int gridmd_main(int argc, char* argv[]) {
 
     sleep(1);

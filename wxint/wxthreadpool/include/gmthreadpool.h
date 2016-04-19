@@ -98,6 +98,13 @@ public:
     ///    \return Is task with \a taskID valid
     bool IsValidIndex(gmTaskID taskID) const;
 
+
+    ///\en Registers a new \ref gmRedirectorPrototyped object with \a prototype.
+    ///    Use this method to register prototype if you want to fetch a copy of it
+    ///    later with \ref gmThreadPool::GetRedirector(). Note, that in current implementation
+    ///    you can register only one instance of certain type (i.e. you can't
+    ///    store two or more prototypes of one type).
+    ///    \param prototype
     template <typename T>
     void RegisterPrototypedRedirector(const T& prototype) {
         wxMutexLocker lock(mRedirectorsMutex);
@@ -107,6 +114,33 @@ public:
         mRedirectorsMap[&typeid(T)] = new gmRedirectorPrototyped<T>(prototype);
     }
 
+    ///\en Gets a pointer to the base class of \ref gmRedirector to work
+    ///    with an arbitary specialized redirectors.
+    ///    \ref gmRedirectorBase is used to abstract from the specialization of
+    ///    \ref gmRedirector bazed classes. To fetch unique object for a \ref gmTask
+    ///    execution you should do something like
+    ///
+    /// \code
+    ///    gmRedirector<ObjectType>* redirector = dynamic_cast<gmRedirector<ObjectType>* >
+    ///            (gmThreadPool::GetRedirector(typeid(ObjectType)));
+    ///
+    ///    if (redirector) {
+    ///        ObjectType* object = redirector->GetObject();
+    ///        if (object) {
+    ///            /*...*/
+    ///       }
+    ///    }
+    /// \endcode
+    ///
+    ///    within the function of \ref gmTask execution (for example \ref gridmd_main(int argc, char **argv)
+    ///    of \ref gmMainTask), or from the main thread. You should previously register prototype of \a ObjectType
+    ///    with \ref gmThreadPool::RegisterPrototypedRedirector(). See \ref redirector_example.cpp to get more
+    ///    info how to work with that mechanism.
+    ///
+    ///    \param typeInfo std::type_info instance of queried \ref gmRedirector specialization
+    ///    type fetched by \a typeid(ObjectType).
+    ///    \return \ref gmRedirectorBase instance or NULL if there's no such specialization for
+    ///    queried type.
     static gmRedirectorBase* GetRedirector(const std::type_info &typeInfo);
 
 protected:
