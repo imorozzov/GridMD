@@ -1,4 +1,5 @@
 #include <wxthreadpool/include/gmthreadpool.h>
+#include <wxthreadpool/include/gmredirector.h>
 #include <wxthreadpool/include/gmthread.h>
 #include <wxthreadpool/include/gmtask.h>
 #include <algorithm>
@@ -64,9 +65,9 @@ void gmThread::StartTask()
 
         {
             wxMutexLocker lock(mPool->mRedirectorsMutex);
-            gmThreadPool::redirector_map_t::iterator mapIter = mPool->mRedirectorsMap.begin();
-            if (mapIter != mPool->mRedirectorsMap.end())
-                mapIter->second->RemoveObject();
+            std::list<gmRedirectorBase*>::iterator redIter = mPool->mRedirectors.begin();
+            for(;redIter != mPool->mRedirectors.end(); ++redIter)
+                (*redIter)->RemoveObject();
         }
 
         mCurrentTask->mExited.Signal();

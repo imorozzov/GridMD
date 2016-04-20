@@ -9,9 +9,6 @@
 #include <utility>
 
 
-std::map<const std::type_info*, gmRedirectorBase*, gmThreadPool::TypeInfoComparator> gmThreadPool::mRedirectorsMap;
-wxMutex gmThreadPool::mRedirectorsMutex;
-
 gmThreadPool::gmThreadPool(size_t threads):
     wxThread(wxTHREAD_JOINABLE),
     mThreadsCount(threads),
@@ -44,10 +41,6 @@ gmThreadPool::~gmThreadPool()
     for(; tasksIter != mTasksMap.end(); ++tasksIter) {
         delete tasksIter->second;
     }
-
-    redirector_map_t::iterator mapIter = mRedirectorsMap.begin();
-    for(;mapIter != mRedirectorsMap.end();++mapIter)
-        delete mapIter->second;
 }
 
 gmTaskID gmThreadPool::CreateGMMainTask(int (*gridmd_main)(int, char *[]), int argc, char *argv[])
@@ -137,9 +130,9 @@ void gmThreadPool::RemoveTask(gmTaskID taskID)
                 task->Kill();
                 {
                     wxMutexLocker lock(mRedirectorsMutex);
-                    redirector_map_t::iterator mapIter = mRedirectorsMap.begin();
-                    for(;mapIter != mRedirectorsMap.end(); ++mapIter)
-                        mapIter->second->RemoveObject(idToDelete);
+                    std::list<gmRedirectorBase*>::iterator redIter = mRedirectors.begin();
+                    for(;redIter != mRedirectors.end(); ++redIter)
+                        (*redIter)->RemoveObject(idToDelete);
                 }
             }
     }
@@ -154,15 +147,6 @@ bool gmThreadPool::IsValidIndex(gmTaskID taskID) const
     return mTasksMap.count(taskID) ? true: false;
 }
 
-gmRedirectorBase *gmThreadPool::GetRedirector(const std::type_info &typeInfo)
-{
-    wxMutexLocker lock(mRedirectorsMutex);
-    redirector_map_t::const_iterator mapIter = mRedirectorsMap.find(&typeInfo);
-    if (mapIter != mRedirectorsMap.end())
-        return mapIter->second;
-    else
-        return NULL;
-}
 
 gmTaskID gmThreadPool::SubmitTask(gmTask *task)
 {

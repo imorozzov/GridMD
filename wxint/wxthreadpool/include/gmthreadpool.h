@@ -6,9 +6,7 @@
 #include <gmd/string.h>
 #include <list>
 #include <map>
-#include <typeinfo>
 
-#include <wxthreadpool/include/gmredirector.h>
 
 /** \file gmthreadpool.h
     \en \brief Class that implements GridMD Thread Pool.
@@ -17,6 +15,7 @@
 
 class gmTask;
 class gmThread;
+class gmRedirectorBase;
 
 ///\en GridMD Thread Pool implementation using wxWidgets.
 class gmThreadPool : public wxThread
@@ -99,48 +98,17 @@ public:
     bool IsValidIndex(gmTaskID taskID) const;
 
 
-    ///\en Registers a new \ref gmRedirectorPrototyped object with \a prototype.
-    ///    Use this method to register prototype if you want to fetch a copy of it
-    ///    later with \ref gmThreadPool::GetRedirector(). Note, that in current implementation
-    ///    you can register only one instance of certain type (i.e. you can't
-    ///    store two or more prototypes of one type).
-    ///    \param prototype
-    template <typename T>
-    void RegisterPrototypedRedirector(const T& prototype) {
+    ///\en Registers a \ref gmRedirector object in \ref gmThreadPool.
+    ///    You should register redirector in order to fetch a clear copy
+    ///    of object storable by redirector in each \ref gmTask execution.
+    ///    Note that \ref gmThreadPool doesn't take ownership of the passed \ref
+    ///    gmRedirector object.
+    ///    \param redirector pointer to \ref gmRedirector to register.
+    void RegisterRedirector(gmRedirectorBase* redirector) {
         wxMutexLocker lock(mRedirectorsMutex);
-        redirector_map_t::iterator mapIter = mRedirectorsMap.find(&typeid(T));
-        if (mapIter != mRedirectorsMap.end())
-            delete mapIter->second;
-        mRedirectorsMap[&typeid(T)] = new gmRedirectorPrototyped<T>(prototype);
+        mRedirectors.push_back(redirector);
     }
 
-    ///\en Gets a pointer to the base class of \ref gmRedirector to work
-    ///    with an arbitary specialized redirectors.
-    ///    \ref gmRedirectorBase is used to abstract from the specialization of
-    ///    \ref gmRedirector bazed classes. To fetch unique object for a \ref gmTask
-    ///    execution you should do something like
-    ///
-    ///\code
-    ///    gmdRedirectorBase* baseRedirector = gmdThreadPool::GetRedirector(typeid(ObjectType));
-    ///    if (baseRedirector) {
-    ///        gmdRedirector<ObjectType>* redirector = static_cast<gmdRedirector<ObjectType>* > (baseRedirector);
-    ///        ObjectType* object = redirector->GetObject();
-    ///        if (object) {
-    ///            /*...*/
-    ///       }
-    ///    }
-    ///\endcode
-    ///
-    ///    within the function of \ref gmTask execution (for example \ref gridmd_main(int argc, char **argv)
-    ///    of \ref gmMainTask), or from the main thread. You should previously register prototype of \a ObjectType
-    ///    with \ref gmThreadPool::RegisterPrototypedRedirector(). See \ref redirector_example.cpp to get more
-    ///    info how to work with that mechanism.
-    ///
-    ///    \param typeInfo std::type_info instance of queried \ref gmRedirector specialization
-    ///    type fetched by \a typeid(ObjectType).
-    ///    \return \ref gmRedirectorBase instance or NULL if there's no such specialization for
-    ///    queried type.
-    static gmRedirectorBase* GetRedirector(const std::type_info &typeInfo);
 
 protected:
     virtual ExitCode Entry();
@@ -160,15 +128,8 @@ private:
     std::list<gmTask*> mTasksQueue;
     std::map<gmTaskID, gmTask*> mTasksMap;
 
-    struct TypeInfoComparator {
-        bool operator()(const std::type_info* left, const std::type_info* right) const {
-            return left->before(*right) ? true: false;
-        }
-    };
-
-    static wxMutex mRedirectorsMutex;
-    typedef std::map<const std::type_info*, gmRedirectorBase*, gmThreadPool::TypeInfoComparator> redirector_map_t;
-    static redirector_map_t mRedirectorsMap;
+    wxMutex mRedirectorsMutex;
+    std::list<gmRedirectorBase*> mRedirectors;
 
     friend class gmThread;
 };

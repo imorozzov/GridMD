@@ -6,8 +6,6 @@
 #include <gmd/string.h>
 #include <gmd/redirector.h>
 #include <list>
-#include <map>
-#include <typeinfo>
 #include <logexc.h>
 
 
@@ -18,9 +16,6 @@ public:
     gmdThreadPool() {;}
 
     ~gmdThreadPool() {
-        std::map<const std::type_info*, gmdRedirectorBase*>::iterator mapIter = mRedirectorsMap.begin();
-        for(;mapIter != mRedirectorsMap.end();++mapIter)
-            delete mapIter->second;
     }
 
     gmTaskID CreateGMMainTask(int (*gridmd_main)(int, char*[]), int argc, char* argv[])
@@ -85,34 +80,10 @@ public:
     }
 
 
-    template <typename T>
-    void RegisterPrototypedRedirector(const T& prototype) {
-
-        ///TODO: here must be mutex for mRedirectorsMap
-        std::map<const std::type_info*, gmdRedirectorBase*>::iterator mapIter = mRedirectorsMap.find(&typeid(T));
-        if (mapIter != mRedirectorsMap.end())
-            delete mapIter->second;
-        mRedirectorsMap[&typeid(T)] = new gmdRedirectorPrototyped<T>(prototype);
+    void RegisterRedirector(gmdRedirectorBase* redirector) {
+        LOGMSG(vblOERR, "gmdThreadPool::RegisterRedirector(gmRedirectorBase* redirector) "
+                        "is not implemented", false);
     }
-
-    static gmdRedirectorBase* GetRedirector(const std::type_info &typeInfo) {
-
-        ///TODO: here must be mutex for mRedirectorsMap
-        std::map<const std::type_info*, gmdRedirectorBase*>::const_iterator mapIter = mRedirectorsMap.find(&typeInfo);
-        if (mapIter != mRedirectorsMap.end())
-            return mapIter->second;
-        else
-            return NULL;
-    }
-
-private:
-    struct TypeInfoComparator {
-        bool operator()(const std::type_info* left, const std::type_info* right) const {
-            return left->before(*right);
-        }
-    };
-
-    static std::map<const std::type_info*, gmdRedirectorBase*, TypeInfoComparator> mRedirectorsMap;
 };
 
 #endif // GRIDMD_THREADPOOL_H

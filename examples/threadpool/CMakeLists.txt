@@ -3,5 +3,5 @@ project(threadpool_example)
 add_executable(threadpool_example threadpool_example.cpp)
 target_link_libraries(threadpool_example gridmd)
 
-add_executable(redirector_example redirector_example.cpp)
-target_link_libraries(redirector_example gridmd)
+#add_executable(redirector_example redirector_example.cpp)
+#target_link_libraries(redirector_example gridmd)
