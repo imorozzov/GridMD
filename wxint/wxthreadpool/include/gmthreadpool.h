@@ -108,7 +108,7 @@ public:
     template <typename T>
     void RegisterPrototypedRedirector(const T& prototype) {
         wxMutexLocker lock(mRedirectorsMutex);
-        std::map<const std::type_info*, gmRedirectorBase*>::iterator mapIter = mRedirectorsMap.find(&typeid(T));
+        redirector_map_t::iterator mapIter = mRedirectorsMap.find(&typeid(T));
         if (mapIter != mRedirectorsMap.end())
             delete mapIter->second;
         mRedirectorsMap[&typeid(T)] = new gmRedirectorPrototyped<T>(prototype);
@@ -162,12 +162,13 @@ private:
 
     struct TypeInfoComparator {
         bool operator()(const std::type_info* left, const std::type_info* right) const {
-            return left->before(*right);
+            return left->before(*right) ? true: false;
         }
     };
 
     static wxMutex mRedirectorsMutex;
-    static std::map<const std::type_info*, gmRedirectorBase*, TypeInfoComparator> mRedirectorsMap;
+    typedef std::map<const std::type_info*, gmRedirectorBase*, gmThreadPool::TypeInfoComparator> redirector_map_t;
+    static redirector_map_t mRedirectorsMap;
 
     friend class gmThread;
 };

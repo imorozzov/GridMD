@@ -64,7 +64,7 @@ void gmThread::StartTask()
 
         {
             wxMutexLocker lock(mPool->mRedirectorsMutex);
-            std::map<const std::type_info*, gmRedirectorBase*>::iterator mapIter = mPool->mRedirectorsMap.begin();
+            gmThreadPool::redirector_map_t::iterator mapIter = mPool->mRedirectorsMap.begin();
             if (mapIter != mPool->mRedirectorsMap.end())
                 mapIter->second->RemoveObject();
         }
