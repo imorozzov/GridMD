@@ -63,10 +63,10 @@ int test_type1(int argc, char* argv[]) {
 
     std::cout << "Task with index = " << argc <<  " is executed" << std::endl;
 
-    gmdRedirector<TestType1>* redirector = dynamic_cast<gmdRedirector<TestType1>* >
-            (gmdThreadPool::GetRedirector(typeid(TestType1)));
+    gmdRedirectorBase* baseRedirector = gmdThreadPool::GetRedirector(typeid(TestType1));
+    if (baseRedirector) {
 
-    if (redirector) {
+        gmdRedirector<TestType1>* redirector = static_cast<gmdRedirector<TestType1>* > (baseRedirector);
         TestType1* object = redirector->GetObject();
         if (object) {
             std::cout << "Task " << argc << ": " << "Get object of TestType1. Object Contents: " <<
@@ -88,10 +88,10 @@ int test_type1_long(int argc, char* argv[]) {
 
     std::cout << "Task with index = " << argc <<  " is executed" << std::endl;
 
-    gmdRedirector<TestType1>* redirector = dynamic_cast<gmdRedirector<TestType1>* >
-            (gmdThreadPool::GetRedirector(typeid(TestType1)));
+    gmdRedirectorBase* baseRedirector = gmdThreadPool::GetRedirector(typeid(TestType1));
+    if (baseRedirector) {
 
-    if (redirector) {
+        gmdRedirector<TestType1>* redirector = static_cast<gmdRedirector<TestType1>* > (baseRedirector);
         TestType1* object = redirector->GetObject();
         if (object) {
             std::cout << "Task " << argc << ": " << "Get object of TestType1. Object Contents: " <<
@@ -117,10 +117,10 @@ int test_type2(int argc, char* argv[]) {
 
     std::cout << "Task with index = " << argc <<  " is executed" << std::endl;
 
-    gmdRedirector<TestType2>* redirector = dynamic_cast<gmdRedirector<TestType2>* >
-            (gmdThreadPool::GetRedirector(typeid(TestType2)));
+    gmdRedirectorBase* baseRedirector = gmdThreadPool::GetRedirector(typeid(TestType2));
+    if (baseRedirector) {
 
-    if (redirector) {
+        gmdRedirector<TestType2>* redirector = static_cast<gmdRedirector<TestType2>* > (baseRedirector);
         TestType2* object = redirector->GetObject();
         if (object) {
             std::cout << "Task " << argc << ": " << "Get object of TestType2. Object Contents: " <<
@@ -159,10 +159,10 @@ int main(int argc, char* argv[]){
         sleep(4);
 
         std::cout << "Get TestType1 object for the MAIN thread..." << std::endl;
-        gmdRedirector<TestType1>* redirectorType1 = dynamic_cast<gmdRedirector<TestType1>* >
-                (gmdThreadPool::GetRedirector(typeid(TestType1)));
+        gmdRedirectorBase* baseRedirector = gmdThreadPool::GetRedirector(typeid(TestType1));
+        if (baseRedirector) {
 
-        if (redirectorType1) {
+            gmdRedirector<TestType1>* redirectorType1 = static_cast<gmdRedirector<TestType1>* > (baseRedirector);
             TestType1* object = redirectorType1->GetObject();
             if (object) {
                 std::cout << "Object contents : " << object->mA  << " " << object->mB << "\n" << std::endl;

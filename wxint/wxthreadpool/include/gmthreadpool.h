@@ -120,17 +120,16 @@ public:
     ///    \ref gmRedirector bazed classes. To fetch unique object for a \ref gmTask
     ///    execution you should do something like
     ///
-    /// \code
-    ///    gmRedirector<ObjectType>* redirector = dynamic_cast<gmRedirector<ObjectType>* >
-    ///            (gmThreadPool::GetRedirector(typeid(ObjectType)));
-    ///
-    ///    if (redirector) {
+    ///\code
+    ///    gmdRedirectorBase* baseRedirector = gmdThreadPool::GetRedirector(typeid(ObjectType));
+    ///    if (baseRedirector) {
+    ///        gmdRedirector<ObjectType>* redirector = static_cast<gmdRedirector<ObjectType>* > (baseRedirector);
     ///        ObjectType* object = redirector->GetObject();
     ///        if (object) {
     ///            /*...*/
     ///       }
     ///    }
-    /// \endcode
+    ///\endcode
     ///
     ///    within the function of \ref gmTask execution (for example \ref gridmd_main(int argc, char **argv)
     ///    of \ref gmMainTask), or from the main thread. You should previously register prototype of \a ObjectType
