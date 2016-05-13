@@ -226,6 +226,7 @@ $Date: 2016/02/03 16:41:18 $
 
 #include "refobj.h"
 #include "gridmd.h"
+#include <gmd/threadpool.h>
 //#include "gmnode.h"
 
 
@@ -280,6 +281,7 @@ public:
   struct wthread_t{
     int state;
     string jobid;
+    gmTaskID taskid; ///<\en for threadpool tasks 
     string stderr_;
     string stdout_;
     int resource_id;
@@ -296,7 +298,7 @@ public:
     std::string error_message;
     bool read; ///<\en indicates that the tread is read from file
     wthread_t():state(-1),exetype(gmEXE_LOCAL),resource_id(-1),restarts(0),persistent(false),
-			stopped(false),recursive(false),error_code(gmERR_NONE),needs_redo(0), read(false){}
+			stopped(false),recursive(false),error_code(gmERR_NONE),needs_redo(0), read(false), taskid(GMPOOLTASK_INVALID_ID) {}
   };
 protected:
  

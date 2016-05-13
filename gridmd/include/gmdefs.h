@@ -1,7 +1,8 @@
 #ifndef GMDEFS_H
 #define GMDEFS_H
 
-/// @file Forvard definitions for type(s) adn function declared at gridmd.h
+/**  @file gmdefs.h Forward definitions for type(s) and functions declared at gridmd.h
+*/
 
 typedef int gmNodeID;
 typedef int gmEdgeID;
@@ -24,18 +25,19 @@ enum gmEDGES{
   gmEDGE_NONE=-1,///<\en No edges found
 };
 
-///\en Execution modes
+///\en Execution modes (bit flags). Specified in \ref gmManager::set_execution() to select which type of execution is allowed for processing.
 enum gmEXE_MODES{
-  gmEXE_SERIAL=0x0,
-  gmEXE_LOCAL=0x1,
-  gmEXE_REMOTE=0x2,
-  gmEXE_MIXED=0x3,
-  gmEXE_CONSTRUCT_ONLY=0x4,
-  gmEXE_EXPLICIT_ONLY=0x8, ///<\en no implicit nodal code is executed, no recursion
+  gmEXE_SERIAL=0x0, ///<\en The code is executed serially, no parallel processing is employed.
+  gmEXE_LOCAL=0x1, ///<\en Nodes are allowed to execute as local tasks regardless of their status
+  gmEXE_REMOTE=0x2, ///<\en Remote nodes are executed remotely (by creating jobs via \ref gmJobManager)
+  gmEXE_CONSTRUCT_ONLY=0x4, ///<\en Nodes are never executed, only the execution graph is constructed
+  gmEXE_EXPLICIT_ONLY=0x8, ///<\en No implicit nodal code is executed, no recursion
+  gmEXE_THREADS=0x10, ///<\en Local nodes may execute in parallel by different threads within the same process
+  gmEXE_MIXED=0x13, ///<\en Nodes are allowed to execute in all available ways (locally, remotely and using threads)
   //gmEXE_LOCAL_UNSPLIT=0x4  ///<\en local, without subtasks: main() is called in worker mode
 };
 
-///\en gmManager operation modes (bit flags)
+///\en Operation modes of \ref gmManager (bit flags). This modes are in most cases assigned in low level processing functions and are for reference only.
 enum gmMODES{
   gmMODE_LOCAL=0, ///<\en Default setting, the modes are automatically selected in course of operation
   gmMODE_MANAGER=0x1,///<\en Same as gmMODE_CONSTRUCT
@@ -85,7 +87,8 @@ enum gmTMP_FILES{
 };
 
 
-///\en Node execution states
+///\en Node execution states. These states are in most cases assigned automatically 
+///    (except for \ref gmNS_PROC, \ref gmNS_UNPROC, \ref gmNS_WAIT).
 enum gmNODE_STATES{
   gmNS_NO_NODE=-1, ///<\en node does not exist or state is not defined
   gmNS_UNPROC=0,   ///<\en node is unprocessed
@@ -101,9 +104,10 @@ enum gmNODE_STATES{
 };
 
 
-///\en Results of callback functions
+///\en Result type of callback functions (see \ref gmRESULTS).
 typedef int gmRESULT;
 
+///\en Result codes for callback functions.
 enum gmRESULTS {
 	gmFAIL = -1,
 	gmSKIP = 0,
