@@ -23,7 +23,7 @@ int gmTask::Result()
     return ret;
 }
 
-gmTASK_STATUS gmTask::Status()
+gmTASK_STATUS gmTask::Status() 
 {
     wxMutexLocker lock(mStatusMutex);
     return mStatus;

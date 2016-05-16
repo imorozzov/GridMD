@@ -57,8 +57,9 @@ int gmThreadPool::TaskResult(gmTaskID taskID)
 {
     int result = GMPOOLTASK_INVALID_RESULT;
 
-    if(IsValidIndex(taskID)) {
-        gmTask* task = mTasksMap.at(taskID);
+   
+    if(IsValidIndex(taskID) && (mTasksMap.find(taskID)!=mTasksMap.end())) {
+        gmTask* task = mTasksMap[taskID];
         result = task->Result();
         mTasksMap.erase(taskID);
         delete task;
@@ -69,10 +70,11 @@ int gmThreadPool::TaskResult(gmTaskID taskID)
 
 gmTASK_STATUS gmThreadPool::TaskStatus(gmTaskID taskID) const
 {
-    if(IsValidIndex(taskID))
-        return mTasksMap.at(taskID)->Status();
+  if(IsValidIndex(taskID) && (mTasksMap.find(taskID)!=mTasksMap.end()) ){
+    return mTasksMap.find(taskID)->second->Status();
+  }
 
-    return gmTASK_INVALID_STATUS;
+  return gmTASK_INVALID_STATUS;
 }
 
 gmdString gmThreadPool::StrTaskStatus(gmTaskID taskID) const
@@ -100,10 +102,10 @@ gmdString gmThreadPool::StrTaskStatus(gmTaskID taskID) const
 
 gmTASK_TYPE gmThreadPool::TaskType(gmTaskID taskID) const
 {
-    if(IsValidIndex(taskID))
-        return mTasksMap.at(taskID)->Type();
-
-
+    if(IsValidIndex(taskID) && (mTasksMap.find(taskID)!=mTasksMap.end()) ){
+      return mTasksMap.find(taskID)->second->Type();
+    }
+  
     return gmTASK_INVALID_TYPE;
 }
 
@@ -144,11 +146,7 @@ void gmThreadPool::RemoveTask(gmTaskID taskID)
 bool gmThreadPool::IsValidIndex(gmTaskID taskID) const
 {
     wxMutexLocker lock(mQueueMutex);
-<<<<<<< HEAD
     return mTasksMap.count(taskID) ? true: false;
-=======
-    return (mTasksMap.count(taskID)!=0);
->>>>>>> remotes/origin/with-threads
 }
 
 
