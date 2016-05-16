@@ -28,6 +28,7 @@ using namespace gridmd;
 
 int main(int argc,char* argv[]){
 
+  // gmdRegisterWorker(gridmd_main,"gridmd_main");
 
   // wxWindows initialization
   if( !gmdInitialize() ) {
@@ -41,6 +42,11 @@ int main(int argc,char* argv[]){
   // The program is interrupted on errors (vblERR).
   message_logger::global().set_levels(vblALLBAD | vblALLMESS/*, vblERR*/);
   
+  
+  //gmManager myexp;
+  //res = myexp.run_implicit("gridmd_main", argc, argv);
+  //res = myexp.run_implicit("gridmd_main", argc, argv);
+
   // All distributed code should be put into gridmd_main() function
   int res= gridmd_main(argc, argv);
 
@@ -120,3 +126,4 @@ int gridmd_main(int argc,char* argv[]){
 
   return 0;
 }
+
