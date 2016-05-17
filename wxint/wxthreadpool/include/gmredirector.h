@@ -14,6 +14,9 @@
 
 **/
 
+
+# define USING_GMTHREADS 1
+
 class gmThreadPool;
 
 
@@ -99,7 +102,8 @@ protected:
 template <typename T>
 class gmRedirectorPrototyped : public gmRedirector<T>
 {
-protected:
+//protected: //?
+public:
     gmRedirectorPrototyped(const T& prototype) :
         mPrototype(new T(prototype)),
         mMainThreadObject(new T(prototype))

@@ -293,9 +293,15 @@ gmNODE_STATES gmGetStateId(const string &state){
   return gmNS_NO_NODE;
 }
 
-
-
+#if !USING_GMTHREADS
 gmManager gmExperiment;
+#else
+gmManager gmExpObj;
+gmRedirectorPrototyped<gmManager> gmExpRedirector(gmExpObj);
+
+#endif
+
+
 
 bool gmShellDescr::operator==(const gmShellDescr &other) const {
   return 

@@ -290,6 +290,7 @@ typedef int32_t gm_int32;
 #include "gmnode.h"  
 
 #include "gmdefs.h"
+#include <gmd/redirector.h>  // for redirecting gmExperiment to multiple threads
 
 ///\en Category structure for indicating the hard link to \ref gmManager::mark_node() function
 struct gmHardLink{
@@ -864,6 +865,12 @@ public:
   gmManager(int mode=gmMODE_LOCAL,
             gmMutex *mutex=&gmMutex::voidMutex,
             gmManagerCallback *call_back =&gmManagerCallback::voidCallBack );
+
+
+  ///\en Copy constructor: intended for working mode multi-thread, creates clean instance
+  gmManager(const gmManager &other):mutex(&gmMutex::voidMutex), call_back(&gmManagerCallback::voidCallBack), mode(gmMODE_LOCAL){
+    _init_params();
+  }
 
   ///\en Destructor.
   ~gmManager();
@@ -1773,9 +1780,16 @@ inline int gmManager::link<gmHardLink>(gmSelector from, gmSelector to, int srcpo
 }
 
 
+#if !USING_GMTHREADS
 ///\en Main experiment object.
 extern gmManager gmExperiment;
+#else
+extern gmManager gmExpObj;
+extern gmRedirectorPrototyped<gmManager> gmExpRedirector;
 
+# define gmExperiment (*(gmExpRedirector.GetObject()))
+
+#endif
 
 ///\en Namespace for global GridMD functions. These functions duplicate (for convenience) the corresponding
 ///    \ref gmManager class member functions and are applied to the global \ref gmExperiment object.
