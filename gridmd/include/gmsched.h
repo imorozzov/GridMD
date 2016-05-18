@@ -102,6 +102,8 @@ public:
 
 
 
+
+
 ///\en Scheduler managing different resources
 class gmScheduler{
   friend class gmManager;
@@ -123,8 +125,8 @@ protected:
   ///\en shell for local operations (file copy, etc.)
   gmShell* local_shell;
   gmdString workdir;
- 
-
+  ///\en thread pool to create tasks for local threads (initialized by first use)
+  gmdThreadPool *threadpool;
 
 public:
   gmScheduler(gmManager *sys_):sys(sys_),resources(1),shells(1){
@@ -139,6 +141,10 @@ public:
     local_shell->SetParam("home_dir",workdir);
     local_shell->SetParam("home_dir_win",workdir);
     shells.push_back(local_shell);
+    threadpool = NULL;
+  }
+  ~gmScheduler(){
+    if(threadpool) delete threadpool;
   }
  
   size_t add_group(){

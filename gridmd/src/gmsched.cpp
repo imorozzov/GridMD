@@ -379,6 +379,10 @@ gmERROR_CODES classify_jm_error(gmJobManager *pjm, gmERROR_CODES guess = gmERR_R
     return guess;
 }
 
+
+
+
+
 size_t gmScheduler::queue_jobs(gmGraph *graph, int exetype){
   
   size_t nrunning=0;
@@ -866,7 +870,7 @@ size_t gmScheduler::queue_jobs(gmGraph *graph, int exetype){
         }
       }
       else{ // recursion mechanism to execute associated code blocks, local actions are also executed in recursive calls by process_curnode()
-        LOGMSG(vblMESS3,"recursively",0);
+        
         //threads[i].state=1; // mark this thread as finished 
         threads[i].state=0; // mark this thread as executing
         threads[i].recursive = true; // mark this thread as executed recursively
@@ -888,31 +892,45 @@ size_t gmScheduler::queue_jobs(gmGraph *graph, int exetype){
           }   
         }*/
 
-        // saving counters
-        int idcount_tmp = sys->idcount;
-        int have_start_node_tmp = sys->have_start_node; 
-
-        sys->rec_level++;
-        try{
-          // argc, argv define the subgraph
-          gridmd_main(sys->_argc+1,myargv); // executes nodes locally
-        }
-        catch(task_finished){} // terminated because maximal node is reached
-        /*if((sys->write_files&gmFILES_LOCAL)){ // moving local links to their destinations
-          for(size_t j=0;j<threads[i].odlinks.size();j++){
-            gmdString filename, destname;
-            bool trg_local = get_odlink_filenames(graph,threads[i].odlinks[j],filename,destname , false);  // simulating nonlocal thread
-            LOGMSG(vblMESS3,fmt("Moving file '%s'->'%s'",(const char *)filename.c_str(),(const char *)destname.c_str()),0);
-            if(gmdCopyFile(filename,destname)){
-              gmdRemoveFile(filename);
-            }
+        if(exetype&gmEXE_THREADS){  // using thread pool
+          LOGMSG(vblMESS3,"using threads",0);
+          if(!threadpool){ // inbitializing threadpool
+            threadpool = new gmdThreadPool;
+ # if USING_GMTHREADS
+            // global gmExpRedirector will take care that each tread works with its own copy of global gmManager
+            threadpool->RegisterRedirector(&gmExpRedirector);
+# endif
           }
-        }*/
-        sys->rec_level--;
+          threads[i].taskid = threadpool->CreateGMMainTask(gridmd_main,sys->_argc+1,myargv);
+        }
+        else{ // direct recursive call
+          LOGMSG(vblMESS3,"recursively",0);
+          // saving counters
+          int idcount_tmp = sys->idcount;
+          int have_start_node_tmp = sys->have_start_node; 
+
+          sys->rec_level++;
+          try{
+            // argc, argv define the subgraph
+            gridmd_main(sys->_argc+1,myargv); // executes nodes locally
+          }
+          catch(task_finished){} // terminated because maximal node is reached
+          /*if((sys->write_files&gmFILES_LOCAL)){ // moving local links to their destinations
+            for(size_t j=0;j<threads[i].odlinks.size();j++){
+              gmdString filename, destname;
+              bool trg_local = get_odlink_filenames(graph,threads[i].odlinks[j],filename,destname , false);  // simulating nonlocal thread
+              LOGMSG(vblMESS3,fmt("Moving file '%s'->'%s'",(const char *)filename.c_str(),(const char *)destname.c_str()),0);
+              if(gmdCopyFile(filename,destname)){
+                gmdRemoveFile(filename);
+              }
+            }
+          }*/
+          sys->rec_level--;
         
-        // restoring
-        sys->idcount = idcount_tmp;
-        sys->have_start_node = have_start_node_tmp; 
+          // restoring
+          sys->idcount = idcount_tmp;
+          sys->have_start_node = have_start_node_tmp; 
+        }
 
         delete [] myargv;
       }
@@ -1092,8 +1110,22 @@ size_t gmScheduler::check_jobs(gmGraph *graph, size_t *pfailed, int thread_id, b
 
     }
     else if(threads[i].state==0 && (threads[i].exetype==gmEXE_LOCAL || threads[i].exetype==gmEXE_SERIAL)){
-      if(threads[i].exetype==gmEXE_LOCAL)
-        threads[i].state=1; // local threads arrive here being actually finished 
+      if(threads[i].exetype==gmEXE_LOCAL){
+        if(threads[i].taskid==GMPOOLTASK_INVALID_ID) // this job was not run as thread from thread pool
+          threads[i].state=1; // in this case local threads arrive here being actually finished 
+        else{ 
+           gmTASK_STATUS status = threadpool->TaskStatus(threads[i].taskid);
+           if(status != gmTASK_FINISHED)
+             continue; // wait till the thread finishes
+           threads[i].state=1; // mark as finished
+           int exit_code = threadpool->TaskResult(threads[i].taskid);
+           if(exit_code!=0){
+             //threads[i].state=2; // failing the thread  (don't)
+             const char *msg = fmt("gmManager.check_jobs: thread job (thread %d) is reported as failed by thread pool (exit code %d)",i,exit_code);
+             LOGMSG(vblWARN,msg,0);  
+           }
+        }    
+      }
       // check the files
       for(size_t j=0;j<threads[i].odlinks.size();j++){ // checking the output files
         int linktype = graph->links[graph->edgeid[threads[i].odlinks[j]]]->GetType();

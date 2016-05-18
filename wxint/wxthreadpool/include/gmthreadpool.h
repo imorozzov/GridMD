@@ -59,7 +59,7 @@ public:
     ///    Possible return values are:\n
     ///    \a gmTASK_POOLED -- task has been queued for processing.\n
     ///    \a gmTASK_PROCESSED -- task is being processed by any of the worker threads.\n
-    ///    \a gmTASK_FINISHES -- task succesfully finished. call gmThreadPool::TaskResult() to
+    ///    \a gmTASK_FINISHED -- task succesfully finished. call gmThreadPool::TaskResult() to
     ///                          get its exit code and destroy it.\n
     ///    \a gmTASK_INVALID_STATUS -- is returned if \a taskID index is not valid (see \ref gmThreadPool::IsValidIndex()).
     ///    \param taskID

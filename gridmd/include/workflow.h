@@ -488,7 +488,8 @@ protected:
     ofstream file;
     file.open(filename);
     wr_flags=flags;
-    write_graphviz(file, graph, vertex_writer(this),edge_writer(this));
+    if(file.is_open())
+      write_graphviz(file, graph, vertex_writer(this),edge_writer(this));
     file.close();
     return 1;
   }
