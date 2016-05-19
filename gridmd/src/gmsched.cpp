@@ -394,7 +394,7 @@ size_t gmScheduler::queue_jobs(gmGraph *graph, int exetype){
     vector< vector<int> > jobset; // subjobs of current thread
     int mynode=-1; // tells whether the last subset is internal (>=0) or external (-1)
     int has_local=0;
-    threads[i].exetype=exetype; 
+    threads[i].exetype = exetype&(~gmEXE_THREADS); 
     string thread_resource;
     string thread_info;   //  Extra job info that can be saved into 'info' file in the working directory
     unsigned thread_nproc=0;     // total number of processes
