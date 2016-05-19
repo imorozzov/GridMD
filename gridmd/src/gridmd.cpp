@@ -297,7 +297,7 @@ gmNODE_STATES gmGetStateId(const string &state){
 gmManager gmExperiment;
 #else
 gmManager gmExpObj;
-gmRedirectorPrototyped<gmManager> gmExpRedirector(gmExpObj);
+gmManRedirector gmExpRedirector(&gmExpObj);
 
 #endif
 

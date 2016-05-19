@@ -902,6 +902,7 @@ size_t gmScheduler::queue_jobs(gmGraph *graph, int exetype){
 # endif
           }
           threads[i].taskid = threadpool->CreateGMMainTask(gridmd_main,sys->_argc+1,myargv);
+          //threadpool->TaskResult(threads[i].taskid);
         }
         else{ // direct recursive call
           LOGMSG(vblMESS3,"recursively",0);

@@ -727,6 +727,7 @@ typedef char **charDoublePtr;
 class gmManager{
   friend class gmScheduler;
 	friend class gmNodeAction;
+  friend class gmManRedirector;
 protected:
   ///<\en name of the current experiment
   string name;
@@ -1785,7 +1786,37 @@ inline int gmManager::link<gmHardLink>(gmSelector from, gmSelector to, int srcpo
 extern gmManager gmExperiment;
 #else
 extern gmManager gmExpObj;
-extern gmRedirectorPrototyped<gmManager> gmExpRedirector;
+
+///\en Class to store a prototype to get it's unique copy
+/// for each of executed \ref gmTask in \ref gmThreadPool.
+class gmManRedirector : public gmRedirector<gmManager>
+{
+//protected: //?
+public:
+    gmManRedirector(gmManager *prototype) :
+        mMainThreadObject(prototype)
+    {;}
+
+    
+    virtual gmManager* GetMainObject() const { return mMainThreadObject; }
+    virtual gmManager* MakeObject() const {
+        gmManager* object  = this->FindObject();
+        if (!object) {
+            object = new gmManager;
+            object->rec_level = 2;  // indicates the correct recursion level (used to throw task_finished on exit)
+            this->mObjectsMap[wxThread::GetCurrentId()] = object;
+        }
+        return object;
+    }
+protected:
+    gmManager* mMainThreadObject;
+
+    friend class gmThreadPool;
+};
+
+
+
+extern gmManRedirector gmExpRedirector;
 
 # define gmExperiment (*(gmExpRedirector.GetObject()))
 

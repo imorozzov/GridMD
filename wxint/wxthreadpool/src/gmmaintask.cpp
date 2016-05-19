@@ -36,6 +36,8 @@ int gmMainTask::Run()
     {
        result = mFuncPtr(mArgc, (char **)mArgv);// gridmd_main allows to modify argv? TODO: make argv const char **!!!
     }
-    catch(const task_finished& ){;}
+    catch(const task_finished& ){
+      ;
+    }
     return result;
 }
