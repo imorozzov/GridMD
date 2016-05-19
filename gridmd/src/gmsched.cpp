@@ -518,7 +518,7 @@ size_t gmScheduler::queue_jobs(gmGraph *graph, int exetype){
     // select resource
     if((exetype&gmEXE_REMOTE) && !resources.size()){
       LOGMSG(vblWARN,"gmManager.queue_jobs: no external resources defined, switching to local execution!",0);
-      exetype &= gmEXE_REMOTE;
+      exetype &= ~gmEXE_REMOTE;
     }
     threads[i].state=0; // execution
     threads[i].resource_id=-1;
