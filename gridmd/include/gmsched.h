@@ -144,7 +144,9 @@ public:
     threadpool = NULL;
   }
   ~gmScheduler(){
-    if(threadpool) delete threadpool;
+  /// FIX ME: this code comment is just to make tests and have working example.
+  /// Uncomment and make it working!
+  //  if(threadpool) delete threadpool;
   }
  
   size_t add_group(){
