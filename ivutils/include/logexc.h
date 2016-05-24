@@ -97,7 +97,8 @@ struct log_exception_traits<enum vbLEVELS>{
 
 
 // format a string
-const char *fmt(const char *format,...);
+extern const char *(*fmt)(const char *format,...);
+const char *_fmt(const char *format,...);
 std::string fmt_s(const char *format,...);
 std::string fmt_va(const char *format, va_list);
 

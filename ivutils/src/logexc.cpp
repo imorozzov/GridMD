@@ -19,7 +19,7 @@ message_logger &message_logger::global(){
 message_logger *message_logger::glogp=NULL;
 stdfile_logger default_log("",0,stdout,stderr,vblALLBAD|vblMESS1,vblFATAL,1);
 
-const char *fmt(const char *format,...){
+const char *_fmt(const char *format,...){
   va_list args;
   va_start(args,format);
   static char buff[1024];
@@ -27,6 +27,9 @@ const char *fmt(const char *format,...){
   va_end(args);
   return buff;
 }
+
+const char *(*fmt)(const char *format,...) = _fmt;
+
 
 std::string fmt_s(const char *format,...)
 {

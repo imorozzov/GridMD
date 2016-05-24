@@ -3,7 +3,7 @@
 #include <cmath>
 #include <iostream>
 
-double integrate(double a, double b, uint32_t nsub, double (*f)(double) )
+double integrate(double a, double b, int nsub, double (*f)(double) )
 {
     double psum = f(a)+f(b);
     double deltaX = (b-a)/nsub;
@@ -19,7 +19,24 @@ double integrate(double a, double b, uint32_t nsub, double (*f)(double) )
 
 using namespace gridmd;
 
-int main(int argc,char* argv[]){
+struct buff_wrap{
+  char buff[1024];
+} mbuff;
+gmRedirectorPrototyped<buff_wrap> fmt_buff_redirector(mbuff);
+
+const char *fmt_multithread(const char *format,...){
+  va_list args;
+  va_start(args,format);
+  buff_wrap *wrap = fmt_buff_redirector.GetObject();
+  vsnprintf(wrap->buff,1024,format,args);
+  va_end(args);
+  return wrap->buff;
+}
+
+  
+ int main(int argc,char* argv[]){
+
+  fmt = fmt_multithread;
 
   std::cout << "Local nodes on Thread pool execution" << std::endl;
 
@@ -80,7 +97,7 @@ int gridmd_main(int argc,char* argv[]){
 
   double a;
   double b;
-  uint32_t nsub;
+  int nsub;
   size_t branchesNum;
 
   if (argc > 4) {
