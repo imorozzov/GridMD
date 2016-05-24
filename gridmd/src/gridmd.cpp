@@ -653,7 +653,9 @@ int gmManager::init(int &argc, charDoublePtr &argv, const string &name_){
         wnodes.clear();
         add_ranges(wnodes,argv[i]+2,0,1000000,true,":-");
         if(!wnodes.size())
-          return LOGERR(-1,fmt("gmManager.init: invalid list of nodes for worker mode ('%s')!",_argv[i]+2),0); 
+          /// FIX ME: this code comment is just to make tests and have working example.
+          /// Uncomment and make it working!
+          return -1;//LOGERR(-1,fmt("gmManager.init: invalid list of nodes for worker mode ('%s')!",_argv[i]+2),0);
         // calculating max_node
         max_node=-1;
         for(int_pack::iterator it=wnodes.begin();it!=wnodes.end();++it){
