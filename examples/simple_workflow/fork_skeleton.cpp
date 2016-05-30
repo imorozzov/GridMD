@@ -83,11 +83,11 @@ int gridmd_main(int argc,char* argv[]){
   // Set the execution mode
   //gmExperiment.set_execution(gmEXE_SERIAL);  // Serial execution where the GridMD calls are ignored
   //gmExperiment.set_execution(gmEXE_CONSTRUCT_ONLY);  // Construction of the execution graph
-  gmExperiment.set_execution(gmEXE_LOCAL);  // Construction of the execution graph and/or
+  //gmExperiment.set_execution(gmEXE_LOCAL);  // Construction of the execution graph and/or
                                             // execution of the selected (all) nodes on the local host
   //gmExperiment.set_execution(gmEXE_REMOTE); // Construction and execution on the remote system(s).
   //                                          // Please set up resources as explained below.
- //gmExperiment.set_execution(gmEXE_THREADS|gmEXE_LOCAL);
+ gmExperiment.set_execution(gmEXE_THREADS|gmEXE_LOCAL);
   // Information about external applications, available resource managers and
   // accounts on the remote systems can be stored to XML file (see template in
   // resources.xml). YOU MUST EDIT THIS FILE and specify the appropriate data

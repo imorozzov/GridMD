@@ -76,7 +76,7 @@ int gridmd_main(int argc,char* argv[]){
 
   double a = 0;
   double b  = 200*M_PI;
-  unsigned long nsub = 1E8;
+  unsigned long nsub = 1E9;
   size_t branchesNum = 8;
   double result = 0;
 
