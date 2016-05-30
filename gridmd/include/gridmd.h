@@ -1652,9 +1652,11 @@ protected:
       FILE *f=fopen((const char *)it->first.c_str(),"wb");
       if(!f)
         LOGMSG(vblWARN,fmt("gmManager.dump_data: can't open the file '%s' for writing, link data skipped!",(const char *)it->first.c_str()),0);
-      else if(!it->second->Dump(f))
-        LOGMSG(vblWARN,fmt("gmManager.dump_data: dumping data to the file '%s' failed, link data skipped!",(const char *)it->first.c_str()),0);
-      fclose(f);
+      else {
+        if(!it->second->Dump(f))
+          LOGMSG(vblWARN,fmt("gmManager.dump_data: dumping data to the file '%s' failed, link data skipped!",(const char *)it->first.c_str()),0);
+        fclose(f);
+      }
     }
   }
   int _mark_node(const string &name); 

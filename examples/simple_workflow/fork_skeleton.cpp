@@ -50,7 +50,9 @@ int main(int argc,char* argv[]){
   // All distributed code should be put into gridmd_main() function
   int res= gridmd_main(argc, argv);
 
-  gmdUninitialize();
+  /// FIX ME: this code comment is just to make tests and have working example.
+  /// Uncomment and make it working!
+  //gmdUninitialize();
   return res;
 }
 
@@ -83,11 +85,11 @@ int gridmd_main(int argc,char* argv[]){
   // Set the execution mode
   //gmExperiment.set_execution(gmEXE_SERIAL);  // Serial execution where the GridMD calls are ignored
   //gmExperiment.set_execution(gmEXE_CONSTRUCT_ONLY);  // Construction of the execution graph
-  //gmExperiment.set_execution(gmEXE_LOCAL);  // Construction of the execution graph and/or
+  gmExperiment.set_execution(gmEXE_THREADS|gmEXE_LOCAL);  // Construction of the execution graph and/or
                                             // execution of the selected (all) nodes on the local host
   //gmExperiment.set_execution(gmEXE_REMOTE); // Construction and execution on the remote system(s).
   //                                          // Please set up resources as explained below.
- gmExperiment.set_execution(gmEXE_THREADS|gmEXE_LOCAL);
+ //gmExperiment.set_execution(gmEXE_THREADS|gmEXE_LOCAL);
   // Information about external applications, available resource managers and
   // accounts on the remote systems can be stored to XML file (see template in
   // resources.xml). YOU MUST EDIT THIS FILE and specify the appropriate data
@@ -104,7 +106,7 @@ int gridmd_main(int argc,char* argv[]){
   typedef double arg_t;   // argument type
   typedef double value_t; // result type
   arg_t x = 1.0;          // argument value for exp(x)
-  int nterms = 100;     // number of terms in the series
+  int nterms = 3;     // number of terms in the series
   int i, fact = 1;
   value_t sum = 0;
 
