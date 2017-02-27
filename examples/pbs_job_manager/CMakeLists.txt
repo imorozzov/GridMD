@@ -6,8 +6,8 @@ if(WIN32)
   add_executable(pbs_plink2 pbs_plink2.cpp)
   target_link_libraries(pbs_plink2 gridmd)
   
-  add_executable(pbs_shellSsh pbs_shellSsh.cpp)
-  target_link_libraries(pbs_shellSsh gridmd)
+  add_executable(pbs_ssh pbs_ssh.cpp)
+  target_link_libraries(pbs_ssh gridmd)
 endif(WIN32)
 
 if(UNIX)
