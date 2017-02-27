@@ -1,7 +1,7 @@
 /*****************************************************************************
 GridMD class library
 Example for PBS Job Manager and gmShellLibssh communication protocol:
-working with multiple jobs
+working with multiple jobs, bash, bc, head, awk
 
 Copyright (c) 2017 Igor Morozov, Ilya Valuev, Evgenia Vdovina 
 
@@ -38,13 +38,13 @@ int main(int argc, char *argv[])
 		message_logger::global().set_levels(vblALL, vblERR);
 		gmBShManager mngr(shell);
 		
-		int power = 1; // степень, в которую нужно возвести экспоненту
-		int n = 20; // сколько членов ряда нужно считать
+		int power = 1; // e ^ power
+		int n = 20; // how many members of range we need to calc
 
 		for (int i = 0; i < n; i++) {
 			gmJob* job = mngr.CreateJob();
 			job->command = gmdString::Format("power=%d^%d; fact=$(echo \"define f(x) {if (x>1){return x*f(x-1)};return 1} f(%d)\" | bc); echo \"$power / $fact\" | bc -l > res.txt ", 
-				power, i, i); // вычисляем каждый член ряда по отдельности
+				power, i, i); // calc one of members of range
 			job->AddOutFile(gmdString::Format("out\\test_out%d.txt", i), "STDOUT");
 			job->AddOutFile(gmdString::Format("out\\test_err%d.txt", i), "STDERR");
 			res = job->Submit(mngr, gmdString::Format("%d", i), false);
@@ -56,7 +56,7 @@ int main(int argc, char *argv[])
 		puts(jobCalc->GetWorkDir());
 		jobCalc->AddOutFile(gmdString::Format("out\\test_out.txt"), "STDOUT");
 		jobCalc->AddOutFile(gmdString::Format("out\\test_err.txt"), "STDERR"); 
-		jobCalc->command = gmdString::Format("cd ../.. ;  head -n 1 job-*/work/res.txt | awk '{s+=$1} END {printf \"%%.20f\", s}'"); // суммируем полученные результаты
+		jobCalc->command = gmdString::Format("cd ../.. ;  head -n 1 job-*/work/res.txt | awk '{s+=$1} END {printf \"%%.20f\", s}'"); // sum previous calcs
 		
 		res = jobCalc->Submit();
 		res = jobCalc->FetchResult();
