@@ -28,7 +28,7 @@ int main(int argc, char *argv[])
 	try {
 		int res;
 
-		// Error handling class message_logger contains definitions
+    // Error handling class message_logger contains definitions
 		// of errors, warnings and messages. Errors (vblOERR level) occur in
 		// the case of incorrect input parameters of library functions,
 		// incorrect function call sequence, impossibility to access the
