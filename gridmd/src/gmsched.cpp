@@ -560,11 +560,11 @@ size_t gmScheduler::queue_jobs(gmGraph *graph, int exetype){
       bool failed_link=false;
       int linktype = graph->links[graph->edgeid[threads[i].idlinks[j]]]->GetType();
       gmdString filename, destname, filename2;
-      bool thread_local = (threads[i].exetype==gmEXE_LOCAL || threads[i].exetype==gmEXE_SERIAL); //threads[i].recursive
-      if(thread_local && (linktype&gmLINK_DATA) && !(sys->write_files&gmFILES_LOCAL)) // in this case files are not used for data links
+      bool thread_local_ = (threads[i].exetype==gmEXE_LOCAL || threads[i].exetype==gmEXE_SERIAL); //threads[i].recursive
+      if(thread_local_ && (linktype&gmLINK_DATA) && !(sys->write_files&gmFILES_LOCAL)) // in this case files are not used for data links
         continue; // don't check
 
-      bool trg_local = get_idlink_filenames(graph,threads[i].idlinks[j],filename,destname,filename2,thread_local);
+      bool trg_local = get_idlink_filenames(graph,threads[i].idlinks[j],filename,destname,filename2,thread_local_);
       if(trg_local)  // should have arrived to local filename, otherwise should be accessible by (modified) filename
         filename=destname; 
       
@@ -579,7 +579,7 @@ size_t gmScheduler::queue_jobs(gmGraph *graph, int exetype){
               failed_link=true;
             else{
               LOGMSG(vblWARN,fmt("gmManager.queue_jobs: file '%s' is found in alternative location '%s', node locality changed?\n",(const char *)filename.c_str(), (const char *)filename2.c_str()),0);
-              if(thread_local) // correcting the local placement
+              if(thread_local_) // correcting the local placement
                 filename = destname; 
               // need to copy
               LOGMSG(vblMESS3,fmt("Copying file '%s'->'%s'",(const char *)filename2.c_str(),(const char *)filename.c_str()),0);
@@ -626,10 +626,10 @@ size_t gmScheduler::queue_jobs(gmGraph *graph, int exetype){
     // check that we have where to copy output to
     for(size_t j=0;j<threads[i].odlinks.size();j++){
       gmdString filename, destname;
-      bool thread_local = (threads[i].exetype==gmEXE_LOCAL || threads[i].exetype==gmEXE_SERIAL); //threads[i].recursive
-      bool trg_local = get_odlink_filenames(graph,threads[i].odlinks[j],filename,destname , thread_local);       
+      bool thread_local_ = (threads[i].exetype==gmEXE_LOCAL || threads[i].exetype==gmEXE_SERIAL); //threads[i].recursive
+      bool trg_local = get_odlink_filenames(graph,threads[i].odlinks[j],filename,destname , thread_local_);       
       // check directory tree 
-      if((trg_local||thread_local) && !check_or_create_dir(destname)){
+      if((trg_local||thread_local_) && !check_or_create_dir(destname)){
         const char *msg = fmt("gmManager.prepare_links: can't create path for link '%s' that has to be produced by node %d, marking the node as failed",(const char *)destname.c_str(),source(threads[i].odlinks[j],graph->g));
         LOGMSG(vblWARN,msg,0);
         threads[i].state=5; // thread cancelled
@@ -1101,8 +1101,8 @@ size_t gmScheduler::check_jobs(gmGraph *graph, size_t *pfailed, int thread_id, b
           continue; 
         
         gmdString filename, destname;
-        bool thread_local = (threads[i].exetype==gmEXE_LOCAL || threads[i].exetype==gmEXE_SERIAL); //threads[i].recursive
-        bool trg_local=get_odlink_filenames(graph,threads[i].odlinks[j],filename,destname,thread_local);
+        bool thread_local_ = (threads[i].exetype==gmEXE_LOCAL || threads[i].exetype==gmEXE_SERIAL); //threads[i].recursive
+        bool trg_local=get_odlink_filenames(graph,threads[i].odlinks[j],filename,destname,thread_local_);
         bool failed_link=false;
         if(!(linktype&gmLINK_OPTDATA)){// don't check wildcards and optional files
           if(!gmdFileExists(filename)){
@@ -1110,7 +1110,7 @@ size_t gmScheduler::check_jobs(gmGraph *graph, size_t *pfailed, int thread_id, b
             LOGMSG(vblWARN,fmt("gmManager.check_jobs: missing output file '%s' of thread %d",(const char *)filename.c_str(),i),0);
           }
         }
-        if( (trg_local||thread_local) && !failed_link && filename!=destname){ // need to copy
+        if( (trg_local||thread_local_) && !failed_link && filename!=destname){ // need to copy
           LOGMSG(vblMESS3,fmt("Copying file '%s'->'%s'",(const char *)filename.c_str(),(const char *)destname.c_str()),0);
           int flags = gmJob::CREATEPATH;
           if(is_dirname(destname))
