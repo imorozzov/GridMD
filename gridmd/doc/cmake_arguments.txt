@@ -1,0 +1,4 @@
+Server nwo2.ihed.ras.ru
+
+cmake -D BOOST_ROOT=/opt/boost_1_53_0 -D wxWidgets_CONFIG_EXECUTABLE=/opt/wxWidgets-2.8.12/bin/wx-config -D USE_WXWIDGETS=ON -D BUILD_SIMPLEWORKFLOW=OFF -D CMAKE_CXX_FLAGS=-std=gnu++0x ..
+
